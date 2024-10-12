@@ -1,0 +1,14 @@
+# Ignore PyCharm project files
+.idea/
+
+# Ignore Python virtual environments
+venv/
+__pycache__/
+*.pyc
+
+# Ignore Jupyter Notebook checkpoints (if you're using notebooks)
+.ipynb_checkpoints/
+
+# Ignore system files (macOS, Linux, Windows)
+.DS_Store
+Thumbs.db
