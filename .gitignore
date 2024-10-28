@@ -12,3 +12,6 @@ __pycache__/
 # Ignore system files (macOS, Linux, Windows)
 .DS_Store
 Thumbs.db
+build
+dist
+*.egg-info
