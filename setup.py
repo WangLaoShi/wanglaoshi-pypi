@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.0.2'
+about['__version__'] = '0.0.5'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
@@ -21,6 +21,8 @@ class UploadCommand(Command):
         pass
 
     def run(self):
+        self.status('Clean build,dist,wanglaoshi.egg-info directory …')
+        os.system('rm -rf ./build ./dist ./*.egg-info')
         self.status('Building Source and Wheel distribution…')
         os.system('{0} setup.py sdist bdist_wheel'.format(sys.executable))
 
@@ -29,6 +31,8 @@ class UploadCommand(Command):
 
         self.status('Pushing git tags…')
         os.system('git tag v{0}'.format(about['__version__']))
+        os.system('git add .')
+        os.system('git commit -m v{0} .'.format(about['__version__']))
         os.system('git push --tags')
         sys.exit()
 

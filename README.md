@@ -17,6 +17,9 @@ WangLaoShi
 
 - 0.0.1 初始化版本，项目开始
 - 0.0.2 增加列表输出
+- 0.0.3 增加字典输出,使用 Rich 输出
+- 0.0.4 实现 JupyterNotebook 环境创建
+- 0.0.5 增加几个有用的库
 
 ## 安装方式
 
@@ -28,3 +31,7 @@ WangLaoShi
 * 安装完成
 
 2. pip安装方式
+
+```shell
+pip install wanglaoshi
+```
