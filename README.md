@@ -20,6 +20,7 @@ WangLaoShi
 - 0.0.3 增加字典输出,使用 Rich 输出
 - 0.0.4 实现 JupyterNotebook 环境创建
 - 0.0.5 增加几个有用的库
+- 0.0.6 修改获取 version 的方法
 
 ## 安装方式
 

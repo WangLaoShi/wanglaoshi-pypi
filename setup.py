@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.0.5'
+about['__version__'] = '0.0.6'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
@@ -55,7 +55,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.6',  # Python 版本要求
+    python_requires='>=3.8',  # Python 版本要求
     cmdclass={
         'upload': UploadCommand,
     }

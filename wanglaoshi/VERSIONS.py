@@ -14,7 +14,7 @@ ml_dl_libraries = {
         "description": "数据处理与操作",
         "category": "数据处理与可视化"
     },
-    "sklearn": {
+    "scikit-learn": {
         "url": "https://scikit-learn.org/",
         "description": "scikit-learn 经典的机器学习库",
         "category": "机器学习"
@@ -166,8 +166,8 @@ def check_versions(libraries=ml_dl_libraries):
     versions = {}
     for lib in libraries.keys():
         try:
-            module = importlib.import_module(lib)
-            lib_version = version(lib)
+            # module = importlib.import_module(lib)
+            lib_version = importlib.metadata.version(lib)
             versions[lib] = lib_version
         except PackageNotFoundError:
             versions[lib] = 'Not installed'
