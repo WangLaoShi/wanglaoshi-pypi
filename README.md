@@ -21,6 +21,7 @@ WangLaoShi
 - 0.0.4 实现 JupyterNotebook 环境创建
 - 0.0.5 增加几个有用的库
 - 0.0.6 修改获取 version 的方法
+- 0.0.7 增加获取当前安装包的版本号，增加获取当前每一个安装包最新版本的方法
 
 ## 安装方式
 
@@ -35,4 +36,31 @@ WangLaoShi
 
 ```shell
 pip install wanglaoshi
+```
+
+## 使用方法
+
+1. 创建新的环境
+    
+```python
+from wanglaoshi import JupyterEnv as JE
+JE.jupyter_kernel_list()
+JE.install_kernel()
+# 按照提示输入环境名称
+```
+2. 获取当前环境常用库版本
+    
+```python
+from wanglaoshi import VERSIONS as V
+V.check_all_versions()
+```
+3. 获取当前环境所有库
+```python
+from wanglaoshi import VERSIONS as V
+V.check_all_installed()
+```
+4. 获取当前环境所有库最新版本
+```python
+from wanglaoshi import VERSIONS as V
+V.check_all_installed_with_latest()
 ```

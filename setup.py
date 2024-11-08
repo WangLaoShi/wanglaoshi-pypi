@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.0.6'
+about['__version__'] = '0.0.7'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
@@ -41,7 +41,8 @@ setup(
     version=about['__version__'],  # 版本号
     packages=find_packages(),  # 自动找到所有模块
     install_requires=[         # 依赖的库
-        'rich'
+        'rich',
+        'requests',
         # 在这里列出其他依赖的库
     ],
     author='WangLaoShi',  # 作者
