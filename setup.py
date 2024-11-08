@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.0.7'
+about['__version__'] = '0.0.8'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
@@ -43,6 +43,12 @@ setup(
     install_requires=[         # 依赖的库
         'rich',
         'requests',
+        'pandas',
+        'numpy',
+        'matplotlib',
+        'seaborn',
+        'scipy',
+        'missingno',
         # 在这里列出其他依赖的库
     ],
     author='WangLaoShi',  # 作者

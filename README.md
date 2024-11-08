@@ -22,6 +22,7 @@ WangLaoShi
 - 0.0.5 增加几个有用的库
 - 0.0.6 修改获取 version 的方法
 - 0.0.7 增加获取当前安装包的版本号，增加获取当前每一个安装包最新版本的方法
+- 0.0.8 增加对数据文件的基本分析的部分
 
 ## 安装方式
 
@@ -64,3 +65,9 @@ V.check_all_installed()
 from wanglaoshi import VERSIONS as V
 V.check_all_installed_with_latest()
 ```
+
+## 建议的版本对照关系
+
+1. numpy https://numpy.org/news/
+2. pandas https://pandas.pydata.org/pandas-docs/stable/whatsnew/index.html
+3. sklearn https://scikit-learn.org/stable/whats_new.html
