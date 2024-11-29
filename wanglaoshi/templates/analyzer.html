@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analysis Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="app" class="flex min-h-screen">
+        <div class="w-1/6 bg-gray-100 border-r border-gray-300">
+            <div class="p-4 text-xl font-bold">🌎数据分析显示仪</div>
+            <ul class="space-y-2 p-4">
+                <li
+                        v-for="menu in menus"
+                        :key="menu.key"
+                        class="cursor-pointer hover:bg-gray-200 p-2 rounded"
+                        @click="selectMenu(menu.key)">
+                    {{ '{{' }} menu.label {{ '}}' }}
+                </li>
+            </ul>
+        </div>
+        <div class="flex-1 p-4">
+            <h1 class="text-2xl font-bold mb-4">{{ '{{' }} selectedLabel {{ '}}' }}</h1>
+            <!-- Content -->
+            <!--
+                1. 遍历 menus 中的 key，根据 key 的值显示不同的内容
+                2. 拿到 tables 中的数据，根据 key 得到当前应该是普通显示还是表格显示
+                3. 如果是表格显示，遍历数据，得到要输出的表格格式
+                4. 如果是普通显示，直接输出数据
+            -->
+            <!-- Contend -->
+            {% for menu in menus %}
+                {% set tk = tables[menu.key]['type'] %}
+                {% set cls = tables[menu.key]['columns'] %}
+                <div v-if="selectedKey === '{{ menu.key }}'">
+                    {% if tk=='String' %}
+                        <pre>{{ '{{' }} data.{{ menu.key }} {{ '}}' }}</pre>
+                    {% elif tk=='Table' %}
+                        <table class="table-auto w-full border-collapse border border-gray-400">
+                            <thead>
+                                <tr>
+                                    {% for c in cls %}
+                                        <th class="border border-gray-300 p-2">{{c}}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="row in data.{{ menu.key }}" :key="row[0]">
+                                    {% for i in range(tables[menu.key]['columns']|length) %}
+                                        <td class="border border-gray-300 p-2"> {{ '{{' }} row[{{i}}] {{ '}}' }} </td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% elif tk=='Plot' %}
+                        <div class="grid grid-cols-2 gap-4">
+                            <img v-for="plot in data.plots"
+                                 :src="'data:image/png;base64,' + plot"
+                                 :key="plot"
+                                 class="border border-gray-300 rounded" />
+                        </div>
+                    {% else %}
+                        <div v-else>
+                            <p>选择一个选项以显示内容。</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    menus: {{ menus }},
+                    data: {{ data }},
+                    selectedKey: "basic_info",
+                    selectedLabel: "基本信息"
+                };
+            },
+            methods: {
+                selectMenu(key) {
+                    this.selectedKey = key;
+                    const menu = this.menus.find((item) => item.key === key);
+                    this.selectedLabel = menu ? menu.label : "";
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>

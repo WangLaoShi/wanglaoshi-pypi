@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.0.8'
+about['__version__'] = '0.0.9'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
@@ -49,6 +49,7 @@ setup(
         'seaborn',
         'scipy',
         'missingno',
+        'jinja2',
         # 在这里列出其他依赖的库
     ],
     author='WangLaoShi',  # 作者

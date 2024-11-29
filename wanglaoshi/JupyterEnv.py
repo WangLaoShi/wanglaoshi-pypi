@@ -27,6 +27,7 @@ def running_os():
         return 'MacOS'
     else:
         return 'Unknown'
+
 def running_python_version():
     """
     Return the running Python version.
