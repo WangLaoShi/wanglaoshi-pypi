@@ -66,6 +66,19 @@ V.check_all_installed()
 from wanglaoshi import VERSIONS as V
 V.check_all_installed_with_latest()
 ```
+5. 得到一个数据文件的基本的分析页面
+
+```python
+from wanglaoshi import Analyzer as A
+A.analyze_data_to_html('data.csv')
+```
+
+如果不需要 HTML 页面也可以使用下面的方法
+
+```python
+from wanglaoshi import Analyzer_Plain as A
+A.analyze_data('data.csv')
+```
 
 ## 建议的版本对照关系
 
