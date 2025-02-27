@@ -1,3 +1,4 @@
+import matplotlib
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import sys
@@ -58,6 +59,22 @@ def simhei():
     downloader = Wget(
         url='https://gitee.com/lincoln/fonts/raw/master/SimHei.ttf',
         output_dir='.',
-        filename='simhei.ttf',
+        filename='SimHei.ttf',
     )
     downloader.download()
+
+def matplotlib_font_init(show_demo = False):
+    # 判断，同级文件夹下是否存在 SimHei.ttf 文件，如果没有，执行 simhei() 函数下载
+    if not os.path.exists('./SimHei.ttf'):
+        simhei()
+    # 设置中文字体和样式
+    matplotlib.font_manager.fontManager.addfont('./SimHei.ttf')
+    matplotlib.rc('font', family='SimHei')
+    # plt.rcParams['font.sans-serif'] = ['simhei']
+    plt.rcParams['axes.unicode_minus'] = False
+
+    # 测试显示
+    if show_demo == True:
+        plt.figure(figsize=(8, 6))
+        plt.text(0.5, 0.5, '这是中文测试', fontsize=20)
+        plt.show()

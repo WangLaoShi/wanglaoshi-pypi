@@ -102,7 +102,7 @@ JE.no_warning()
 使用方法：
 
 ```python
-from wget import Wget
+from WebGetter import Wget
 
 # 创建下载器实例
 downloader = Wget(
@@ -113,6 +113,14 @@ downloader = Wget(
 
 # 开始下载
 downloader.download()
+```
+
+## 8. 字体安装
+
+```python
+# 这里用的是 SimHei 字体，可以根据自己的需要更改
+from wanglaoshi import JupyterFont as JF
+JF.matplotlib_font_init()
 ```
 
 ## 建议的版本对照关系
