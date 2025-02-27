@@ -24,17 +24,18 @@ WangLaoShi
 - 0.0.7 增加获取当前安装包的版本号，增加获取当前每一个安装包最新版本的方法
 - 0.0.8 增加对数据文件的基本分析的部分
 - 0.0.9 增加 jinja2 的模板输出的 Analyzer
+- 0.10.0 增加 no_waring,字体获取，安装字体
 
 ## 安装方式
 
-1. 源码安装方式
+### 1. 源码安装方式
 
 * 检出项目
 * 进入项目目录
 * 执行`python setup.py install`
 * 安装完成
 
-2. pip安装方式
+### 2. pip安装方式
 
 ```shell
 pip install wanglaoshi
@@ -42,7 +43,7 @@ pip install wanglaoshi
 
 ## 使用方法
 
-1. 创建新的环境
+### 1. 创建新的环境
     
 ```python
 from wanglaoshi import JupyterEnv as JE
@@ -50,23 +51,26 @@ JE.jupyter_kernel_list()
 JE.install_kernel()
 # 按照提示输入环境名称
 ```
-2. 获取当前环境常用库版本
+### 2. 获取当前环境常用库版本
     
 ```python
 from wanglaoshi import VERSIONS as V
 V.check_all_versions()
 ```
-3. 获取当前环境所有库
+### 3. 获取当前环境所有库
+
 ```python
 from wanglaoshi import VERSIONS as V
 V.check_all_installed()
 ```
-4. 获取当前环境所有库最新版本
+### 4. 获取当前环境所有库最新版本
+
 ```python
 from wanglaoshi import VERSIONS as V
 V.check_all_installed_with_latest()
 ```
-5. 得到一个数据文件的基本的分析页面
+
+### 5. 得到一个数据文件的基本的分析页面
 
 ```python
 from wanglaoshi import Analyzer as A
@@ -78,6 +82,37 @@ A.analyze_data_to_html('data.csv')
 ```python
 from wanglaoshi import Analyzer_Plain as A
 A.analyze_data('data.csv')
+```
+
+### 6. 取消错误输出
+
+```python
+from wanglaoshi import JupyterEnv as JE
+JE.no_warning()
+```
+
+### 7. Wget 功能
+
+基本功能：
+ - 支持从 URL 下载文件
+ - 自动从 URL 提取文件名
+ - 支持指定输出目录和自定义文件名
+ - 显示下载进度条
+
+使用方法：
+
+```python
+from wget import Wget
+
+# 创建下载器实例
+downloader = Wget(
+    url='https://example.com/file.zip',
+    output_dir='./downloads',
+    filename='custom_name.zip'
+)
+
+# 开始下载
+downloader.download()
 ```
 
 ## 建议的版本对照关系

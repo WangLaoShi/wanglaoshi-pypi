@@ -89,3 +89,7 @@ def install_kernel():
     kernel_name = input("Please input the kernel name:")
     kernel_display_name = input("Please input the kernel display name:")
     run_cmd(python_path + ' -m ipykernel install --user --name=' + kernel_name + ' --display-name=' + kernel_display_name)
+
+def no_warning():
+    import warnings
+    warnings.filterwarnings('ignore')
