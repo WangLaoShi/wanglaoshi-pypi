@@ -1,6 +1,9 @@
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
-import numpy as np
+import sys
+import os
+# Add the directory containing WebGetter.py to the Python path
+sys.path.append(os.path.dirname(__file__))
 from WebGetter import Wget
 
 def is_chinese_font(font_path):
