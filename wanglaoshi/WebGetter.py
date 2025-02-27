@@ -59,19 +59,19 @@ class Wget:
             return False
 
 
-def main():
-    """主函数"""
-    if len(sys.argv) < 2:
-        print("使用方法: python wget.py <URL> [输出目录] [文件名]")
-        sys.exit(1)
-
-    url = sys.argv[1]
-    output_dir = sys.argv[2] if len(sys.argv) > 2 else '.'
-    filename = sys.argv[3] if len(sys.argv) > 3 else None
-
-    downloader = Wget(url, output_dir, filename)
-    downloader.download()
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     """主函数"""
+#     if len(sys.argv) < 2:
+#         print("使用方法: python wget.py <URL> [输出目录] [文件名]")
+#         sys.exit(1)
+#
+#     url = sys.argv[1]
+#     output_dir = sys.argv[2] if len(sys.argv) > 2 else '.'
+#     filename = sys.argv[3] if len(sys.argv) > 3 else None
+#
+#     downloader = Wget(url, output_dir, filename)
+#     downloader.download()
+#
+#
+# if __name__ == "__main__":
+#     main()

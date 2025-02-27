@@ -1,6 +1,7 @@
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import numpy as np
+from WebGetter import Wget
 
 def is_chinese_font(font_path):
     """测试字体是否支持中文"""
@@ -50,8 +51,6 @@ def fonts(show_demo = False):
         plt.show()
 
 def simhei():
-    from Wget import Wget
-
     # 创建下载器实例
     downloader = Wget(
         url='https://gitee.com/lincoln/fonts/raw/master/SimHei.ttf',
