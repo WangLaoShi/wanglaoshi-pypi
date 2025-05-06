@@ -17,6 +17,7 @@ from scipy.stats import skew, kurtosis, zscore, chi2_contingency, normaltest, sh
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import LabelEncoder
 
 # 设置中文字体
 rcParams['font.sans-serif'] = ['SimHei']
@@ -201,25 +202,48 @@ class DataAnalyzer:
     # ==================== 高级统计分析 ====================
     def correlation_analysis(self) -> pd.DataFrame:
         """相关性分析"""
-        corr_matrix = self.df.corr()
+        # 创建数据副本
+        df_corr = self.df.copy()
+        
+        # 对分类变量进行编码
+        for col in self.categorical_cols:
+            df_corr[col] = LabelEncoder().fit_transform(df_corr[col])
+            
+        # 计算相关性
+        corr_matrix = df_corr.corr()
         return corr_matrix
 
     def multicollinearity_analysis(self) -> pd.DataFrame:
         """多重共线性分析"""
+        # 创建数据副本
+        df_vif = self.df.copy()
+        
+        # 对分类变量进行编码
+        for col in self.categorical_cols:
+            df_vif[col] = LabelEncoder().fit_transform(df_vif[col])
+            
+        # 计算VIF
         vif_data = pd.DataFrame()
-        vif_data["列名"] = self.numeric_cols
-        vif_data["VIF"] = [variance_inflation_factor(self.df[self.numeric_cols].values, i) 
-                          for i in range(len(self.numeric_cols))]
+        vif_data["列名"] = df_vif.columns
+        vif_data["VIF"] = [variance_inflation_factor(df_vif.values, i) 
+                          for i in range(len(df_vif.columns))]
         return vif_data
 
     def pca_analysis(self) -> Dict[str, Any]:
         """主成分分析"""
-        if len(self.numeric_cols) < 2:
-            return {"error": "需要至少两个数值型变量进行PCA分析"}
+        # 创建数据副本
+        df_pca = self.df.copy()
+        
+        # 对分类变量进行编码
+        for col in self.categorical_cols:
+            df_pca[col] = LabelEncoder().fit_transform(df_pca[col])
+            
+        if len(df_pca.columns) < 2:
+            return {"error": "需要至少两个变量进行PCA分析"}
             
         # 标准化数据
         scaler = StandardScaler()
-        scaled_data = scaler.fit_transform(self.df[self.numeric_cols])
+        scaled_data = scaler.fit_transform(df_pca)
         
         # 执行PCA
         pca = PCA()
@@ -229,7 +253,7 @@ class DataAnalyzer:
         cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
         
         return {
-            "主成分数量": len(self.numeric_cols),
+            "主成分数量": len(df_pca.columns),
             "各主成分方差贡献率": pca.explained_variance_ratio_,
             "累计方差贡献率": cumulative_variance,
             "建议保留主成分数量": np.argmax(cumulative_variance >= 0.95) + 1

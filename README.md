@@ -179,7 +179,7 @@ A.analyze_multiple_files('test_data', output_dir='reports')
 - `tips_report.html`：餐厅小费数据集的分析报告
 - `iris_report.html`：鸢尾花数据集的分析报告
 
-## 10. MLDL
+## 10. MLDL (单独安装 torch，pip install torch)
 
 ```python
 """使用示例"""
