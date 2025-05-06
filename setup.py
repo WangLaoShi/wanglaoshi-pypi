@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.10.4'
+about['__version__'] = '0.10.5'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
