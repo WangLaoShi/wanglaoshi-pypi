@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.10.8'
+about['__version__'] = '0.10.9'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
@@ -34,6 +34,7 @@ class UploadCommand(Command):
         os.system('git add .')
         os.system('git commit -m v{0} .'.format(about['__version__']))
         os.system('git push --tags')
+        os.system('git push')
         sys.exit()
 
 setup(
