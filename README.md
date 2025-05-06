@@ -27,6 +27,7 @@ WangLaoShi
 - 0.10.0 增加 no_waring,字体获取，安装字体
 - 0.10.6 增加 Analyzer 的使用部分(需要 statsmodels)
 - 0.10.7 增加 MLDL 部分(需要 sklearn,torch)
+- 0.10.10 增加分析结果 Render notebook 部分
 
 ## 安装方式
 
@@ -215,6 +216,25 @@ dl_model.train(X_tensor, y_tensor, epochs=100)
 evaluator = ModelEvaluator()
 y_pred = ml_model.predict(X)
 evaluator.plot_confusion_matrix(y, y_pred)
+```
+
+## 11. render notebook
+
+```python
+# 方法1：使用工具函数
+from wanglaoshi import analyze_notebook
+import pandas as pd
+
+df = pd.read_csv('your_data.csv')
+analyze_notebook(df)
+
+# 方法2：使用类方法
+from wanglaoshi import DataAnalyzer
+import pandas as pd
+
+df = pd.read_csv('your_data.csv')
+analyzer = DataAnalyzer(df)
+analyzer.analyze_notebook()
 ```
 
 

@@ -1,95 +1,382 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Analysis Report</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>数据分析报告</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .section.rendered {
+            opacity: 1;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .plot {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .plot img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .interpretation {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .interpretation h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .interpretation h4 {
+            color: #34495e;
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+        
+        .interpretation h5 {
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        
+        .interpretation p {
+            line-height: 1.6;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .interpretation ul {
+            list-style-type: none;
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        
+        .interpretation li {
+            margin: 8px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-left: 3px solid #3498db;
+            border-radius: 0 4px 4px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .interpretation li strong {
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        .interpretation .sample {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        
+        .interpretation strong {
+            color: #e74c3c;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            padding: 10px;
+            background: #fde8e8;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .rendered {
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        #debug-panel {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow: auto;
+            display: none;
+        }
+        #debug-toggle {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .dataset-name {
+            color: #3498db;
+            font-size: 1.5em;
+            margin: 10px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+    </style>
 </head>
 <body>
-    <div id="app" class="flex min-h-screen">
-        <div class="w-1/6 bg-gray-100 border-r border-gray-300">
-            <div class="p-4 text-xl font-bold">🌎数据分析显示仪</div>
-            <ul class="space-y-2 p-4">
-                <li
-                        v-for="menu in menus"
-                        :key="menu.key"
-                        class="cursor-pointer hover:bg-gray-200 p-2 rounded"
-                        @click="selectMenu(menu.key)">
-                    {{ '{{' }} menu.label {{ '}}' }}
-                </li>
-            </ul>
+    <!-- 加载指示器 -->
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在加载报告...</div>
+    </div>
+
+    <div class="container">
+        <h1>数据分析报告</h1>
+        <h2 id="dataset-name" class="dataset-name"></h2>
+        <p class="timestamp">生成时间：{{ timestamp }}</p>
+
+        <!-- 基本信息 -->
+        <div class="section">
+            <h2>基本信息</h2>
+            <div id="basic-info"></div>
         </div>
-        <div class="flex-1 p-4">
-            <h1 class="text-2xl font-bold mb-4">{{ '{{' }} selectedLabel {{ '}}' }}</h1>
-            <!-- Content -->
-            <!--
-                1. 遍历 menus 中的 key，根据 key 的值显示不同的内容
-                2. 拿到 tables 中的数据，根据 key 得到当前应该是普通显示还是表格显示
-                3. 如果是表格显示，遍历数据，得到要输出的表格格式
-                4. 如果是普通显示，直接输出数据
-            -->
-            <!-- Contend -->
-            {% for menu in menus %}
-                {% set tk = tables[menu.key]['type'] %}
-                {% set cls = tables[menu.key]['columns'] %}
-                <div v-if="selectedKey === '{{ menu.key }}'">
-                    {% if tk=='String' %}
-                        <pre>{{ '{{' }} data.{{ menu.key }} {{ '}}' }}</pre>
-                    {% elif tk=='Table' %}
-                        <table class="table-auto w-full border-collapse border border-gray-400">
-                            <thead>
-                                <tr>
-                                    {% for c in cls %}
-                                        <th class="border border-gray-300 p-2">{{c}}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="row in data.{{ menu.key }}" :key="row[0]">
-                                    {% for i in range(tables[menu.key]['columns']|length) %}
-                                        <td class="border border-gray-300 p-2"> {{ '{{' }} row[{{i}}] {{ '}}' }} </td>
-                                    {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
-                    {% elif tk=='Plot' %}
-                        <div class="grid grid-cols-2 gap-4">
-                            <img v-for="plot in data.plots"
-                                 :src="'data:image/png;base64,' + plot"
-                                 :key="plot"
-                                 class="border border-gray-300 rounded" />
-                        </div>
-                    {% else %}
-                        <div v-else>
-                            <p>选择一个选项以显示内容。</p>
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
+
+        <!-- 基础统计分析 -->
+        <div class="section">
+            <h2>基础统计分析</h2>
+            <div id="basic-stats"></div>
+        </div>
+
+        <!-- 数据质量分析 -->
+        <div class="section">
+            <h2>数据质量分析</h2>
+            <div id="data-quality"></div>
+        </div>
+
+        <!-- 异常值分析 -->
+        <div class="section">
+            <h2>异常值分析</h2>
+            <div id="outlier-analysis"></div>
+        </div>
+
+        <!-- 相关性分析 -->
+        <div class="section">
+            <h2>相关性分析</h2>
+            <div id="correlation-analysis"></div>
+        </div>
+
+        <!-- 主成分分析 -->
+        <div class="section">
+            <h2>主成分分析</h2>
+            <div id="pca-analysis"></div>
+        </div>
+
+        <!-- 数据可视化 -->
+        <div class="section">
+            <h2>数据可视化</h2>
+            <div id="visualization"></div>
+        </div>
+
+        <!-- 结果解读 -->
+        <div class="section">
+            <h2>结果解读</h2>
+            <div id="interpretation"></div>
         </div>
     </div>
 
+    <!-- 调试面板 -->
+    <div id="debug-panel"></div>
+    <button id="debug-toggle">调试模式</button>
+
+    <!-- 加载 JavaScript -->
     <script>
-        const app = Vue.createApp({
-            data() {
-                return {
-                    menus: {{ menus }},
-                    data: {{ data }},
-                    selectedKey: "basic_info",
-                    selectedLabel: "基本信息"
-                };
-            },
-            methods: {
-                selectMenu(key) {
-                    this.selectedKey = key;
-                    const menu = this.menus.find((item) => item.key === key);
-                    this.selectedLabel = menu ? menu.label : "";
-                }
+        // 初始化全局变量
+        try {
+            console.log('开始加载数据...');
+            const rawData = {{ data | safe }};
+            console.log('原始数据:', rawData);
+            
+            // 验证数据结构
+            if (!rawData) {
+                throw new Error('数据为空');
+            }
+            
+            if (!rawData.basic_stats) {
+                console.warn('缺少基础统计数据');
+            }
+            if (!rawData.interpretations) {
+                console.warn('缺少解读数据');
+            }
+            if (!rawData.plots) {
+                console.warn('缺少图表数据');
+            }
+            
+            window.ANALYZER_DATA = rawData;
+            console.log('数据已加载到全局变量');
+            
+            // 显示数据加载成功消息
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">数据加载成功，正在渲染报告...</div>
+                `;
+            }
+        } catch (error) {
+            console.error('数据加载失败:', error);
+            document.body.innerHTML = `
+                <div class="error-message">
+                    <h2>数据加载失败</h2>
+                    <p>错误信息: ${error.message}</p>
+                    <p>请检查控制台获取更多信息。</p>
+                </div>
+            `;
+        }
+    </script>
+    <script src="{{ static_url }}/js/analyzer.js"></script>
+    <script>
+        // 初始化渲染器
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM 加载完成，准备初始化渲染器');
+            if (window.ANALYZER_DATA) {
+                console.log('找到分析数据，开始初始化渲染器');
+                console.log('数据内容:', window.ANALYZER_DATA);
+                
+                const renderer = new ReportRenderer(window.ANALYZER_DATA);
+                renderer.render().catch(error => {
+                    console.error('渲染报告时出错:', error);
+                    // 显示错误信息
+                    const container = document.querySelector('.container');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="error-message">
+                                <h2>报告渲染失败</h2>
+                                <p>错误信息: ${error.message}</p>
+                                <p>请检查控制台获取更多信息。</p>
+                            </div>
+                        `;
+                    }
+                });
+            } else {
+                console.error('未找到分析数据');
+                document.body.innerHTML = `
+                    <div class="error-message">
+                        <h2>数据加载失败</h2>
+                        <p>未能找到分析数据</p>
+                    </div>
+                `;
             }
         });
-        app.mount('#app');
+
+        // 隐藏加载指示器
+        window.addEventListener('load', () => {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+        });
+
+        // 调试面板功能
+        const debugToggle = document.getElementById('debug-toggle');
+        const debugPanel = document.getElementById('debug-panel');
+        
+        if (debugToggle && debugPanel) {
+            debugToggle.addEventListener('click', () => {
+                debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+            });
+        }
     </script>
 </body>
 </html>
