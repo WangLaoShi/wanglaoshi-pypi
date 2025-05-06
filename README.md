@@ -25,6 +25,7 @@ WangLaoShi
 - 0.0.8 增加对数据文件的基本分析的部分
 - 0.0.9 增加 jinja2 的模板输出的 Analyzer
 - 0.10.0 增加 no_waring,字体获取，安装字体
+- 0.10.6 增加 Analyzer 的使用部分(需要 statsmodels)
 
 ## 安装方式
 
@@ -74,8 +75,17 @@ V.check_all_installed_with_latest()
 
 ```python
 from wanglaoshi import Analyzer as A
-A.analyze_data_to_html('data.csv')
+A.analyze_data('data.csv')  # 生成HTML格式的分析报告
 ```
+
+分析报告包含以下内容：
+- 基础统计分析：描述性统计、缺失值分析等
+- 异常值分析：
+  - Z-score方法：识别极端异常值（|Z-score| > 3）和中度异常值（2 < |Z-score| ≤ 3）
+  - IQR方法：基于四分位距的异常值检测，提供数据分布特征和异常值范围
+  - 详细的异常值解释和处理建议
+- 数据质量分析：重复值、缺失值等
+- 高级统计分析：相关性分析、主成分分析等
 
 如果不需要 HTML 页面也可以使用下面的方法
 
@@ -123,14 +133,50 @@ from wanglaoshi import JupyterFont as JF
 JF.matplotlib_font_init()
 ```
 
-## 9. 数据的基本分析（适合比赛）
+## 9. 批量数据分析（适合比赛）
 
 ```python
 from wanglaoshi import Analyzer as A
-folder_path = "your_data_folder"  # 替换为实际的文件夹路径
-target_dir = "reports"            # 替换为实际的报告保存目录
-A.load_and_explore_csvs(folder_path, report=True, target_dir=target_dir)
+import seaborn as sns
+import pandas as pd
+
+# 获取示例数据集
+# 方法1：使用seaborn自带的数据集
+tips = sns.load_dataset('tips')  # 餐厅小费数据集
+tips.to_csv('tips.csv', index=False)
+
+# 方法2：使用sklearn自带的数据集
+from sklearn.datasets import load_iris
+iris = load_iris()
+iris_df = pd.DataFrame(iris.data, columns=iris.feature_names)
+iris_df['target'] = iris.target
+iris_df.to_csv('iris.csv', index=False)
+
+# 创建测试文件夹
+import os
+os.makedirs('test_data', exist_ok=True)
+
+# 将数据集移动到测试文件夹
+import shutil
+shutil.move('tips.csv', 'test_data/tips.csv')
+shutil.move('iris.csv', 'test_data/iris.csv')
+
+# 分析数据集
+A.analyze_multiple_files('test_data', output_dir='reports')
 ```
+
+批量分析功能特点：
+- 支持多种数据格式（CSV、Excel、JSON）
+- 自动生成每个数据文件的详细分析报告
+- 异常值分析包含：
+  - Z-score方法：识别极端和中度异常值
+  - IQR方法：提供数据分布特征和异常值范围
+  - 综合建议：基于两种方法的结果给出处理建议
+- 报告包含可视化图表和详细的解释说明
+
+分析完成后，您可以在 `reports` 目录下找到生成的分析报告：
+- `tips_report.html`：餐厅小费数据集的分析报告
+- `iris_report.html`：鸢尾花数据集的分析报告
 
 ## 建议的版本对照关系
 

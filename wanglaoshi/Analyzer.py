@@ -3,6 +3,7 @@ import io
 import json
 from datetime import datetime
 from io import BytesIO
+from typing import Union, List, Dict, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,462 +12,605 @@ import pandas as pd
 import seaborn as sns
 from jinja2 import Environment, FileSystemLoader
 from matplotlib import rcParams
-from scipy.stats import skew, kurtosis, zscore
+from scipy import stats
+from scipy.stats import skew, kurtosis, zscore, chi2_contingency, normaltest, shapiro
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
-# 设置字体为 SimHei
-rcParams['font.sans-serif'] = ['SimHei']  # 设置默认字体
-rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+# 设置中文字体
+rcParams['font.sans-serif'] = ['SimHei']
+rcParams['axes.unicode_minus'] = False
 
+class DataAnalyzer:
+    """数据分析器主类"""
+    
+    def __init__(self, df: pd.DataFrame):
+        self.df = df.copy()
+        self.numeric_cols = self.df.select_dtypes(include=['number']).columns
+        self.categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns
+        self.datetime_cols = self.df.select_dtypes(include=['datetime']).columns
 
-def generate_skew_kurtosis_table(df):
-    results = []
+    # ==================== 基础统计分析 ====================
+    def basic_statistics(self) -> pd.DataFrame:
+        """计算基本统计量"""
+        stats_df = self.df.describe(include='all', datetime_is_numeric=True).transpose()
+        stats_df['缺失值数量'] = self.df.isnull().sum()
+        stats_df['缺失率 (%)'] = (self.df.isnull().mean() * 100).round(2)
+        stats_df['唯一值数量'] = self.df.nunique()
+        return stats_df.reset_index().rename(columns={'index': '列名'})
 
-    # 遍历所有数值列
-    for column in df.select_dtypes(include=['int64', 'float64']).columns:
-        col_data = df[column].dropna()
-        skewness = skew(col_data)
-        kurtosis_val = kurtosis(col_data)
+    def normality_test(self) -> pd.DataFrame:
+        """正态性检验"""
+        results = []
+        for col in self.numeric_cols:
+            data = self.df[col].dropna()
+            if len(data) > 3:  # 至少需要3个样本才能进行正态性检验
+                # Shapiro-Wilk检验
+                shapiro_stat, shapiro_p = shapiro(data)
+                # D'Agostino-Pearson检验
+                norm_stat, norm_p = normaltest(data)
+                
+                results.append({
+                    '列名': col,
+                    'Shapiro-Wilk统计量': shapiro_stat,
+                    'Shapiro-Wilk p值': shapiro_p,
+                    'D\'Agostino-Pearson统计量': norm_stat,
+                    'D\'Agostino-Pearson p值': norm_p,
+                    '是否正态分布': '是' if shapiro_p > 0.05 and norm_p > 0.05 else '否'
+                })
+        return pd.DataFrame(results)
 
-        # 偏度解释
-        if skewness > 0:
-            skew_explanation = "偏度为正值，表示数据右偏，数据分布的右尾较长。"
-        elif skewness < 0:
-            skew_explanation = "偏度为负值，表示数据左偏，数据分布的左尾较长。"
-        else:
-            skew_explanation = "偏度接近零，数据呈对称分布。"
-
-        # 峰度解释
-        if kurtosis_val > 0:
-            kurtosis_explanation = "峰度为正值，表示数据分布尖峰较高，尾部更厚（可能存在更多极端值）。"
-        elif kurtosis_val < 0:
-            kurtosis_explanation = "峰度为负值，表示数据分布较平坦，尾部较薄。"
-        else:
-            kurtosis_explanation = "峰度接近零，数据呈正态分布形态。"
-
-        # 添加结果
-        results.append({
-            "列名": column,
-            "偏度": skewness,
-            "偏度解释": skew_explanation,
-            "峰度": kurtosis_val,
-            "峰度解释": kurtosis_explanation
+    # ==================== 数据质量分析 ====================
+    def missing_value_analysis(self) -> pd.DataFrame:
+        """缺失值分析"""
+        missing_counts = self.df.isnull().sum()
+        missing_ratios = self.df.isnull().mean() * 100
+        suggestions = []
+        
+        for col, ratio in missing_ratios.items():
+            if ratio == 0:
+                suggestion = "无缺失，无需处理"
+            elif ratio < 5:
+                suggestion = "填充缺失值，例如均值/众数"
+            elif ratio < 50:
+                suggestion = "视情况填充或丢弃列"
+            else:
+                suggestion = "考虑丢弃列"
+            suggestions.append(suggestion)
+        
+        return pd.DataFrame({
+            "列名": self.df.columns,
+            "缺失值数量": missing_counts,
+            "缺失率 (%)": missing_ratios,
+            "建议处理方案": suggestions
         })
 
-    # 转换为 DataFrame
-    results_df = pd.DataFrame(results)
-    return results_df
+    def outlier_analysis(self) -> pd.DataFrame:
+        """异常值分析"""
+        results = []
+        for col in self.numeric_cols:
+            data = self.df[col].dropna()
+            
+            # Z-score方法
+            z_scores = zscore(data)
+            outliers_zscore = np.sum(np.abs(z_scores) > 3)
+            zscore_explanation = self._get_zscore_interpretation(z_scores)
+            
+            # IQR方法
+            Q1 = data.quantile(0.25)
+            Q3 = data.quantile(0.75)
+            IQR = Q3 - Q1
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+            outliers_iqr = np.sum((data < lower_bound) | (data > upper_bound))
+            iqr_explanation = self._get_iqr_interpretation(data, Q1, Q3, IQR)
+            
+            # 箱线图方法
+            outliers_box = np.sum((data < Q1 - 3 * IQR) | (data > Q3 + 3 * IQR))
+            
+            results.append({
+                "列名": col,
+                "Z-score异常值数量": outliers_zscore,
+                "Z-score解释": zscore_explanation,
+                "IQR异常值数量": outliers_iqr,
+                "IQR解释": iqr_explanation,
+                "箱线图异常值数量": outliers_box,
+                "异常值比例 (%)": (max(outliers_zscore, outliers_iqr, outliers_box) / len(data) * 100).round(2)
+            })
+        
+        return pd.DataFrame(results)
 
-
-def calculate_missing_values(df):
-    # 缺失值统计
-    missing_counts = df.isnull().sum()  # 缺失值数量
-    missing_ratios = df.isnull().mean() * 100  # 缺失率
-    suggestions = []
-
-    # 生成建议处理方案
-    for col, ratio in missing_ratios.items():
-        if ratio == 0:
-            suggestion = "无缺失，无需处理"
-        elif ratio < 5:
-            suggestion = "填充缺失值，例如均值/众数"
-        elif ratio < 50:
-            suggestion = "视情况填充或丢弃列"
+    def _get_zscore_interpretation(self, z_scores: np.ndarray) -> str:
+        """生成Z-score方法的解释"""
+        total_points = len(z_scores)
+        extreme_outliers = np.sum(np.abs(z_scores) > 3)  # 极端异常值
+        moderate_outliers = np.sum((np.abs(z_scores) > 2) & (np.abs(z_scores) <= 3))  # 中度异常值
+        
+        interpretation = []
+        
+        # 总体情况
+        if extreme_outliers == 0 and moderate_outliers == 0:
+            interpretation.append("数据分布较为集中，未检测到异常值。")
         else:
-            suggestion = "考虑丢弃列"
-        suggestions.append(suggestion)
+            interpretation.append(f"共检测到 {extreme_outliers + moderate_outliers} 个异常值，占总数据的 {((extreme_outliers + moderate_outliers) / total_points * 100):.2f}%。")
+        
+        # 详细解释
+        if extreme_outliers > 0:
+            interpretation.append(f"其中 {extreme_outliers} 个为极端异常值（|Z-score| > 3），占总数据的 {extreme_outliers / total_points * 100:.2f}%。")
+        if moderate_outliers > 0:
+            interpretation.append(f"另有 {moderate_outliers} 个为中度异常值（2 < |Z-score| ≤ 3），占总数据的 {moderate_outliers / total_points * 100:.2f}%。")
+        
+        # 建议
+        if extreme_outliers > 0:
+            interpretation.append("建议检查这些极端异常值的合理性，必要时进行处理。")
+        elif moderate_outliers > 0:
+            interpretation.append("建议关注这些中度异常值，确认其是否合理。")
+        
+        return " ".join(interpretation)
 
-    # 汇总结果为 DataFrame
-    missing_summary = pd.DataFrame({
-        "列名": df.columns,
-        "缺失值数量": missing_counts,
-        "缺失率 (%)": missing_ratios,
-        "建议处理方案": suggestions
-    })
-    return missing_summary
-
-
-def extended_describe(df):
-    # 筛选数值列
-    numeric_cols = df.select_dtypes(include=['number']).columns
-
-    # 初步描述性统计
-    desc = df.describe(include='all', datetime_is_numeric=True).transpose()
-
-    # 添加额外统计信息
-    desc['缺失值数量'] = df.isnull().sum()
-    desc['缺失率 (%)'] = (df.isnull().mean() * 100).round(2)
-    desc['唯一值数量'] = df.nunique()
-
-    # 仅对数值列计算偏度和峰度
-    desc['偏度 (Skewness)'] = None
-    desc['峰度 (Kurtosis)'] = None
-    for col in numeric_cols:
-        desc.at[col, '偏度 (Skewness)'] = skew(df[col].dropna())
-        desc.at[col, '峰度 (Kurtosis)'] = kurtosis(df[col].dropna())
-    desc.fillna(value='', inplace=True)
-    # 检测并将 datetime 列转换为字符串
-    for col in desc.select_dtypes(include=['datetime']):
-        desc[col] = desc[col].astype(str)
-    # desc.to_csv("desc.csv")
-    # 返回结果
-    return desc.reset_index().rename(columns={'index': '列名'})
-
-
-def generate_frequency_table(df):
-    frequency_tables = []
-
-    # 遍历 object 和 category 类型的列
-    for column in df.select_dtypes(include=['object', 'category']).columns:
-        # 计算频率分布
-        freq = df[column].value_counts().reset_index()
-        freq.columns = ['类别', '频数']
-
-        # 添加列名信息
-        freq['列名'] = column
-
-        # 重排列顺序
-        freq = freq[['列名', '类别', '频数']]
-        frequency_tables.append(freq)
-
-    # 合并所有列的结果
-    final_table = pd.concat(frequency_tables, ignore_index=True)
-    return final_table
-
-
-# 自定义序列化函数
-def convert_to_serializable(obj):
-    if isinstance(obj, (np.int64, np.int32)):
-        return int(obj)
-    elif isinstance(obj, (np.float64, np.float32)):
-        return float(obj)
-    elif pd.isna(obj):  # 处理 NaN 值
-        return None
-    elif isinstance(obj, datetime):
-        return obj.isoformat()  # 转换为 ISO 8601 格式字符串
-    raise TypeError("Type not serializable")
-
-    return obj
-
-
-def detect_outliers(df):
-    results = []
-
-    # 遍历所有数值列
-    for column in df.select_dtypes(include=['int64', 'float64']).columns:
-        col_data = df[column].dropna()
-
-        # Z-score 异常值检测
-        z_scores = zscore(col_data)
-        outliers_zscore_count = np.sum(np.abs(z_scores) > 3)
-        zscore_explanation = (
-            "使用 Z-score 检测到异常值，通常 Z-score > 3 的值可能是异常值。"
-            if outliers_zscore_count > 0
-            else "无异常值。"
-        )
-
-        # IQR 异常值检测
-        Q1 = col_data.quantile(0.25)
-        Q3 = col_data.quantile(0.75)
-        IQR = Q3 - Q1
+    def _get_iqr_interpretation(self, data: pd.Series, Q1: float, Q3: float, IQR: float) -> str:
+        """生成IQR方法的解释"""
         lower_bound = Q1 - 1.5 * IQR
         upper_bound = Q3 + 1.5 * IQR
-        outliers_iqr_count = np.sum((col_data < lower_bound) | (col_data > upper_bound))
-        iqr_explanation = (
-            "使用 IQR 检测到异常值，低于 Q1 - 1.5 * IQR 或高于 Q3 + 1.5 * IQR 的值可能是异常值。"
-            if outliers_iqr_count > 0
-            else "无异常值。"
-        )
-
-        # 添加结果
-        results.append({
-            "列名": column,
-            "异常值数量": outliers_zscore_count,
-            "解释": zscore_explanation
-        })
-        results.append({
-            "列名": column,
-            "异常值数量": outliers_iqr_count,
-            "解释": iqr_explanation
-        })
-
-    # 转换为 DataFrame
-    results_df = pd.DataFrame(results)
-    return results_df
-
-
-def generate_correlation_table(df):
-    # 计算相关系数矩阵
-    correlation_matrix = df.corr()
-
-    # 格式化为字符串表格形式
-    table_str = correlation_matrix.to_string(
-        formatters={col: '{:.2f}'.format for col in correlation_matrix.columns}
-    )
-    return table_str
-
-
-def analyze_data_to_html(file_path, output_html="analysis_report.html"):
-    ## 如果 file_path 是一个字符串的话，读取文件，否则直接使用 DataFrame
-    if isinstance(file_path, str):
-        # Load Data
-        if file_path.endswith('.csv'):
-            df = pd.read_csv(file_path)
-        elif file_path.endswith(('.xls', '.xlsx')):
-            df = pd.read_excel(file_path)
-        elif file_path.endswith('.json'):
-            df = pd.read_json(file_path)
+        mild_outliers = np.sum((data < lower_bound) | (data > upper_bound))
+        
+        # 计算四分位距的分布
+        q1_percentile = np.percentile(data, 25)
+        q3_percentile = np.percentile(data, 75)
+        median = np.median(data)
+        
+        interpretation = []
+        
+        # 总体情况
+        if mild_outliers == 0:
+            interpretation.append("数据分布较为均匀，未检测到异常值。")
         else:
-            raise ValueError("Unsupported file format")
-    else:
-        df = file_path
+            interpretation.append(f"检测到 {mild_outliers} 个异常值，占总数据的 {mild_outliers / len(data) * 100:.2f}%。")
+        
+        # 数据分布特征
+        interpretation.append(f"数据的中位数为 {median:.2f}，")
+        if Q3 - Q1 < np.std(data):
+            interpretation.append("四分位距较小，说明数据较为集中；")
+        else:
+            interpretation.append("四分位距较大，说明数据较为分散；")
+        
+        # 异常值范围
+        interpretation.append(f"异常值范围为：小于 {lower_bound:.2f} 或大于 {upper_bound:.2f}。")
+        
+        # 建议
+        if mild_outliers > 0:
+            if mild_outliers / len(data) > 0.1:  # 异常值比例超过10%
+                interpretation.append("异常值比例较高，建议进行详细检查并考虑是否需要处理。")
+            else:
+                interpretation.append("异常值比例较低，建议检查这些值的合理性。")
+        
+        return " ".join(interpretation)
 
-    # 使用 io.StringIO 获取 DataFrame 的 info
-    buffer = io.StringIO()
-    df.info(buf=buffer)
-    info_str = buffer.getvalue()
-    data_structure = {
-        "menus": [
-            {"label": "基本信息", "key": "basic_info"},
-            {"label": "描述性统计", "key": "desc_stats"},
-            {"label": "缺失值统计", "key": "missing_stats"},
-            {"label": "唯一性统计", "key": "unique_stats"},
-            {"label": "频度分布", "key": "value_counts"},
-            {"label": "偏度和峰度分析", "key": "skew_kurt"},
-            {"label": "异常值检测", "key": "outliers"},
-            # {"label": "相关系数矩阵", "key": "correlation_matrix"},
-            {"label": "图表展示", "key": "plots"}
-        ],
-        "tables": {
-            "basic_info": {"type": "String", "columns": []},
-            "desc_stats": {"type": "Table",
-                           "columns": ['列名', 'count', 'unique', 'top', 'freq', 'mean', 'min', '25%', '50%', '75%',
-                                       'max', 'std', '缺失值数量', '缺失率 (%)', '唯一值数量', '偏度 (Skewness)',
-                                       '峰度 (Kurtosis)']},
-            "missing_stats": {"type": "Table", "columns": ["列名", "缺失值数量", "缺失率 (%)", "建议处理方案"]},
-            "unique_stats": {"type": "Table", "columns": ['列名', '唯一值数量']},
-            "value_counts": {"type": "Table", "columns": ['列名', '类别', '频度分布']},
-            "skew_kurt": {"type": "Table", "columns": ['列名', '偏度', '偏度解释', '峰度', '峰度解释']},
-            "outliers": {"type": "Table", "columns": ['列名', '异常值数量', '解释']},
-            # "correlation_matrix":{"type":"String","columns":[]},
-            "plots": {"type": "Plot", "columns": []}
+    def duplicate_analysis(self) -> Dict[str, Any]:
+        """重复值分析"""
+        duplicate_rows = self.df.duplicated().sum()
+        duplicate_ratio = (duplicate_rows / len(self.df) * 100).round(2)
+        
+        return {
+            "重复行数量": duplicate_rows,
+            "重复率 (%)": duplicate_ratio,
+            "建议": "建议删除重复行" if duplicate_ratio > 5 else "重复率较低，可保留"
         }
-    }
-    # Data Analysis
-    data = {
-        "basic_info": info_str,
-        "missing_stats": calculate_missing_values(df).values.tolist(),
-        "unique_stats": df.nunique().reset_index().values.tolist(),
-        "desc_stats": extended_describe(df).values.tolist(),
-        "value_counts": generate_frequency_table(df).values.tolist(),
-        "skew_kurt": generate_skew_kurtosis_table(df).values.tolist(),
-        "outliers": detect_outliers(df).values.tolist(),
-        # "correlation_matrix": generate_correlation_table(df),
-        "plots": []
-    }
 
-    numeric_cols = df.select_dtypes(include=np.number).columns
+    # ==================== 高级统计分析 ====================
+    def correlation_analysis(self) -> pd.DataFrame:
+        """相关性分析"""
+        corr_matrix = self.df.corr()
+        return corr_matrix
 
-    # Plots
-    for col in numeric_cols:
-        fig, ax = plt.subplots()
-        sns.histplot(df[col], kde=True, ax=ax)
+    def multicollinearity_analysis(self) -> pd.DataFrame:
+        """多重共线性分析"""
+        vif_data = pd.DataFrame()
+        vif_data["列名"] = self.numeric_cols
+        vif_data["VIF"] = [variance_inflation_factor(self.df[self.numeric_cols].values, i) 
+                          for i in range(len(self.numeric_cols))]
+        return vif_data
+
+    def pca_analysis(self) -> Dict[str, Any]:
+        """主成分分析"""
+        if len(self.numeric_cols) < 2:
+            return {"error": "需要至少两个数值型变量进行PCA分析"}
+            
+        # 标准化数据
+        scaler = StandardScaler()
+        scaled_data = scaler.fit_transform(self.df[self.numeric_cols])
+        
+        # 执行PCA
+        pca = PCA()
+        pca.fit(scaled_data)
+        
+        # 计算累计方差贡献率
+        cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
+        
+        return {
+            "主成分数量": len(self.numeric_cols),
+            "各主成分方差贡献率": pca.explained_variance_ratio_,
+            "累计方差贡献率": cumulative_variance,
+            "建议保留主成分数量": np.argmax(cumulative_variance >= 0.95) + 1
+        }
+
+    # ==================== 数据可视化 ====================
+    def plot_distribution(self, column: str) -> str:
+        """绘制分布图"""
+        if column not in self.df.columns:
+            return "列名不存在"
+            
+        plt.figure(figsize=(10, 6))
+        if column in self.numeric_cols:
+            sns.histplot(self.df[column], kde=True)
+            plt.title(f"{column} 的分布")
+        else:
+            sns.countplot(x=column, data=self.df)
+            plt.title(f"{column} 的频数分布")
+            plt.xticks(rotation=45)
+        
         buf = BytesIO()
-        fig.savefig(buf, format="png")
+        plt.savefig(buf, format='png')
         buf.seek(0)
-        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
-        data["plots"].append(img_base64)
-        buf.close()
-        plt.close(fig)
-    # 绘制相关性矩阵热图
-    correlation_matrix = df.corr()
-    fig, ax = plt.subplots(figsize=(12, 8))
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", ax=ax)
-    ax.set_title("数值特征的相关性矩阵")
-    buf = BytesIO()
-    fig.savefig(buf, format="png")
-    buf.seek(0)
-    img_base64 = base64.b64encode(buf.read()).decode("utf-8")
-    data["plots"].append(img_base64)
-    buf.close()
-    plt.close(fig)
-    # Load External Template
-    env = Environment(loader=FileSystemLoader('./templates/'))
-    template = env.get_template('analyzer.html')
-    data_json = json.dumps(data, default=convert_to_serializable)
-    # 保存 data_json
-    # with open("data.json","w",encoding="utf-8") as f:
-    #     f.write(data_json)
-    # Render Template
-    rendered_html = template.render({
-        "menus": data_structure['menus'],
-        "data": data_json,
-        "tables": data_structure['tables']
-    })
+        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        plt.close()
+        return img_base64
 
-    # 得到当前时间，追加到文件上
-    file_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    output_html = f"analysis_report_{file_time}.html"
-    # Save Rendered HTML
-    with open(output_html, "w", encoding="utf-8") as f:
-        f.write(rendered_html)
-        print(f"Analysis report saved to {output_html}")
+    def plot_correlation_heatmap(self) -> str:
+        """绘制相关性热图"""
+        plt.figure(figsize=(12, 8))
+        sns.heatmap(self.correlation_analysis(), annot=True, cmap='coolwarm', fmt='.2f')
+        plt.title('相关性热图')
+        
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        plt.close()
+        return img_base64
 
+    # ==================== 结果解读 ====================
+    def interpret_results(self) -> Dict[str, Any]:
+        """解读所有分析结果"""
+        interpretations = {
+            "basic_info": self._interpret_basic_info(),
+            "data_quality": self._interpret_data_quality(),
+            "statistical_analysis": self._interpret_statistical_analysis(),
+            "recommendations": self._generate_recommendations()
+        }
+        return interpretations
 
-def generate_analysis_report(df, key_name, target_dir='.'):
-    """
-    生成数据分析报告并保存到文件
+    def _interpret_basic_info(self) -> Dict[str, str]:
+        """解读基本信息"""
+        total_rows, total_cols = self.df.shape
+        numeric_count = len(self.numeric_cols)
+        categorical_count = len(self.categorical_cols)
+        datetime_count = len(self.datetime_cols)
 
-    Args:
-        df (pd.DataFrame): 要分析的数据框
-        key_name (str): 报告的关键名称
-        target_dir (str): 报告保存的目标目录
-    """
-    # 创建报告内容
-    report_lines = []
+        return {
+            "数据集规模": f"数据集包含 {total_rows} 行和 {total_cols} 列。",
+            "变量类型": f"其中包含 {numeric_count} 个数值型变量、{categorical_count} 个分类型变量和 {datetime_count} 个时间型变量。",
+            "说明": "这个规模的数据集适合进行统计分析，但需要注意数据质量和变量之间的关系。"
+        }
 
-    # 添加报告头部
-    report_lines.append(f"数据分析报告 - {key_name}")
-    report_lines.append(f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    report_lines.append("=" * 50)
+    def _interpret_data_quality(self) -> Dict[str, Any]:
+        """解读数据质量分析结果"""
+        # 缺失值分析
+        missing_stats = self.missing_value_analysis()
+        missing_interpretation = {
+            "总体情况": f"数据集中共有 {len(missing_stats)} 个变量，其中 {sum(missing_stats['缺失值数量'] > 0)} 个变量存在缺失值。",
+            "缺失值分布": "缺失值分布情况如下：",
+            "details": []
+        }
 
-    # 基本信息
-    report_lines.append("\n1. 基本信息")
-    report_lines.append("-" * 30)
-    report_lines.append(f"行数: {df.shape[0]}")
-    report_lines.append(f"列数: {df.shape[1]}")
+        for _, row in missing_stats.iterrows():
+            if row['缺失值数量'] > 0:
+                missing_interpretation["details"].append({
+                    "变量": row['列名'],
+                    "缺失情况": f"缺失 {row['缺失值数量']} 个值，缺失率为 {row['缺失率 (%)']:.2f}%",
+                    "建议": row['建议处理方案']
+                })
 
-    # 数据类型
-    report_lines.append("\n2. 数据类型检查")
-    report_lines.append("-" * 30)
-    for col, dtype in df.dtypes.items():
-        report_lines.append(f"{col}: {dtype}")
+        # 异常值分析
+        outlier_stats = self.outlier_analysis()
+        outlier_interpretation = {
+            "总体情况": f"数据集中共有 {len(outlier_stats)} 个数值型变量，其中 {sum(outlier_stats['异常值比例 (%)'] > 0)} 个变量存在异常值。",
+            "异常值分布": "异常值分布情况如下：",
+            "details": []
+        }
 
-    # 缺失值统计
-    report_lines.append("\n3. 缺失值统计")
-    report_lines.append("-" * 30)
-    missing_stats = df.isnull().sum()
-    for col, count in missing_stats.items():
-        if count > 0:
-            percentage = (count / len(df)) * 100
-            report_lines.append(f"{col}: {count} 个缺失值 ({percentage:.2f}%)")
+        for _, row in outlier_stats.iterrows():
+            if row['异常值比例 (%)'] > 0:
+                outlier_interpretation["details"].append({
+                    "变量": row['列名'],
+                    "Z-score分析": row['Z-score解释'],
+                    "IQR分析": row['IQR解释'],
+                    "异常值比例": f"{row['异常值比例 (%)']:.2f}%",
+                    "建议": "建议根据Z-score和IQR的分析结果，综合考虑是否需要处理异常值。"
+                })
 
-    # 唯一值统计
-    report_lines.append("\n4. 唯一值统计")
-    report_lines.append("-" * 30)
-    unique_stats = df.nunique()
-    for col, count in unique_stats.items():
-        report_lines.append(f"{col}: {count} 个唯一值")
+        # 重复值分析
+        duplicate_stats = self.duplicate_analysis()
+        duplicate_interpretation = {
+            "总体情况": f"数据集中存在 {duplicate_stats['重复行数量']} 行重复数据，重复率为 {duplicate_stats['重复率 (%)']:.2f}%。",
+            "建议": duplicate_stats['建议']
+        }
 
-    # 数值型列的统计信息
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    if len(numeric_cols) > 0:
-        report_lines.append("\n5. 数值型列的统计信息")
-        report_lines.append("-" * 30)
-        stats = df[numeric_cols].describe()
-        for col in numeric_cols:
-            report_lines.append(f"\n{col} 的统计信息:")
-            report_lines.append(f"  均值: {stats[col]['mean']:.2f}")
-            report_lines.append(f"  标准差: {stats[col]['std']:.2f}")
-            report_lines.append(f"  最小值: {stats[col]['min']:.2f}")
-            report_lines.append(f"  25%分位数: {stats[col]['25%']:.2f}")
-            report_lines.append(f"  中位数: {stats[col]['50%']:.2f}")
-            report_lines.append(f"  75%分位数: {stats[col]['75%']:.2f}")
-            report_lines.append(f"  最大值: {stats[col]['max']:.2f}")
+        return {
+            "缺失值分析": missing_interpretation,
+            "异常值分析": outlier_interpretation,
+            "重复值分析": duplicate_interpretation
+        }
 
-    # 非数值型列的统计信息
-    non_numeric_cols = df.select_dtypes(exclude=[np.number]).columns
-    if len(non_numeric_cols) > 0:
-        report_lines.append("\n6. 非数值型列的统计信息")
-        report_lines.append("-" * 30)
-        for col in non_numeric_cols:
-            report_lines.append(f"\n{col} 的分布:")
-            value_counts = df[col].value_counts().head(10)
-            for value, count in value_counts.items():
-                percentage = (count / len(df)) * 100
-                report_lines.append(f"  {value}: {count} 次 ({percentage:.2f}%)")
+    def _interpret_statistical_analysis(self) -> Dict[str, Any]:
+        """解读统计分析结果"""
+        # 正态性检验解读
+        normality_stats = self.normality_test()
+        normality_interpretation = {
+            "总体情况": f"对 {len(normality_stats)} 个数值型变量进行了正态性检验。",
+            "检验结果": "检验结果如下：",
+            "details": []
+        }
 
-    # 确保目标目录存在
-    os.makedirs(target_dir, exist_ok=True)
+        for _, row in normality_stats.iterrows():
+            normality_interpretation["details"].append({
+                "变量": row['列名'],
+                "是否正态分布": row['是否正态分布'],
+                "解释": "该变量服从正态分布，可以使用参数检验方法。" if row['是否正态分布'] == '是' else "该变量不服从正态分布，建议使用非参数检验方法。"
+            })
 
-    # 保存报告到文件
-    report_file = os.path.join(target_dir, f"{key_name}_report.txt")
-    with open(report_file, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(report_lines))
+        # 峰度和偏度解读
+        skew_kurt_stats = self._analyze_skew_kurtosis()
+        skew_kurt_interpretation = {
+            "总体情况": "对数值型变量进行了峰度和偏度分析，结果如下：",
+            "details": []
+        }
 
-    print(f"分析报告已保存到: {report_file}")
-    return report_file
+        for _, row in skew_kurt_stats.iterrows():
+            # 偏度解释
+            skewness = row['偏度']
+            if abs(skewness) < 0.5:
+                skew_explanation = "数据分布接近对称"
+            elif skewness > 0:
+                skew_explanation = "数据右偏，右尾较长，可能存在较大的异常值"
+            else:
+                skew_explanation = "数据左偏，左尾较长，可能存在较小的异常值"
 
+            # 峰度解释
+            kurtosis_val = row['峰度']
+            if abs(kurtosis_val) < 0.5:
+                kurtosis_explanation = "数据分布接近正态分布"
+            elif kurtosis_val > 0:
+                kurtosis_explanation = "数据分布尖峰，尾部较厚，存在较多极端值"
+            else:
+                kurtosis_explanation = "数据分布平坦，尾部较薄，极端值较少"
 
-def load_and_analyze_data(file_path, key_name, target_dir='.'):
-    """
-    加载数据并执行分析
+            skew_kurt_interpretation["details"].append({
+                "变量": row['列名'],
+                "偏度": f"{skewness:.3f}",
+                "偏度解释": skew_explanation,
+                "峰度": f"{kurtosis_val:.3f}",
+                "峰度解释": kurtosis_explanation,
+                "建议": self._get_skew_kurtosis_recommendation(skewness, kurtosis_val)
+            })
 
-    Args:
-        file_path (str): 数据文件路径
-        key_name (str): 报告的关键名称
-        target_dir (str): 报告保存的目标目录
-    """
-    try:
-        df = pd.read_csv(file_path)
-        print(f"成功加载数据: {file_path}")
-        report_file = generate_analysis_report(df, key_name, target_dir)
-        return df, report_file
-    except Exception as e:
-        print(f"加载数据时出错: {str(e)}")
-        return None, None
+        # 相关性分析解读
+        corr_matrix = self.correlation_analysis()
+        corr_interpretation = {
+            "总体情况": "变量间的相关性分析结果如下：",
+            "强相关变量": [],
+            "中等相关变量": [],
+            "弱相关变量": []
+        }
 
+        for i in range(len(corr_matrix.columns)):
+            for j in range(i+1, len(corr_matrix.columns)):
+                corr = corr_matrix.iloc[i, j]
+                if abs(corr) >= 0.7:
+                    corr_interpretation["强相关变量"].append({
+                        "变量对": f"{corr_matrix.columns[i]} - {corr_matrix.columns[j]}",
+                        "相关系数": f"{corr:.2f}",
+                        "解释": "这两个变量存在强相关性，可能存在多重共线性问题。"
+                    })
+                elif abs(corr) >= 0.3:
+                    corr_interpretation["中等相关变量"].append({
+                        "变量对": f"{corr_matrix.columns[i]} - {corr_matrix.columns[j]}",
+                        "相关系数": f"{corr:.2f}",
+                        "解释": "这两个变量存在中等程度的相关性。"
+                    })
+                elif abs(corr) >= 0.1:
+                    corr_interpretation["弱相关变量"].append({
+                        "变量对": f"{corr_matrix.columns[i]} - {corr_matrix.columns[j]}",
+                        "相关系数": f"{corr:.2f}",
+                        "解释": "这两个变量存在弱相关性。"
+                    })
 
-def load_and_explore_csvs(folder_path, encoding='utf-8', report=False, target_dir='.'):
-    """
-    加载并探索指定文件夹中的所有CSV文件
+        # PCA分析解读
+        pca_stats = self.pca_analysis()
+        pca_interpretation = {
+            "总体情况": f"主成分分析结果显示，数据集中有 {pca_stats['主成分数量']} 个主成分。",
+            "建议保留主成分数": f"建议保留 {pca_stats['建议保留主成分数量']} 个主成分，可以解释 {pca_stats['累计方差贡献率'][pca_stats['建议保留主成分数量']-1]*100:.2f}% 的方差。",
+            "解释": "主成分分析可以帮助降维，减少变量间的相关性。"
+        }
 
-    Args:
-        folder_path (str): CSV文件所在的文件夹路径
-        encoding (str): 文件编码，默认为'utf-8'
-        report (bool): 是否生成分析报告
-        target_dir (str): 报告保存的目标目录
-    """
-    # 确保目标目录存在
-    os.makedirs(target_dir, exist_ok=True)
+        return {
+            "正态性检验": normality_interpretation,
+            "峰度偏度分析": skew_kurt_interpretation,
+            "相关性分析": corr_interpretation,
+            "主成分分析": pca_interpretation
+        }
 
-    # 获取所有CSV文件
-    csv_files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+    def _analyze_skew_kurtosis(self) -> pd.DataFrame:
+        """分析数值型变量的峰度和偏度"""
+        results = []
+        for col in self.numeric_cols:
+            data = self.df[col].dropna()
+            if len(data) > 0:
+                skewness = skew(data)
+                kurtosis_val = kurtosis(data)
+                results.append({
+                    "列名": col,
+                    "偏度": skewness,
+                    "峰度": kurtosis_val
+                })
+        return pd.DataFrame(results)
 
-    if not csv_files:
-        print(f"在 {folder_path} 中没有找到CSV文件")
-        return
+    def _get_skew_kurtosis_recommendation(self, skewness: float, kurtosis: float) -> str:
+        """根据峰度和偏度生成建议"""
+        recommendations = []
+        
+        # 偏度建议
+        if abs(skewness) >= 1:
+            recommendations.append("数据严重偏斜，建议进行数据转换（如对数转换）")
+        elif abs(skewness) >= 0.5:
+            recommendations.append("数据存在一定偏斜，可以考虑进行数据转换")
+        
+        # 峰度建议
+        if abs(kurtosis) >= 2:
+            recommendations.append("数据分布与正态分布差异较大，建议使用稳健统计方法")
+        elif abs(kurtosis) >= 1:
+            recommendations.append("数据分布与正态分布有一定差异，建议检查异常值")
+        
+        if not recommendations:
+            recommendations.append("数据分布接近正态，可以使用常规统计方法")
+        
+        return "；".join(recommendations)
 
-    print(f"\n在 {folder_path} 中找到 {len(csv_files)} 个CSV文件")
+    def _generate_recommendations(self) -> List[Dict[str, str]]:
+        """生成数据分析和处理建议"""
+        recommendations = []
 
-    # 处理每个CSV文件
-    for csv_file in csv_files:
-        file_path = os.path.join(folder_path, csv_file)
-        print(f"\n处理文件: {csv_file}")
+        # 数据质量建议
+        missing_stats = self.missing_value_analysis()
+        for _, row in missing_stats.iterrows():
+            if row['缺失率 (%)'] > 0:
+                recommendations.append({
+                    "类型": "数据质量",
+                    "问题": f"变量 '{row['列名']}' 存在缺失值",
+                    "建议": row['建议处理方案']
+                })
 
-        try:
-            # 加载数据
-            df = pd.read_csv(file_path, encoding=encoding)
-            print(f"成功加载数据: {file_path}")
+        outlier_stats = self.outlier_analysis()
+        for _, row in outlier_stats.iterrows():
+            if row['异常值比例 (%)'] > 5:
+                recommendations.append({
+                    "类型": "数据质量",
+                    "问题": f"变量 '{row['列名']}' 存在较多异常值",
+                    "建议": "建议检查异常值的合理性，必要时进行处理。"
+                })
 
-            # 显示基本信息
-            print(f"\n文件: {csv_file}")
-            print(f"行数: {df.shape[0]}, 列数: {df.shape[1]}")
+        # 统计分析建议
+        normality_stats = self.normality_test()
+        for _, row in normality_stats.iterrows():
+            if row['是否正态分布'] == '否':
+                recommendations.append({
+                    "类型": "统计分析",
+                    "问题": f"变量 '{row['列名']}' 不服从正态分布",
+                    "建议": "建议使用非参数检验方法进行分析。"
+                })
 
-            # 如果启用了报告功能，生成分析报告
-            if report:
-                key_name = os.path.splitext(csv_file)[0]
-                report_file = generate_analysis_report(df, key_name, target_dir)
-                print(f"已生成分析报告: {report_file}")
+        # 峰度偏度建议
+        skew_kurt_stats = self._analyze_skew_kurtosis()
+        for _, row in skew_kurt_stats.iterrows():
+            if abs(row['偏度']) >= 1 or abs(row['峰度']) >= 2:
+                recommendations.append({
+                    "类型": "统计分析",
+                    "问题": f"变量 '{row['列名']}' 的分布严重偏离正态分布",
+                    "建议": self._get_skew_kurtosis_recommendation(row['偏度'], row['峰度'])
+                })
 
-        except Exception as e:
-            print(f"处理文件 {csv_file} 时出错: {str(e)}")
+        corr_matrix = self.correlation_analysis()
+        for i in range(len(corr_matrix.columns)):
+            for j in range(i+1, len(corr_matrix.columns)):
+                corr = corr_matrix.iloc[i, j]
+                if abs(corr) >= 0.7:
+                    recommendations.append({
+                        "类型": "统计分析",
+                        "问题": f"变量 '{corr_matrix.columns[i]}' 和 '{corr_matrix.columns[j]}' 存在强相关性",
+                        "建议": "建议考虑删除其中一个变量或使用主成分分析降维。"
+                    })
 
-# if __name__ == "__main__":
-#     # 示例使用
-#     folder_path = "your_data_folder"  # 替换为实际的文件夹路径
-#     target_dir = "reports"            # 替换为实际的报告保存目录
-#     load_and_explore_csvs(folder_path, report=True, target_dir=target_dir)
+        return recommendations
 
-# Example usage
-# if __name__ == "__main__":
-#     analyze_data_to_html("科研数据汇总（2024-10-27清洁版）.xlsx")
+    # ==================== 报告生成 ====================
+    def generate_report(self, output_html: str = "analysis_report.html") -> None:
+        """生成分析报告"""
+        # 收集所有分析结果
+        analysis_results = {
+            "basic_stats": self.basic_statistics().to_dict('records'),
+            "normality_test": self.normality_test().to_dict('records'),
+            "missing_analysis": self.missing_value_analysis().to_dict('records'),
+            "outlier_analysis": self.outlier_analysis().to_dict('records'),
+            "duplicate_analysis": self.duplicate_analysis(),
+            "correlation_matrix": self.correlation_analysis().to_dict(),
+            "multicollinearity": self.multicollinearity_analysis().to_dict('records'),
+            "pca_analysis": self.pca_analysis(),
+            "plots": {
+                "distribution": {col: self.plot_distribution(col) for col in self.df.columns},
+                "correlation": self.plot_correlation_heatmap()
+            },
+            "interpretations": self.interpret_results()  # 添加结果解读
+        }
+        
+        # 加载模板
+        env = Environment(loader=FileSystemLoader('./templates/'))
+        template = env.get_template('analyzer.html')
+        
+        # 渲染模板
+        rendered_html = template.render({
+            "data": json.dumps(analysis_results, default=self._convert_to_serializable),
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+        # 保存报告
+        with open(output_html, 'w', encoding='utf-8') as f:
+            f.write(rendered_html)
+        print(f"分析报告已保存至: {output_html}")
+
+    @staticmethod
+    def _convert_to_serializable(obj: Any) -> Any:
+        """将对象转换为可序列化的格式"""
+        if isinstance(obj, (np.int64, np.int32)):
+            return int(obj)
+        elif isinstance(obj, (np.float64, np.float32)):
+            return float(obj)
+        elif pd.isna(obj):
+            return None
+        elif isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, (pd.DataFrame, pd.Series)):
+            return obj.to_dict()
+        raise TypeError(f"Type {type(obj)} not serializable")
+
+# 工具函数
+def load_data(file_path: str) -> pd.DataFrame:
+    """加载数据文件"""
+    if file_path.endswith('.csv'):
+        return pd.read_csv(file_path)
+    elif file_path.endswith(('.xls', '.xlsx')):
+        return pd.read_excel(file_path)
+    elif file_path.endswith('.json'):
+        return pd.read_json(file_path)
+    else:
+        raise ValueError("不支持的文件格式")
+
+def analyze_data(file_path: str, output_html: str = "analysis_report.html") -> None:
+    """分析数据并生成报告"""
+    df = load_data(file_path)
+    analyzer = DataAnalyzer(df)
+    analyzer.generate_report(output_html)
+
+def analyze_multiple_files(folder_path: str, output_dir: str = "reports") -> None:
+    """分析文件夹中的所有数据文件"""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    for file in os.listdir(folder_path):
+        if file.endswith(('.csv', '.xls', '.xlsx', '.json')):
+            file_path = os.path.join(folder_path, file)
+            output_html = os.path.join(output_dir, f"{os.path.splitext(file)[0]}_report.html")
+            try:
+                analyze_data(file_path, output_html)
+                print(f"已分析文件: {file}")
+            except Exception as e:
+                print(f"分析文件 {file} 时出错: {str(e)}")

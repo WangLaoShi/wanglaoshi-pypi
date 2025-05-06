@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.10.5'
+about['__version__'] = '0.10.6'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
@@ -50,7 +50,9 @@ setup(
         'scipy',
         'missingno',
         'jinja2',
-        'tqdm'
+        'tqdm',
+        'statsmodels',
+        'scikit-learn',
         # 在这里列出其他依赖的库
     ],
     author='WangLaoShi',  # 作者
