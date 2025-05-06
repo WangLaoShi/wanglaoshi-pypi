@@ -6,6 +6,7 @@ from io import BytesIO
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import pandas as pd
 import seaborn as sns
 from jinja2 import Environment, FileSystemLoader
@@ -310,6 +311,161 @@ def analyze_data_to_html(file_path, output_html="analysis_report.html"):
         f.write(rendered_html)
         print(f"Analysis report saved to {output_html}")
 
+
+def generate_analysis_report(df, key_name, target_dir='.'):
+    """
+    生成数据分析报告并保存到文件
+
+    Args:
+        df (pd.DataFrame): 要分析的数据框
+        key_name (str): 报告的关键名称
+        target_dir (str): 报告保存的目标目录
+    """
+    # 创建报告内容
+    report_lines = []
+
+    # 添加报告头部
+    report_lines.append(f"数据分析报告 - {key_name}")
+    report_lines.append(f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    report_lines.append("=" * 50)
+
+    # 基本信息
+    report_lines.append("\n1. 基本信息")
+    report_lines.append("-" * 30)
+    report_lines.append(f"行数: {df.shape[0]}")
+    report_lines.append(f"列数: {df.shape[1]}")
+
+    # 数据类型
+    report_lines.append("\n2. 数据类型检查")
+    report_lines.append("-" * 30)
+    for col, dtype in df.dtypes.items():
+        report_lines.append(f"{col}: {dtype}")
+
+    # 缺失值统计
+    report_lines.append("\n3. 缺失值统计")
+    report_lines.append("-" * 30)
+    missing_stats = df.isnull().sum()
+    for col, count in missing_stats.items():
+        if count > 0:
+            percentage = (count / len(df)) * 100
+            report_lines.append(f"{col}: {count} 个缺失值 ({percentage:.2f}%)")
+
+    # 唯一值统计
+    report_lines.append("\n4. 唯一值统计")
+    report_lines.append("-" * 30)
+    unique_stats = df.nunique()
+    for col, count in unique_stats.items():
+        report_lines.append(f"{col}: {count} 个唯一值")
+
+    # 数值型列的统计信息
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    if len(numeric_cols) > 0:
+        report_lines.append("\n5. 数值型列的统计信息")
+        report_lines.append("-" * 30)
+        stats = df[numeric_cols].describe()
+        for col in numeric_cols:
+            report_lines.append(f"\n{col} 的统计信息:")
+            report_lines.append(f"  均值: {stats[col]['mean']:.2f}")
+            report_lines.append(f"  标准差: {stats[col]['std']:.2f}")
+            report_lines.append(f"  最小值: {stats[col]['min']:.2f}")
+            report_lines.append(f"  25%分位数: {stats[col]['25%']:.2f}")
+            report_lines.append(f"  中位数: {stats[col]['50%']:.2f}")
+            report_lines.append(f"  75%分位数: {stats[col]['75%']:.2f}")
+            report_lines.append(f"  最大值: {stats[col]['max']:.2f}")
+
+    # 非数值型列的统计信息
+    non_numeric_cols = df.select_dtypes(exclude=[np.number]).columns
+    if len(non_numeric_cols) > 0:
+        report_lines.append("\n6. 非数值型列的统计信息")
+        report_lines.append("-" * 30)
+        for col in non_numeric_cols:
+            report_lines.append(f"\n{col} 的分布:")
+            value_counts = df[col].value_counts().head(10)
+            for value, count in value_counts.items():
+                percentage = (count / len(df)) * 100
+                report_lines.append(f"  {value}: {count} 次 ({percentage:.2f}%)")
+
+    # 确保目标目录存在
+    os.makedirs(target_dir, exist_ok=True)
+
+    # 保存报告到文件
+    report_file = os.path.join(target_dir, f"{key_name}_report.txt")
+    with open(report_file, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(report_lines))
+
+    print(f"分析报告已保存到: {report_file}")
+    return report_file
+
+
+def load_and_analyze_data(file_path, key_name, target_dir='.'):
+    """
+    加载数据并执行分析
+
+    Args:
+        file_path (str): 数据文件路径
+        key_name (str): 报告的关键名称
+        target_dir (str): 报告保存的目标目录
+    """
+    try:
+        df = pd.read_csv(file_path)
+        print(f"成功加载数据: {file_path}")
+        report_file = generate_analysis_report(df, key_name, target_dir)
+        return df, report_file
+    except Exception as e:
+        print(f"加载数据时出错: {str(e)}")
+        return None, None
+
+
+def load_and_explore_csvs(folder_path, encoding='utf-8', report=False, target_dir='.'):
+    """
+    加载并探索指定文件夹中的所有CSV文件
+
+    Args:
+        folder_path (str): CSV文件所在的文件夹路径
+        encoding (str): 文件编码，默认为'utf-8'
+        report (bool): 是否生成分析报告
+        target_dir (str): 报告保存的目标目录
+    """
+    # 确保目标目录存在
+    os.makedirs(target_dir, exist_ok=True)
+
+    # 获取所有CSV文件
+    csv_files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+
+    if not csv_files:
+        print(f"在 {folder_path} 中没有找到CSV文件")
+        return
+
+    print(f"\n在 {folder_path} 中找到 {len(csv_files)} 个CSV文件")
+
+    # 处理每个CSV文件
+    for csv_file in csv_files:
+        file_path = os.path.join(folder_path, csv_file)
+        print(f"\n处理文件: {csv_file}")
+
+        try:
+            # 加载数据
+            df = pd.read_csv(file_path, encoding=encoding)
+            print(f"成功加载数据: {file_path}")
+
+            # 显示基本信息
+            print(f"\n文件: {csv_file}")
+            print(f"行数: {df.shape[0]}, 列数: {df.shape[1]}")
+
+            # 如果启用了报告功能，生成分析报告
+            if report:
+                key_name = os.path.splitext(csv_file)[0]
+                report_file = generate_analysis_report(df, key_name, target_dir)
+                print(f"已生成分析报告: {report_file}")
+
+        except Exception as e:
+            print(f"处理文件 {csv_file} 时出错: {str(e)}")
+
+# if __name__ == "__main__":
+#     # 示例使用
+#     folder_path = "your_data_folder"  # 替换为实际的文件夹路径
+#     target_dir = "reports"            # 替换为实际的报告保存目录
+#     load_and_explore_csvs(folder_path, report=True, target_dir=target_dir)
 
 # Example usage
 # if __name__ == "__main__":

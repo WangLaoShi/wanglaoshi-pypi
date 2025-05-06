@@ -123,6 +123,15 @@ from wanglaoshi import JupyterFont as JF
 JF.matplotlib_font_init()
 ```
 
+## 9. 数据的基本分析（适合比赛）
+
+```python
+from wanglaoshi import Analyzer as A
+folder_path = "your_data_folder"  # 替换为实际的文件夹路径
+target_dir = "reports"            # 替换为实际的报告保存目录
+A.load_and_explore_csvs(folder_path, report=True, target_dir=target_dir)
+```
+
 ## 建议的版本对照关系
 
 1. numpy https://numpy.org/news/
