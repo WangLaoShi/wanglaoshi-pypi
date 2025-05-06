@@ -34,7 +34,7 @@ class DataAnalyzer:
     # ==================== 基础统计分析 ====================
     def basic_statistics(self) -> pd.DataFrame:
         """计算基本统计量"""
-        stats_df = self.df.describe(include='all', datetime_is_numeric=True).transpose()
+        stats_df = self.df.describe(include='all').transpose()
         stats_df['缺失值数量'] = self.df.isnull().sum()
         stats_df['缺失率 (%)'] = (self.df.isnull().mean() * 100).round(2)
         stats_df['唯一值数量'] = self.df.nunique()

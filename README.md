@@ -26,6 +26,7 @@ WangLaoShi
 - 0.0.9 增加 jinja2 的模板输出的 Analyzer
 - 0.10.0 增加 no_waring,字体获取，安装字体
 - 0.10.6 增加 Analyzer 的使用部分(需要 statsmodels)
+- 0.10.7 增加 MLDL 部分(需要 sklearn,torch)
 
 ## 安装方式
 
@@ -177,6 +178,45 @@ A.analyze_multiple_files('test_data', output_dir='reports')
 分析完成后，您可以在 `reports` 目录下找到生成的分析报告：
 - `tips_report.html`：餐厅小费数据集的分析报告
 - `iris_report.html`：鸢尾花数据集的分析报告
+
+## 10. MLDL
+
+```python
+"""使用示例"""
+from MLDL import *
+# 1. 数据预处理
+preprocessor = DataPreprocessor()
+df = pd.DataFrame({
+    'A': [1, 2, np.nan, 4, 5],
+    'B': ['a', 'b', 'a', 'c', 'b']
+})
+df_processed = preprocessor.handle_missing_values(df, method='mean')
+df_encoded = preprocessor.encode_categorical(df_processed, ['B'])
+
+# 2. 特征工程
+engineer = FeatureEngineer()
+df_features = engineer.create_polynomial_features(df_encoded, ['A'], degree=2)
+
+# 3. 机器学习模型
+ml_model = MLModel('logistic')
+X = df_features[['A', 'A_power_2']]
+y = df_features['B']
+ml_model.train(X, y)
+metrics = ml_model.evaluate()
+print("ML模型评估结果:", metrics)
+
+# 4. 深度学习模型
+dl_model = DLModel(input_size=2, hidden_size=4, output_size=3)
+X_tensor = torch.FloatTensor(X.values)
+y_tensor = torch.LongTensor(y.values)
+dl_model.train(X_tensor, y_tensor, epochs=100)
+
+# 5. 模型评估
+evaluator = ModelEvaluator()
+y_pred = ml_model.predict(X)
+evaluator.plot_confusion_matrix(y, y_pred)
+```
+
 
 ## 建议的版本对照关系
 
