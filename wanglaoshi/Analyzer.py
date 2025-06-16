@@ -1,24 +1,29 @@
-import base64
-import io
-import json
 import os  # 确保os模块在文件开头导入
+import base64
+import json
+import logging
 from datetime import datetime
 from io import BytesIO
-from typing import Union, List, Dict, Any
+from typing import Dict, List, Any
 
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+from matplotlib import rcParams
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from jinja2 import Environment, FileSystemLoader
-from matplotlib import rcParams
-from scipy import stats
-from scipy.stats import skew, kurtosis, zscore, chi2_contingency, normaltest, shapiro
-from statsmodels.stats.outliers_influence import variance_inflation_factor
+from scipy.stats import skew, kurtosis, zscore, normaltest, shapiro
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import LabelEncoder
-import matplotlib.font_manager as fm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # 获取当前文件所在目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -30,21 +35,171 @@ if os.path.exists(font_path):
     rcParams['font.family'] = 'sans-serif'
     rcParams['font.sans-serif'] = ['SimHei'] + rcParams['font.sans-serif']
     rcParams['axes.unicode_minus'] = False
-    print(f"已加载字体文件: {font_path}")
+    logger.info(f"已加载字体文件: {font_path}")
 else:
-    print(f"警告: 未找到字体文件: {font_path}")
+    logger.warning(f"警告: 未找到字体文件: {font_path}")
     # 使用系统默认字体
     rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'WenQuanYi Micro Hei', 'sans-serif']
     rcParams['axes.unicode_minus'] = False
+
+class DataProcessor:
+    """数据处理工具类"""
+    
+    @staticmethod
+    def validate_dataframe(df: pd.DataFrame) -> None:
+        """验证DataFrame的有效性"""
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError("输入必须是pandas DataFrame")
+        if df.empty:
+            raise ValueError("DataFrame不能为空")
+    
+    @staticmethod
+    def get_column_types(df: pd.DataFrame) -> Dict[str, List[str]]:
+        """获取列类型信息"""
+        return {
+            'numeric_cols': df.select_dtypes(include=['number']).columns.tolist(),
+            'categorical_cols': df.select_dtypes(include=['object', 'category']).columns.tolist(),
+            'datetime_cols': df.select_dtypes(include=['datetime']).columns.tolist()
+        }
+    
+    @staticmethod
+    def process_value(v: Any) -> Any:
+        """处理单个值，转换为可序列化格式"""
+        if isinstance(v, np.ndarray):
+            return v.tolist()
+        if isinstance(v, (np.int64, np.int32)):
+            return int(v)
+        if isinstance(v, (np.float64, np.float32)):
+            if np.isnan(v) or np.isinf(v):
+                return None
+            return float(v)
+        if isinstance(v, datetime):
+            return v.isoformat()
+        if isinstance(v, pd.Series):
+            return v.to_dict()
+        if isinstance(v, pd.DataFrame):
+            return v.to_dict('records')
+        try:
+            if pd.isna(v):
+                return None
+        except (TypeError, ValueError):
+            pass
+        return v
+    
+    @staticmethod
+    def process_data(obj: Any) -> Any:
+        """递归处理数据，转换为可序列化格式"""
+        if isinstance(obj, dict):
+            return {k: DataProcessor.process_data(v) for k, v in obj.items()}
+        elif isinstance(obj, (list, np.ndarray)):
+            return [DataProcessor.process_data(item) for item in obj]
+        else:
+            return DataProcessor.process_value(obj)
+    
+    @staticmethod
+    def chunk_dataframe(df: pd.DataFrame, chunk_size: int = 1000) -> List[pd.DataFrame]:
+        """将DataFrame分块处理"""
+        return [df[i:i + chunk_size] for i in range(0, len(df), chunk_size)]
 
 class DataAnalyzer:
     """数据分析器主类"""
     
     def __init__(self, df: pd.DataFrame):
+        # 验证输入数据
+        DataProcessor.validate_dataframe(df)
         self.df = df.copy()
-        self.numeric_cols = self.df.select_dtypes(include=['number']).columns
-        self.categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns
-        self.datetime_cols = self.df.select_dtypes(include=['datetime']).columns
+        
+        # 获取列类型信息
+        column_types = DataProcessor.get_column_types(self.df)
+        self.numeric_cols = column_types['numeric_cols']
+        self.categorical_cols = column_types['categorical_cols']
+        self.datetime_cols = column_types['datetime_cols']
+        
+        # 初始化可视化工具
+        self.visualizer = Visualizer(font_prop)
+        
+        # 初始化缓存
+        self._correlation_cache = None
+        self._multicollinearity_cache = None
+    
+    def __del__(self):
+        """清理资源"""
+        if hasattr(self, 'visualizer'):
+            self.visualizer.clear_cache()
+    
+    def correlation_analysis(self) -> pd.DataFrame:
+        """相关性分析"""
+        if self._correlation_cache is None:
+            self._correlation_cache = self.df[self.numeric_cols].corr()
+        return self._correlation_cache
+    
+    def multicollinearity_analysis(self) -> pd.DataFrame:
+        """多重共线性分析"""
+        if self._multicollinearity_cache is None:
+            vif_data = pd.DataFrame()
+            vif_data["列名"] = self.numeric_cols
+            vif_data["VIF"] = [variance_inflation_factor(self.df[self.numeric_cols].values, i) 
+                              for i in range(len(self.numeric_cols))]
+            self._multicollinearity_cache = vif_data
+        return self._multicollinearity_cache
+    
+    def plot_distribution(self, column: str) -> str:
+        """绘制分布图"""
+        if column not in self.df.columns:
+            raise ValueError(f"列名不存在: {column}")
+        return self.visualizer.plot_distribution(self.df[column], column)
+    
+    def plot_correlation_heatmap(self) -> str:
+        """绘制相关性热图"""
+        return self.visualizer.plot_correlation_heatmap(self.correlation_analysis())
+    
+    def generate_report(self, output_html: str = "analysis_report.html") -> None:
+        """生成分析报告"""
+        try:
+            # 获取数据集名称
+            try:
+                base_name = os.path.basename(output_html)
+                name_without_ext = os.path.splitext(base_name)[0]
+                suffixes_to_remove = ['_analysis', '_report', '_data']
+                dataset_name = name_without_ext
+                for suffix in suffixes_to_remove:
+                    if dataset_name.endswith(suffix):
+                        dataset_name = dataset_name[:-len(suffix)]
+                dataset_name = dataset_name.replace('_', ' ').title()
+            except Exception as e:
+                logger.error(f"处理数据集名称时出错: {str(e)}")
+                dataset_name = "未命名数据集"
+            
+            # 收集所有分析结果
+            logger.info("收集分析结果...")
+            analysis_results = {
+                "dataset_name": dataset_name,
+                "basic_stats": self.basic_statistics().to_dict('records'),
+                "normality_test": self.normality_test().to_dict('records'),
+                "missing_analysis": self.missing_value_analysis().to_dict('records'),
+                "outlier_analysis": self.outlier_analysis().to_dict('records'),
+                "duplicate_analysis": self.duplicate_analysis(),
+                "correlation_matrix": self.correlation_analysis().to_dict(),
+                "multicollinearity": self.multicollinearity_analysis().to_dict('records'),
+                "pca_analysis": self.pca_analysis(),
+                "plots": {
+                    "distribution": {col: self.plot_distribution(col) for col in self.df.columns},
+                    "correlation": self.plot_correlation_heatmap()
+                },
+                "interpretations": self.interpret_results()
+            }
+            
+            # 获取包内模板目录的绝对路径
+            template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+            static_dir = os.path.join(os.path.dirname(__file__), 'static')
+            
+            # 创建报告生成器并生成报告
+            report_generator = ReportGenerator(template_dir, static_dir)
+            report_generator.generate_report(analysis_results, output_html)
+            
+        except Exception as e:
+            logger.error(f"生成报告时出错: {str(e)}")
+            raise
 
     # ==================== 基础统计分析 ====================
     def basic_statistics(self) -> pd.DataFrame:
@@ -229,21 +384,6 @@ class DataAnalyzer:
         }
 
     # ==================== 高级统计分析 ====================
-    def correlation_analysis(self) -> pd.DataFrame:
-        """相关性分析"""
-        # 只对数值型变量计算相关性
-        corr_matrix = self.df[self.numeric_cols].corr()
-        return corr_matrix
-
-    def multicollinearity_analysis(self) -> pd.DataFrame:
-        """多重共线性分析"""
-        # 只对数值型变量计算VIF
-        vif_data = pd.DataFrame()
-        vif_data["列名"] = self.numeric_cols
-        vif_data["VIF"] = [variance_inflation_factor(self.df[self.numeric_cols].values, i) 
-                          for i in range(len(self.numeric_cols))]
-        return vif_data
-
     def pca_analysis(self) -> Dict[str, Any]:
         """主成分分析"""
         if len(self.numeric_cols) < 2:
@@ -266,50 +406,6 @@ class DataAnalyzer:
             "累计方差贡献率": cumulative_variance,
             "建议保留主成分数量": np.argmax(cumulative_variance >= 0.95) + 1
         }
-
-    # ==================== 数据可视化 ====================
-    def plot_distribution(self, column: str) -> str:
-        """绘制分布图"""
-        if column not in self.df.columns:
-            return "列名不存在"
-            
-        plt.figure(figsize=(10, 6))
-        if column in self.numeric_cols:
-            sns.histplot(self.df[column], kde=True)
-            plt.title(f"{column} 的分布", fontproperties=font_prop)
-            plt.xlabel(column, fontproperties=font_prop)
-            plt.ylabel('频数', fontproperties=font_prop)
-        else:
-            sns.countplot(x=column, data=self.df)
-            plt.title(f"{column} 的频数分布", fontproperties=font_prop)
-            plt.xlabel(column, fontproperties=font_prop)
-            plt.ylabel('频数', fontproperties=font_prop)
-            plt.xticks(rotation=45, fontproperties=font_prop)
-            plt.yticks(fontproperties=font_prop)
-        
-        buf = BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight', dpi=100)
-        buf.seek(0)
-        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
-        plt.close()
-        return img_base64
-
-    def plot_correlation_heatmap(self) -> str:
-        """绘制相关性热图"""
-        plt.figure(figsize=(12, 8))
-        sns.heatmap(self.correlation_analysis(), annot=True, cmap='coolwarm', fmt='.2f')
-        plt.title('相关性热图', fontproperties=font_prop)
-        
-        # 设置坐标轴标签字体
-        plt.xticks(fontproperties=font_prop)
-        plt.yticks(fontproperties=font_prop)
-        
-        buf = BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight', dpi=100)
-        buf.seek(0)
-        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
-        plt.close()
-        return img_base64
 
     # ==================== 结果解读 ====================
     def interpret_results(self) -> Dict[str, Any]:
@@ -612,293 +708,74 @@ class DataAnalyzer:
 
         return recommendations
 
-    # ==================== 报告生成 ====================
-    def _copy_static_files(self, static_dir: str) -> None:
-        """复制静态文件到输出目录"""
-        import shutil
-        import os
-        
-        # 源文件路径
-        source_js = os.path.join(os.path.dirname(__file__), 'static', 'js', 'analyzer.js')
-        target_js = os.path.join(static_dir, 'js', 'analyzer.js')
-        
-        # 确保目标目录存在
-        os.makedirs(os.path.dirname(target_js), exist_ok=True)
-        
-        # 复制文件
-        try:
-            if os.path.exists(source_js):
-                if os.path.exists(target_js):
-                    # 如果目标文件存在且与源文件不同，则更新
-                    if not self._files_are_identical(source_js, target_js):
-                        shutil.copy2(source_js, target_js)
-                        print(f"更新了JavaScript文件: {target_js}")
-                else:
-                    shutil.copy2(source_js, target_js)
-                    print(f"复制了JavaScript文件: {target_js}")
-            else:
-                print(f"警告: 源文件不存在: {source_js}")
-        except Exception as e:
-            print(f"复制静态文件时出错: {str(e)}")
+class Visualizer:
+    """数据可视化工具类"""
     
-    @staticmethod
-    def _files_are_identical(file1: str, file2: str) -> bool:
-        """比较两个文件是否相同"""
+    def __init__(self, font_prop: fm.FontProperties):
+        self.font_prop = font_prop
+        self._figure_cache = {}
+    
+    def _create_figure(self, figsize: tuple = (10, 6)) -> plt.Figure:
+        """创建新的图表"""
+        return plt.figure(figsize=figsize)
+    
+    def _close_figure(self, fig: plt.Figure) -> None:
+        """关闭图表"""
+        plt.close(fig)
+    
+    def plot_distribution(self, data: pd.Series, column: str) -> str:
+        """绘制分布图"""
         try:
-            with open(file1, 'rb') as f1, open(file2, 'rb') as f2:
-                return f1.read() == f2.read()
-        except Exception:
-            return False
-
-    def generate_report(self, output_html: str = "analysis_report.html") -> None:
-        """生成分析报告"""
-        print("开始生成报告...")
-        
-        # 获取数据集名称
-        try:
-            # 从文件名中提取数据集名称
-            base_name = os.path.basename(output_html)
-            # 移除文件扩展名
-            name_without_ext = os.path.splitext(base_name)[0]
-            # 移除常见的后缀
-            suffixes_to_remove = ['_analysis', '_report', '_data']
-            dataset_name = name_without_ext
-            for suffix in suffixes_to_remove:
-                if dataset_name.endswith(suffix):
-                    dataset_name = dataset_name[:-len(suffix)]
-            # 将下划线替换为空格并首字母大写
-            dataset_name = dataset_name.replace('_', ' ').title()
-        except Exception as e:
-            print(f"处理数据集名称时出错: {str(e)}")
-            dataset_name = "未命名数据集"
-        
-        # 收集所有分析结果
-        print("收集分析结果...")
-        analysis_results = {
-            "dataset_name": dataset_name,  # 添加数据集名称
-            "basic_stats": self.basic_statistics().to_dict('records'),
-            "normality_test": self.normality_test().to_dict('records'),
-            "missing_analysis": self.missing_value_analysis().to_dict('records'),
-            "outlier_analysis": self.outlier_analysis().to_dict('records'),
-            "duplicate_analysis": self.duplicate_analysis(),
-            "correlation_matrix": self.correlation_analysis().to_dict(),
-            "multicollinearity": self.multicollinearity_analysis().to_dict('records'),
-            "pca_analysis": self.pca_analysis(),
-            "plots": {
-                "distribution": {col: self.plot_distribution(col) for col in self.df.columns},
-                "correlation": self.plot_correlation_heatmap()
-            },
-            "interpretations": self.interpret_results()
-        }
-        print("分析结果收集完成")
-        
-        # 获取包内模板目录的绝对路径
-        import os
-        import wanglaoshi
-        template_dir = os.path.join(os.path.dirname(wanglaoshi.__file__), 'templates')
-        static_dir = os.path.join(os.path.dirname(wanglaoshi.__file__), 'static')
-        print(f"模板目录: {template_dir}")
-        print(f"静态文件目录: {static_dir}")
-        
-        # 确保静态文件目录存在并复制静态文件
-        os.makedirs(static_dir, exist_ok=True)
-        os.makedirs(os.path.join(static_dir, 'js'), exist_ok=True)
-        self._copy_static_files(static_dir)
-        
-        # 加载模板
-        env = Environment(loader=FileSystemLoader(template_dir))
-        template = env.get_template('analyzer.html')
-        print("模板加载成功")
-        
-        # 获取输出文件的目录
-        output_dir = os.path.dirname(os.path.abspath(output_html))
-        if not output_dir:
-            output_dir = os.getcwd()
-        print(f"输出目录: {output_dir}")
-        
-        # 计算静态文件的相对路径
-        static_url = os.path.relpath(static_dir, output_dir)
-        if static_url.startswith('..'):
-            static_url = os.path.join('..', static_url)
-        print(f"静态文件URL: {static_url}")
-        
-        # 处理数据中的特殊值
-        def process_value(v):
-            if isinstance(v, np.ndarray):
-                return v.tolist()
-            if isinstance(v, (np.int64, np.int32)):
-                return int(v)
-            if isinstance(v, (np.float64, np.float32)):
-                if np.isnan(v) or np.isinf(v):
-                    return None
-                return float(v)
-            if isinstance(v, datetime):
-                return v.isoformat()
-            if isinstance(v, pd.Series):
-                return v.to_dict()
-            if isinstance(v, pd.DataFrame):
-                return v.to_dict('records')
-            try:
-                if pd.isna(v):
-                    return None
-            except (TypeError, ValueError):
-                pass
-            return v
-
-        def process_data(obj):
-            if isinstance(obj, dict):
-                return {k: process_data(v) for k, v in obj.items()}
-            elif isinstance(obj, (list, np.ndarray)):
-                return [process_data(item) for item in obj]
+            fig = self._create_figure()
+            if pd.api.types.is_numeric_dtype(data):
+                sns.histplot(data, kde=True)
+                plt.title(f"{column} 的分布", fontproperties=self.font_prop)
+                plt.xlabel(column, fontproperties=self.font_prop)
+                plt.ylabel('频数', fontproperties=self.font_prop)
             else:
-                return process_value(obj)
-
-        # 处理数据并转换为JSON
-        processed_data = process_data(analysis_results)
-        json_data = json.dumps(processed_data, ensure_ascii=False)
-        
-        # 渲染模板
-        print("开始渲染模板...")
-        rendered_html = template.render(
-            data=json_data,
-            timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            static_url=static_url
-        )
-        print("模板渲染完成")
-        
-        # 保存报告
-        print(f"保存报告到: {output_html}")
-        with open(output_html, 'w', encoding='utf-8') as f:
-            f.write(rendered_html)
-        print(f"分析报告已保存至: {output_html}")
-
-    @staticmethod
-    def _convert_to_serializable(obj: Any) -> Any:
-        """将对象转换为可序列化的格式"""
-        if isinstance(obj, (np.int64, np.int32)):
-            return int(obj)
-        elif isinstance(obj, (np.float64, np.float32)):
-            if np.isnan(obj) or np.isinf(obj):
-                return "NaN"
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return [DataAnalyzer._convert_to_serializable(item) for item in obj.tolist()]
-        elif isinstance(obj, pd.Series):
-            return obj.apply(lambda x: "NaN" if pd.isna(x) else DataAnalyzer._convert_to_serializable(x)).to_dict()
-        elif isinstance(obj, pd.DataFrame):
-            return obj.applymap(lambda x: "NaN" if pd.isna(x) else DataAnalyzer._convert_to_serializable(x)).to_dict('records')
-        elif isinstance(obj, datetime):
-            return obj.isoformat()
-        elif pd.isna(obj):
-            return "NaN"
-        elif isinstance(obj, (list, tuple)):
-            return [DataAnalyzer._convert_to_serializable(item) for item in obj]
-        elif isinstance(obj, dict):
-            return {k: DataAnalyzer._convert_to_serializable(v) for k, v in obj.items()}
-        return obj
-
-    def render_notebook(self) -> None:
-        """在Jupyter Notebook中直接显示分析报告"""
-        try:
-            from IPython.display import HTML, display
-            import json
-            from datetime import datetime
+                sns.countplot(x=data)
+                plt.title(f"{column} 的频数分布", fontproperties=self.font_prop)
+                plt.xlabel(column, fontproperties=self.font_prop)
+                plt.ylabel('频数', fontproperties=self.font_prop)
+                plt.xticks(rotation=45, fontproperties=self.font_prop)
+                plt.yticks(fontproperties=self.font_prop)
             
-            # 获取数据集名称
-            try:
-                dataset_name = "未命名数据集"
-                # 尝试从DataFrame的name属性获取名称
-                if hasattr(self.df, 'name') and self.df.name:
-                    dataset_name = self.df.name
-            except Exception as e:
-                print(f"处理数据集名称时出错: {str(e)}")
-            
-            # 收集所有分析结果
-            print("收集分析结果...")
-            analysis_results = {
-                "dataset_name": dataset_name,
-                "basic_stats": self.basic_statistics().to_dict('records'),
-                "normality_test": self.normality_test().to_dict('records'),
-                "missing_analysis": self.missing_value_analysis().to_dict('records'),
-                "outlier_analysis": self.outlier_analysis().to_dict('records'),
-                "duplicate_analysis": self.duplicate_analysis(),
-                "correlation_matrix": self.correlation_analysis().to_dict(),
-                "multicollinearity": self.multicollinearity_analysis().to_dict('records'),
-                "pca_analysis": self.pca_analysis(),
-                "plots": {
-                    "distribution": {col: self.plot_distribution(col) for col in self.df.columns},
-                    "correlation": self.plot_correlation_heatmap()
-                },
-                "interpretations": self.interpret_results()
-            }
-            
-            # 处理数据中的特殊值
-            def process_value(v):
-                if isinstance(v, np.ndarray):
-                    return v.tolist()
-                if isinstance(v, (np.int64, np.int32)):
-                    return int(v)
-                if isinstance(v, (np.float64, np.float32)):
-                    if np.isnan(v) or np.isinf(v):
-                        return None
-                    return float(v)
-                if isinstance(v, datetime):
-                    return v.isoformat()
-                if isinstance(v, pd.Series):
-                    return v.to_dict()
-                if isinstance(v, pd.DataFrame):
-                    return v.to_dict('records')
-                try:
-                    if pd.isna(v):
-                        return None
-                except (TypeError, ValueError):
-                    pass
-                return v
-
-            def process_data(obj):
-                if isinstance(obj, dict):
-                    return {k: process_data(v) for k, v in obj.items()}
-                elif isinstance(obj, (list, np.ndarray)):
-                    return [process_data(item) for item in obj]
-                else:
-                    return process_value(obj)
-
-            # 处理数据并转换为JSON
-            processed_data = process_data(analysis_results)
-            json_data = json.dumps(processed_data, ensure_ascii=False)
-            
-            # 获取模板目录
-            template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-            
-            # 加载模板
-            env = Environment(loader=FileSystemLoader(template_dir))
-            template = env.get_template('analyzer.html')
-            
-            # 渲染模板
-            rendered_html = template.render(
-                data=json_data,
-                timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                static_url=""
-            )
-            
-            # 在notebook中显示
-            display(HTML(rendered_html))
-            
-        except ImportError:
-            print("错误：此方法需要在Jupyter Notebook环境中运行")
+            buf = BytesIO()
+            plt.savefig(buf, format='png', bbox_inches='tight', dpi=100)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+            self._close_figure(fig)
+            return img_base64
         except Exception as e:
-            print(f"渲染报告时出错: {str(e)}")
-
-    def analyze_notebook(self) -> None:
-        """在Jupyter Notebook中分析数据并显示报告"""
+            logger.error(f"绘制分布图时出错: {str(e)}")
+            self._close_figure(fig)
+            raise
+    
+    def plot_correlation_heatmap(self, corr_matrix: pd.DataFrame) -> str:
+        """绘制相关性热图"""
         try:
-            from IPython.display import display, HTML
-            print("开始分析数据...")
-            self.render_notebook()
-        except ImportError:
-            print("错误：此方法需要在Jupyter Notebook环境中运行")
+            fig = self._create_figure((12, 8))
+            sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+            plt.title('相关性热图', fontproperties=self.font_prop)
+            plt.xticks(fontproperties=self.font_prop)
+            plt.yticks(fontproperties=self.font_prop)
+            
+            buf = BytesIO()
+            plt.savefig(buf, format='png', bbox_inches='tight', dpi=100)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+            self._close_figure(fig)
+            return img_base64
         except Exception as e:
-            print(f"分析数据时出错: {str(e)}")
+            logger.error(f"绘制相关性热图时出错: {str(e)}")
+            self._close_figure(fig)
+            raise
+    
+    def clear_cache(self) -> None:
+        """清除图表缓存"""
+        for fig in self._figure_cache.values():
+            self._close_figure(fig)
+        self._figure_cache.clear()
 
 # 工具函数
 def load_data(file_path: str) -> pd.DataFrame:
@@ -946,3 +823,96 @@ def analyze_notebook(df: pd.DataFrame) -> None:
         analyzer.analyze_notebook()
     except Exception as e:
         print(f"分析数据时出错: {str(e)}")
+
+class ReportGenerator:
+    """报告生成工具类"""
+    
+    def __init__(self, template_dir: str, static_dir: str):
+        self.template_dir = template_dir
+        self.static_dir = static_dir
+        self.env = Environment(loader=FileSystemLoader(template_dir))
+    
+    def _copy_static_files(self) -> None:
+        """复制静态文件到输出目录"""
+        import shutil
+        
+        # 源文件路径
+        source_js = os.path.join(os.path.dirname(__file__), 'static', 'js', 'analyzer.js')
+        target_js = os.path.join(self.static_dir, 'js', 'analyzer.js')
+        
+        # 确保目标目录存在
+        os.makedirs(os.path.dirname(target_js), exist_ok=True)
+        
+        # 复制文件
+        try:
+            if os.path.exists(source_js):
+                if os.path.exists(target_js):
+                    # 如果目标文件存在且与源文件不同，则更新
+                    if not self._files_are_identical(source_js, target_js):
+                        shutil.copy2(source_js, target_js)
+                        logger.info(f"更新了JavaScript文件: {target_js}")
+                else:
+                    shutil.copy2(source_js, target_js)
+                    logger.info(f"复制了JavaScript文件: {target_js}")
+            else:
+                logger.warning(f"警告: 源文件不存在: {source_js}")
+        except Exception as e:
+            logger.error(f"复制静态文件时出错: {str(e)}")
+    
+    @staticmethod
+    def _files_are_identical(file1: str, file2: str) -> bool:
+        """比较两个文件是否相同"""
+        try:
+            with open(file1, 'rb') as f1, open(file2, 'rb') as f2:
+                return f1.read() == f2.read()
+        except Exception:
+            return False
+    
+    def generate_report(self, analysis_results: Dict[str, Any], output_html: str) -> None:
+        """生成分析报告"""
+        try:
+            logger.info("开始生成报告...")
+            
+            # 确保静态文件目录存在并复制静态文件
+            os.makedirs(self.static_dir, exist_ok=True)
+            os.makedirs(os.path.join(self.static_dir, 'js'), exist_ok=True)
+            self._copy_static_files()
+            
+            # 加载模板
+            template = self.env.get_template('analyzer.html')
+            logger.info("模板加载成功")
+            
+            # 获取输出文件的目录
+            output_dir = os.path.dirname(os.path.abspath(output_html))
+            if not output_dir:
+                output_dir = os.getcwd()
+            logger.info(f"输出目录: {output_dir}")
+            
+            # 计算静态文件的相对路径
+            static_url = os.path.relpath(self.static_dir, output_dir)
+            if static_url.startswith('..'):
+                static_url = os.path.join('..', static_url)
+            logger.info(f"静态文件URL: {static_url}")
+            
+            # 处理数据并转换为JSON
+            processed_data = DataProcessor.process_data(analysis_results)
+            json_data = json.dumps(processed_data, ensure_ascii=False)
+            
+            # 渲染模板
+            logger.info("开始渲染模板...")
+            rendered_html = template.render(
+                data=json_data,
+                timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                static_url=static_url
+            )
+            logger.info("模板渲染完成")
+            
+            # 保存报告
+            logger.info(f"保存报告到: {output_html}")
+            with open(output_html, 'w', encoding='utf-8') as f:
+                f.write(rendered_html)
+            logger.info(f"分析报告已保存至: {output_html}")
+            
+        except Exception as e:
+            logger.error(f"生成报告时出错: {str(e)}")
+            raise
