@@ -39,6 +39,7 @@ if os.path.exists(font_path):
 else:
     logger.warning(f"警告: 未找到字体文件: {font_path}")
     # 使用系统默认字体
+    font_prop = fm.FontProperties()
     rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'WenQuanYi Micro Hei', 'sans-serif']
     rcParams['axes.unicode_minus'] = False
 
@@ -117,6 +118,7 @@ class DataAnalyzer:
         
         # 初始化可视化工具
         self.visualizer = Visualizer(font_prop)
+        self.font_prop = font_prop  # 保存字体属性供其他方法使用
         
         # 初始化缓存
         self._correlation_cache = None
@@ -137,10 +139,31 @@ class DataAnalyzer:
     def multicollinearity_analysis(self) -> pd.DataFrame:
         """多重共线性分析"""
         if self._multicollinearity_cache is None:
+            # 只使用数值型列
+            numeric_df = self.df[self.numeric_cols].copy()
+            
+            # 处理无穷大和NaN值
+            numeric_df = numeric_df.replace([np.inf, -np.inf], np.nan)
+            numeric_df = numeric_df.fillna(numeric_df.mean())
+            
+            # 标准化数据
+            scaler = StandardScaler()
+            scaled_data = scaler.fit_transform(numeric_df)
+            
+            # 计算VIF
             vif_data = pd.DataFrame()
             vif_data["列名"] = self.numeric_cols
-            vif_data["VIF"] = [variance_inflation_factor(self.df[self.numeric_cols].values, i) 
+            vif_data["VIF"] = [variance_inflation_factor(scaled_data, i) 
                               for i in range(len(self.numeric_cols))]
+            
+            # 添加解释
+            vif_data["解释"] = vif_data["VIF"].apply(
+                lambda x: "严重多重共线性" if x > 10 else 
+                         "中等多重共线性" if x > 5 else 
+                         "轻微多重共线性" if x > 2 else 
+                         "无显著多重共线性"
+            )
+            
             self._multicollinearity_cache = vif_data
         return self._multicollinearity_cache
     
@@ -387,12 +410,20 @@ class DataAnalyzer:
     # ==================== 高级统计分析 ====================
     def pca_analysis(self) -> Dict[str, Any]:
         """主成分分析"""
-        if len(self.numeric_cols) < 2:
-            return {"error": "需要至少两个数值型变量进行PCA分析"}
-            
-        # 只对数值型变量进行PCA
+        # 只使用数值型列
+        numeric_df = self.df[self.numeric_cols].copy()
+        
+        # 处理无穷大和NaN值
+        numeric_df = numeric_df.replace([np.inf, -np.inf], np.nan)
+        
+        # 检查是否有缺失值
+        if numeric_df.isna().any().any():
+            logger.warning("数据中存在缺失值，将使用均值填充")
+            numeric_df = numeric_df.fillna(numeric_df.mean())
+        
+        # 标准化数据
         scaler = StandardScaler()
-        scaled_data = scaler.fit_transform(self.df[self.numeric_cols])
+        scaled_data = scaler.fit_transform(numeric_df)
         
         # 执行PCA
         pca = PCA()
@@ -401,11 +432,55 @@ class DataAnalyzer:
         # 计算累计方差贡献率
         cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
         
+        # 计算每个主成分的方差贡献率
+        variance_ratio = pca.explained_variance_ratio_
+        
+        # 计算特征向量（主成分的系数）
+        components = pd.DataFrame(
+            pca.components_,
+            columns=self.numeric_cols,
+            index=[f'PC{i+1}' for i in range(len(self.numeric_cols))]
+        )
+        
+        # 计算主成分得分
+        scores = pd.DataFrame(
+            pca.transform(scaled_data),
+            columns=[f'PC{i+1}' for i in range(len(self.numeric_cols))]
+        )
+        
+        # 确定主成分数量（解释95%方差所需的主成分数）
+        n_components = np.argmax(cumulative_variance >= 0.95) + 1
+        
+        # 可视化
+        plt.figure(figsize=(12, 6))
+        
+        # 绘制碎石图
+        plt.subplot(1, 2, 1)
+        plt.plot(range(1, len(variance_ratio) + 1), 
+                cumulative_variance, 'bo-')
+        plt.axhline(y=0.95, color='r', linestyle='--')
+        plt.xlabel('主成分数量')
+        plt.ylabel('累计方差贡献率')
+        plt.title('碎石图')
+        
+        # 绘制主成分载荷图
+        plt.subplot(1, 2, 2)
+        plt.bar(range(1, len(variance_ratio) + 1), 
+                variance_ratio)
+        plt.xlabel('主成分')
+        plt.ylabel('方差贡献率')
+        plt.title('主成分方差贡献率')
+        
+        plt.tight_layout()
+        plt.show()
+        
         return {
-            "主成分数量": len(self.numeric_cols),
-            "各主成分方差贡献率": pca.explained_variance_ratio_,
-            "累计方差贡献率": cumulative_variance,
-            "建议保留主成分数量": np.argmax(cumulative_variance >= 0.95) + 1
+            'n_components': n_components,
+            'variance_ratio': variance_ratio,
+            'cumulative_variance': cumulative_variance,
+            'components': components,
+            'scores': scores,
+            'feature_names': self.numeric_cols
         }
 
     # ==================== 结果解读 ====================
@@ -605,8 +680,8 @@ class DataAnalyzer:
         # PCA分析解读
         pca_stats = self.pca_analysis()
         pca_interpretation = {
-            "总体情况": f"主成分分析结果显示，数据集中有 {pca_stats['主成分数量']} 个主成分。",
-            "建议保留主成分数": f"建议保留 {pca_stats['建议保留主成分数量']} 个主成分，可以解释 {pca_stats['累计方差贡献率'][pca_stats['建议保留主成分数量']-1]*100:.2f}% 的方差。",
+            "总体情况": f"主成分分析结果显示，数据集中有 {pca_stats['n_components']} 个主成分。",
+            "建议保留主成分数": f"建议保留 {pca_stats['n_components']} 个主成分，可以解释 {pca_stats['cumulative_variance'][pca_stats['n_components']-1]*100:.2f}% 的方差。",
             "解释": "主成分分析可以帮助降维，减少变量间的相关性。"
         }
 

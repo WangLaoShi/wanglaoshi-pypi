@@ -28,6 +28,7 @@ WangLaoShi
 - 0.10.6 增加 Analyzer 的使用部分(需要 statsmodels)
 - 0.10.7 增加 MLDL 部分(需要 sklearn,torch)
 - 0.10.10 增加分析结果 Render notebook 部分
+- 0.10.13 修复分析结果
 
 ## 安装方式
 
