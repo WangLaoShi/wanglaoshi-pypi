@@ -121,6 +121,7 @@ class DataAnalyzer:
         # 初始化缓存
         self._correlation_cache = None
         self._multicollinearity_cache = None
+        self._memory_usage = None
     
     def __del__(self):
         """清理资源"""
@@ -707,6 +708,103 @@ class DataAnalyzer:
                     })
 
         return recommendations
+
+    def get_memory_usage(self) -> float:
+        """获取DataFrame的内存使用情况（MB）"""
+        if self._memory_usage is None:
+            self._memory_usage = self.df.memory_usage(deep=True).sum() / 1024**2
+        return self._memory_usage
+
+    def get_basic_info(self) -> Dict[str, Any]:
+        """获取数据集的基本信息"""
+        return {
+            "行数": self.df.shape[0],
+            "列数": self.df.shape[1],
+            "内存使用(MB)": self.get_memory_usage(),
+            "列名列表": self.df.columns.tolist(),
+            "数据类型": self.df.dtypes.to_dict()
+        }
+
+    def get_categorical_stats(self) -> Dict[str, Dict[str, Any]]:
+        """获取分类变量的统计信息"""
+        stats = {}
+        for col in self.categorical_cols:
+            value_counts = self.df[col].value_counts()
+            stats[col] = {
+                "唯一值数量": value_counts.nunique(),
+                "前10个值的分布": value_counts.head(10).to_dict()
+            }
+        return stats
+
+    def get_time_stats(self) -> Dict[str, Dict[str, Any]]:
+        """获取时间变量的统计信息"""
+        stats = {}
+        for col in self.datetime_cols:
+            stats[col] = {
+                "时间范围": f"{self.df[col].min()} 到 {self.df[col].max()}",
+                "时间跨度": str(self.df[col].max() - self.df[col].min())
+            }
+        return stats
+
+    def explore_dataframe(self, name: str = "DataFrame", show_plots: bool = True) -> Dict[str, Any]:
+        """
+        对DataFrame进行全面的探索性分析，整合所有分析方法
+        
+        参数:
+            name: DataFrame的名称,用于输出显示
+            show_plots: 是否显示可视化图表
+            
+        返回:
+            包含所有分析结果的字典
+        """
+        logger.info(f"开始探索性分析: {name}")
+        
+        # 收集所有分析结果
+        analysis_results = {
+            "基本信息": self.get_basic_info(),
+            "缺失值分析": self.missing_value_analysis().to_dict('records'),
+            "数值统计": self.basic_statistics().to_dict('records'),
+            "分类统计": self.get_categorical_stats(),
+            "相关性分析": self.correlation_analysis().to_dict(),
+            "重复值分析": self.duplicate_analysis(),
+            "异常值分析": self.outlier_analysis().to_dict('records'),
+            "正态性检验": self.normality_test().to_dict('records'),
+            "时间分析": self.get_time_stats()
+        }
+        
+        # 如果show_plots为True，添加可视化结果
+        if show_plots:
+            analysis_results["可视化"] = {
+                "相关性热图": self.plot_correlation_heatmap(),
+                "分布图": {col: self.plot_distribution(col) for col in self.df.columns}
+            }
+            
+            # 为时间列添加时间序列图
+            for col in self.datetime_cols:
+                if "可视化" not in analysis_results:
+                    analysis_results["可视化"] = {}
+                analysis_results["可视化"][f"{col}_时间序列"] = self.plot_time_series(self.df[col], col)
+        
+        return analysis_results
+
+    def plot_time_series(self, data: pd.Series, column: str) -> str:
+        """绘制时间序列图"""
+        try:
+            fig = self.visualizer._create_figure((12, 6))
+            data.value_counts().sort_index().plot()
+            plt.title(f"{column} 时间分布", fontproperties=self.font_prop)
+            plt.tight_layout()
+            
+            buf = BytesIO()
+            plt.savefig(buf, format='png', bbox_inches='tight', dpi=100)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+            self.visualizer._close_figure(fig)
+            return img_base64
+        except Exception as e:
+            logger.error(f"绘制时间序列图时出错: {str(e)}")
+            self.visualizer._close_figure(fig)
+            raise
 
 class Visualizer:
     """数据可视化工具类"""

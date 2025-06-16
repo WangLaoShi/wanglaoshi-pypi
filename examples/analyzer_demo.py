@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 from wanglaoshi import DataAnalyzer
 import os
+import json
+from pprint import pprint
 
 def create_sample_data():
     """创建示例数据"""
@@ -44,7 +46,7 @@ def create_sample_data():
 
 def basic_analysis_demo():
     """基础分析示例"""
-    print("=== 基础分析示例 ===")
+    print("\n=== 基础分析示例 ===")
     
     # 创建示例数据
     df = create_sample_data()
@@ -54,30 +56,23 @@ def basic_analysis_demo():
     # 创建分析器实例
     analyzer = DataAnalyzer(df)
     
-    # 基本统计分析
-    print("\n基本统计信息:")
-    basic_stats = analyzer.basic_statistics()
-    print(basic_stats)
+    # 使用explore_dataframe进行基础分析
+    print("\n进行基础分析...")
+    results = analyzer.explore_dataframe(name="示例数据集", show_plots=True)
     
-    # 正态性检验
-    print("\n正态性检验结果:")
-    normality_test = analyzer.normality_test()
-    print(normality_test)
+    # 打印基本信息
+    print("\n基本信息:")
+    pprint(results["基本信息"])
     
-    # 缺失值分析
+    # 打印缺失值分析
     print("\n缺失值分析:")
-    missing_analysis = analyzer.missing_value_analysis()
-    print(missing_analysis)
+    pprint(results["缺失值分析"])
     
-    # 异常值分析
+    # 打印异常值分析
     print("\n异常值分析:")
-    outlier_analysis = analyzer.outlier_analysis()
-    print(outlier_analysis)
+    pprint(results["异常值分析"])
     
-    # 重复值分析
-    print("\n重复值分析:")
-    duplicate_analysis = analyzer.duplicate_analysis()
-    print(duplicate_analysis)
+    return results
 
 def advanced_analysis_demo():
     """高级分析示例"""
@@ -87,20 +82,23 @@ def advanced_analysis_demo():
     df = create_sample_data()
     analyzer = DataAnalyzer(df)
     
-    # 相关性分析
+    # 使用explore_dataframe进行高级分析
+    print("\n进行高级分析...")
+    results = analyzer.explore_dataframe(name="示例数据集", show_plots=True)
+    
+    # 打印相关性分析
     print("\n相关性分析:")
-    correlation_matrix = analyzer.correlation_analysis()
-    print(correlation_matrix)
+    pprint(results["相关性分析"])
     
-    # 多重共线性分析
-    print("\n多重共线性分析:")
-    multicollinearity = analyzer.multicollinearity_analysis()
-    print(multicollinearity)
+    # 打印正态性检验
+    print("\n正态性检验:")
+    pprint(results["正态性检验"])
     
-    # 主成分分析
-    print("\n主成分分析:")
-    pca_analysis = analyzer.pca_analysis()
-    print(pca_analysis)
+    # 打印时间分析
+    print("\n时间分析:")
+    pprint(results["时间分析"])
+    
+    return results
 
 def visualization_demo():
     """可视化示例"""
@@ -110,17 +108,17 @@ def visualization_demo():
     df = create_sample_data()
     analyzer = DataAnalyzer(df)
     
-    # 分布图
-    print("\n生成分布图...")
-    for column in ['age', 'income', 'height', 'weight']:
-        print(f"\n{column} 的分布图:")
-        img_base64 = analyzer.plot_distribution(column)
-        print(f"图片已生成，base64长度: {len(img_base64)}")
+    # 使用explore_dataframe生成可视化
+    print("\n生成可视化...")
+    results = analyzer.explore_dataframe(name="示例数据集", show_plots=True)
     
-    # 相关性热图
-    print("\n生成相关性热图...")
-    heatmap_base64 = analyzer.plot_correlation_heatmap()
-    print(f"热图已生成，base64长度: {len(heatmap_base64)}")
+    # 检查可视化结果
+    if "可视化" in results:
+        print("\n已生成以下可视化:")
+        for plot_name in results["可视化"].keys():
+            print(f"- {plot_name}")
+    
+    return results
 
 def report_generation_demo():
     """报告生成示例"""
@@ -134,6 +132,13 @@ def report_generation_demo():
     print("\n生成分析报告...")
     analyzer.generate_report("analysis_report.html")
     print("报告已生成: analysis_report.html")
+    
+    # 保存分析结果为JSON
+    print("\n保存分析结果为JSON...")
+    results = analyzer.explore_dataframe(name="示例数据集", show_plots=True)
+    with open("analysis_results.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    print("分析结果已保存: analysis_results.json")
 
 def file_analysis_demo():
     """文件分析示例"""
@@ -197,8 +202,16 @@ def notebook_demo():
     # 创建分析器实例
     analyzer = DataAnalyzer(df)
     
-    # 在notebook中显示分析报告
-    analyzer.analyze_notebook()
+    # 进行探索性分析
+    results = analyzer.explore_dataframe(name="我的数据集", show_plots=True)
+    
+    # 查看分析结果
+    print("基本信息:", results["基本信息"])
+    print("缺失值分析:", results["缺失值分析"])
+    print("异常值分析:", results["异常值分析"])
+    
+    # 生成HTML报告
+    analyzer.generate_report("analysis_report.html")
     ```
     """)
 
