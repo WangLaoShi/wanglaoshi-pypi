@@ -1,0 +1,3 @@
+recursive-include wanglaoshi/static *
+recursive-include wanglaoshi/templates *
+include README.md

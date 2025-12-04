@@ -3,7 +3,7 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.10.13'
+about['__version__'] = '0.11.01'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):
@@ -41,6 +41,7 @@ setup(
     name=about['__project_name__'],  # 包的名称
     version=about['__version__'],  # 版本号
     packages=find_packages(),  # 自动找到所有模块
+    include_package_data=True,
     install_requires=[         # 依赖的库
         'rich',
         'requests',

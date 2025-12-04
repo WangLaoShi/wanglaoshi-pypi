@@ -29,6 +29,7 @@ WangLaoShi
 - 0.10.7 增加 MLDL 部分(需要 sklearn,torch)
 - 0.10.10 增加分析结果 Render notebook 部分
 - 0.10.13 修复分析结果
+- 0.11.01 增加 static 和 template 修改 html 报告生成
 
 ## 安装方式
 
@@ -86,7 +87,7 @@ DataAnalyzer 使用示例
 
 import pandas as pd
 import numpy as np
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.Analyzer import DataAnalyzer
 import os
 
 def create_sample_data():
