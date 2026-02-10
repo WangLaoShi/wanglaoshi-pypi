@@ -3,7 +3,8 @@ import os
 import sys
 
 about = {}
-about['__version__'] = '0.11.2'
+# 与 README 中的版本历史保持一致
+about['__version__'] = '0.13.0'
 about['__project_name__'] = 'wanglaoshi'
 
 class UploadCommand(Command):

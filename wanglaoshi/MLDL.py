@@ -1,93 +1,201 @@
 """
-机器学习和深度学习基础方法模块
+机器学习和深度学习基础方法模块 (MLDL.py)
 
-本模块提供了常用的机器学习和深度学习方法的实现，包括：
-1. 数据预处理
-2. 特征工程
-3. 基础机器学习模型
-4. 深度学习模型
-5. 模型评估
-6. 可视化工具
+这个模块提供了完整的机器学习和深度学习工作流程的工具类，包括：
+
+1. 【数据预处理】
+   - 缺失值处理（均值、中位数、众数填充或删除）
+   - 分类变量编码（标签编码）
+   - 特征标准化（StandardScaler、MinMaxScaler）
+
+2. 【特征工程】
+   - 特征选择
+   - 特征创建
+   - 特征转换
+
+3. 【基础机器学习模型】
+   - 线性回归、逻辑回归
+   - 决策树（分类和回归）
+   - 随机森林（分类和回归）
+   - 支持向量机（SVM）
+   - K近邻（KNN）
+
+4. 【深度学习模型】
+   - 使用PyTorch构建神经网络
+   - 自定义数据集类
+   - 模型训练和评估
+
+5. 【模型评估】
+   - 分类指标：准确率、精确率、召回率、F1分数
+   - 回归指标：均方误差、R²分数
+   - 混淆矩阵
+
+6. 【可视化工具】
+   - 训练过程可视化
+   - 结果可视化
+
+使用场景：
+- 快速构建ML/DL模型
+- 学习ML/DL工作流程
+- 原型开发和实验
+
+主要类：
+- DataPreprocessor: 数据预处理类
+- FeatureEngineer: 特征工程类
+- MLModel: 机器学习模型类
+- DeepLearningModel: 深度学习模型类
 """
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.metrics import mean_squared_error, r2_score, confusion_matrix
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.svm import SVC, SVR
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
+# ==================== 导入必要的库 ====================
+import numpy as np  # 数值计算库
+import pandas as pd  # 数据处理库
+import matplotlib.pyplot as plt  # 绘图库
+import seaborn as sns  # 数据可视化库
+
+# sklearn: 机器学习库
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder  # 数据预处理
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV  # 模型选择和评估
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score  # 分类指标
+from sklearn.metrics import mean_squared_error, r2_score, confusion_matrix  # 回归指标和混淆矩阵
+
+# sklearn模型
+from sklearn.linear_model import LinearRegression, LogisticRegression  # 线性模型
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor  # 决策树
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor  # 随机森林
+from sklearn.svm import SVC, SVR  # 支持向量机
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor  # K近邻
+
+# PyTorch: 深度学习框架
+import torch  # PyTorch主模块
+import torch.nn as nn  # 神经网络模块
+import torch.optim as optim  # 优化器模块
+from torch.utils.data import Dataset, DataLoader  # 数据集和数据加载器
 
 class DataPreprocessor:
-    """数据预处理类
+    """
+    数据预处理类
     
-    提供数据清洗、标准化、编码等基础预处理功能
+    这个类提供了数据预处理的基础功能，包括：
+    - 缺失值处理（多种填充方法）
+    - 分类变量编码（标签编码）
+    - 特征标准化（Z-score标准化）
+    
+    使用场景：
+    - 在训练模型前对数据进行预处理
+    - 统一数据格式和范围
+    - 处理缺失值和分类变量
+    
+    示例:
+        preprocessor = DataPreprocessor()
+        df_processed = preprocessor.handle_missing_values(df, method='mean')
+        df_encoded = preprocessor.encode_categorical(df_processed, ['category_col'])
+        df_scaled = preprocessor.scale_features(df_encoded, ['numeric_col1', 'numeric_col2'])
     """
     
     def __init__(self):
-        """初始化预处理器"""
+        """
+        初始化预处理器
+        
+        创建标准化器和标签编码器对象，供后续使用。
+        """
+        # StandardScaler: Z-score标准化（均值为0，标准差为1）
         self.scaler = StandardScaler()
+        # LabelEncoder: 将分类变量转换为数值标签（0, 1, 2, ...）
         self.label_encoder = LabelEncoder()
         
     def handle_missing_values(self, df: pd.DataFrame, method: str = 'mean') -> pd.DataFrame:
-        """处理缺失值
+        """
+        处理缺失值
+        
+        这个函数提供了多种缺失值处理方法：
+        - 'mean': 用均值填充（适合数值型数据）
+        - 'median': 用中位数填充（适合有异常值的数据）
+        - 'mode': 用众数填充（适合分类型数据）
+        - 'drop': 删除包含缺失值的行
         
         参数:
-            df: 输入数据框
+            df: 输入数据框（可能包含缺失值）
             method: 填充方法，可选 'mean', 'median', 'mode', 'drop'
+                   默认 'mean'
             
         返回:
-            处理后的数据框
+            处理后的数据框（无缺失值或已删除缺失值行）
+            
+        注意：
+        - 使用copy()避免修改原始数据
+        - 不同列可能适合不同的填充方法
         """
+        # 复制数据，避免修改原始DataFrame
         df_processed = df.copy()
         
         if method == 'mean':
+            # 用每列的均值填充缺失值
             df_processed = df_processed.fillna(df_processed.mean())
         elif method == 'median':
+            # 用每列的中位数填充缺失值（对异常值更稳健）
             df_processed = df_processed.fillna(df_processed.median())
         elif method == 'mode':
+            # 用每列的众数填充缺失值（mode()返回Series，取第一个值）
             df_processed = df_processed.fillna(df_processed.mode().iloc[0])
         elif method == 'drop':
+            # 删除包含缺失值的行
             df_processed = df_processed.dropna()
             
         return df_processed
     
     def encode_categorical(self, df: pd.DataFrame, columns: list) -> pd.DataFrame:
-        """对分类变量进行编码
+        """
+        对分类变量进行编码（标签编码）
+        
+        标签编码将分类变量转换为数值标签：
+        - 例如: ['A', 'B', 'C'] -> [0, 1, 2]
         
         参数:
             df: 输入数据框
             columns: 需要编码的列名列表
+                    例如: ['category1', 'category2']
             
         返回:
-            编码后的数据框
+            编码后的数据框（分类变量已转换为数值）
+            
+        注意：
+        - 标签编码是有序的（0 < 1 < 2），可能不适合无序分类变量
+        - 对于无序分类变量，建议使用独热编码（One-Hot Encoding）
         """
+        # 复制数据，避免修改原始DataFrame
         df_encoded = df.copy()
+        # 遍历需要编码的列
         for col in columns:
+            # fit_transform() 先学习标签映射，然后转换
+            # 例如: ['A', 'B', 'A'] -> [0, 1, 0]
             df_encoded[col] = self.label_encoder.fit_transform(df_encoded[col])
         return df_encoded
     
     def scale_features(self, df: pd.DataFrame, columns: list) -> pd.DataFrame:
-        """特征标准化
+        """
+        特征标准化（Z-score标准化）
+        
+        标准化将数据转换为均值为0、标准差为1的分布：
+        - 公式: z = (x - mean) / std
+        - 这样可以消除不同量纲的影响
         
         参数:
             df: 输入数据框
             columns: 需要标准化的列名列表
+                    例如: ['feature1', 'feature2']
             
         返回:
-            标准化后的数据框
+            标准化后的数据框（指定列已标准化）
+            
+        使用场景：
+        - 不同特征的单位和范围差异很大时
+        - 使用基于距离的算法（如SVM、KNN）时
+        - 使用梯度下降优化时
         """
+        # 复制数据，避免修改原始DataFrame
         df_scaled = df.copy()
+        # fit_transform() 先学习均值和标准差，然后转换
+        # 只对指定的列进行标准化
         df_scaled[columns] = self.scaler.fit_transform(df_scaled[columns])
         return df_scaled
 
