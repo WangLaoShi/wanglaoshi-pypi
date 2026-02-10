@@ -39,10 +39,19 @@ from . import Analyzer
 from . import Analyzer_Plain
 from . import CompetitionTools
 from . import FeatureEngineering
-from . import MLDL
 from . import JupyterFont
 from . import Useful
 from . import WebGetter
+
+# MLDL 依赖 torch，为了不影响普通用户导入，本模块中将其视为「可选模块」。
+# - 如果用户未安装 torch，则 from wanglaoshi import MLDL 不会自动失败；
+# - 需要使用 MLDL 时，推荐：在安装 torch 后，单独 from wanglaoshi import MLDL。
+try:
+    from . import MLDL  # type: ignore  # noqa: F401
+    _MLDL_AVAILABLE = True
+except ImportError:
+    MLDL = None  # type: ignore
+    _MLDL_AVAILABLE = False
 
 # 直接导出常用类和函数（方便用户少写一层模块前缀）
 from .Analyzer import DataAnalyzer, analyze_data, analyze_multiple_files, analyze_notebook
@@ -55,6 +64,7 @@ __all__ = [
     "Analyzer_Plain",
     "CompetitionTools",
     "FeatureEngineering",
+    # MLDL 是可选模块，这里继续导出名称，但需要用户自己确保安装了 torch
     "MLDL",
     "JupyterFont",
     "Useful",
