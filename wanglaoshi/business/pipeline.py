@@ -15,6 +15,7 @@ from .cleaning import clean_dataframe
 from .derived import derive_metrics
 from .planning import build_analysis_plan
 from .metrics import calculate_metrics
+from .analysis import run_multidimensional_analysis
 
 
 _DOWNSTREAM_AFTER = {
@@ -38,6 +39,7 @@ _DOWNSTREAM_AFTER = {
         "D10_report_archive",
     ],
 }
+# NOTE: keep D07 in skip lists so blocked upstream does not pretend analysis ran.
 
 
 def _skip_remaining(record: RunRecord, stage_ids: Sequence[str], reason: str) -> None:
@@ -54,7 +56,7 @@ def _skip_remaining(record: RunRecord, stage_ids: Sequence[str], reason: str) ->
 class BusinessPipeline:
     """最小可跑总控（D11）。
 
-    已接线：D01 → D02 → D03 → D04 → D05 → D06；其后显式 skipped。
+    已接线：D01 → D02 → D03 → D04 → D05 → D06 → D07；其后显式 skipped。
     """
 
     def __init__(
@@ -182,7 +184,16 @@ class BusinessPipeline:
         )
         record.add_stage(metrics)
 
-        for stage_id in ["D07_analysis", "D09_insights", "D10_report_archive"]:
+        analysis = run_multidimensional_analysis(
+            derived_df,
+            date_col=date_col,
+            value_col=value_col,
+            dim_col=dim_cols[0] if dim_cols else None,
+            segment_col=segment_cols[0] if segment_cols else None,
+        )
+        record.add_stage(analysis)
+
+        for stage_id in ["D09_insights", "D10_report_archive"]:
             record.add_stage(
                 StageResult(
                     stage_id=stage_id,

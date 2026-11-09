@@ -14,6 +14,7 @@ from wanglaoshi.business import (
     clean_dataframe,
     derive_metrics,
     intake_file,
+    run_multidimensional_analysis,
     structure_dataframe,
 )
 
@@ -83,16 +84,17 @@ def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
     record = pipe.run(src)
     assert not record.blocked()
     ids = [s.stage_id for s in record.stages]
-    assert ids[:6] == [
+    assert ids[:7] == [
         "D01_intake",
         "D02_structuring",
         "D03_cleaning",
         "D04_derived",
         "D05_planning",
         "D06_metrics",
+        "D07_analysis",
     ]
-    assert all(s.status in {"passed", "warning"} for s in record.stages[:6])
-    assert any(s.stage_id == "D07_analysis" and s.status == "skipped" for s in record.stages)
+    assert all(s.status in {"passed", "warning"} for s in record.stages[:7])
+    assert any(s.stage_id == "D09_insights" and s.status == "skipped" for s in record.stages)
 
 
 @pytest.mark.quick
@@ -186,3 +188,26 @@ def test_metrics_gmv_aov_and_share() -> None:
     assert result.data["metrics"]["aov"] == 20.0
     assert result.data["share_check"]["ok"] is True
     assert abs(sum(r["share"] for r in result.data["workbook"]) - 1.0) < 1e-9
+
+
+@pytest.mark.quick
+def test_analysis_six_views() -> None:
+    df = pd.DataFrame(
+        {
+            "order_date": pd.date_range("2024-01-01", periods=10, freq="D").astype(str).tolist() * 2,
+            "amount": [10, 12, 11, 40, 13, 12, 11, 10, 12, 11] * 2,
+            "channel": (["web"] * 10) + (["app"] * 10),
+            "user_tier": (["A"] * 10) + (["B"] * 10),
+        }
+    )
+    result = run_multidimensional_analysis(
+        df,
+        date_col="order_date",
+        value_col="amount",
+        dim_col="channel",
+        segment_col="user_tier",
+    )
+    assert result.status in {"passed", "warning"}
+    assert result.data["ok_count"] >= 4
+    assert result.data["views"]["pareto"]["status"] == "ok"
+    assert "不证明业务因果" in result.data["views"]["pareto"]["note"]

@@ -13,7 +13,7 @@
 | A 现有能力盘点 | 进行中（A01–A04 文档/样例） | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | `docs/API_INVENTORY.md` + `docs/SKILL_API_MAPPING.md` |
 | B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` |
 | C 回归测试体系 | 进行中（quick/full/release 入口） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + `scripts/run_tests.sh` |
-| D Skill 增量固化 | 进行中（D01–D06 + pipeline） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + tests |
+| D Skill 增量固化 | 进行中（D01–D07 + pipeline） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + tests |
 | E 12 个进阶演示 | 进行中（12 Notebook 已加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` + `_deepen_all.py` |
 | F 安装、兼容与发布验证 | 待开发 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 待补充 |
 | Epic 总跟踪 | 进行中 | [#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6) | 本文件 |
@@ -89,7 +89,7 @@
 - [x] D04 时间部件、占比、简单环比（MVP；缺期/跨年/分层标签待补）。（`business/derived.py`）
 - [x] D05 四方向分析计划及不适用原因。（`business/planning.py`）
 - [x] D06 指标字典与底稿；明细汇总、占比一致性校验。（`business/metrics.py`）
-- [ ] D07 六视角分析；贡献分解与因果假设分开。
+- [x] D07 六视角分析；贡献分解与因果假设分开。（`business/analysis.py`；pareto 注明非因果）
 - [ ] D08 图表独立归档，标题/单位/周期/来源齐全。
 - [ ] D09 带证据的规则结论和行动建议。
 - [ ] D10 完整报告、脱敏、交付索引、缺项阻断。

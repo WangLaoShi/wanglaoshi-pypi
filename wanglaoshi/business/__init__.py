@@ -16,6 +16,7 @@ from .cleaning import clean_dataframe
 from .derived import derive_metrics
 from .planning import build_analysis_plan
 from .metrics import calculate_metrics, DEFAULT_METRIC_DICT
+from .analysis import run_multidimensional_analysis
 
 __all__ = [
     "StageResult",
@@ -29,4 +30,5 @@ __all__ = [
     "build_analysis_plan",
     "calculate_metrics",
     "DEFAULT_METRIC_DICT",
+    "run_multidimensional_analysis",
 ]
