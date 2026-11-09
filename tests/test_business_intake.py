@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from wanglaoshi.business import BusinessPipeline, intake_file, structure_dataframe
+from wanglaoshi.business import BusinessPipeline, clean_dataframe, intake_file, structure_dataframe
 
 
 def test_intake_archives_and_hashes(tmp_path: Path) -> None:
@@ -55,7 +55,9 @@ def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
     assert record.stages[0].status == "passed"
     assert record.stages[1].stage_id == "D02_structuring"
     assert record.stages[1].status == "passed"
-    assert any(s.status == "skipped" for s in record.stages[2:])
+    assert record.stages[2].stage_id == "D03_cleaning"
+    assert record.stages[2].status == "passed"
+    assert any(s.status == "skipped" for s in record.stages[3:])
 
 
 def test_structure_normalizes_columns() -> None:
@@ -65,3 +67,18 @@ def test_structure_normalizes_columns() -> None:
     assert "order_id" in result.data["columns"]
     assert "gmv" in result.data["columns"]
     assert result.frame["gmv"].dtype == "float64"  # type: ignore[attr-defined]
+
+
+def test_clean_drop_duplicates_and_clip(tmp_path: Path) -> None:
+    df = pd.DataFrame({"id": [1, 1, 2], "amount": [10.0, 10.0, 999.0]})
+    result = clean_dataframe(
+        df,
+        drop_duplicates=True,
+        clip_bounds={"amount": (0.0, 100.0)},
+        output_path=tmp_path / "cleaned.csv",
+        log_path=tmp_path / "log.json",
+    )
+    assert result.status == "passed"
+    assert result.data["rows_out"] == 2
+    assert result.frame["amount"].max() <= 100.0  # type: ignore[attr-defined]
+    assert (tmp_path / "log.json").exists()

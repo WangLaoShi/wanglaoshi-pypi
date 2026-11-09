@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Sequence
 from .contracts import RunRecord, StageResult
 from .intake import intake_file
 from .structuring import structure_file
+from .cleaning import clean_dataframe
 
 
 class BusinessPipeline:
@@ -98,9 +99,22 @@ class BusinessPipeline:
                 )
             return record
 
+        import pandas as pd
+
+        structured_df = getattr(structuring, "frame", None)
+        if structured_df is None and structured_path.exists():
+            structured_df = pd.read_csv(structured_path)
+        cleaned_path = self.archive_dir / f"{rid}__cleaned.csv"
+        log_path = self.archive_dir / f"{rid}__cleaning_log.json"
+        cleaning = clean_dataframe(
+            structured_df if structured_df is not None else pd.DataFrame(),
+            output_path=cleaned_path,
+            log_path=log_path,
+        )
+        record.add_stage(cleaning)
+
         # 占位：后续 Skill 未实现时显式 skipped，避免静默当作完成
         for stage_id in [
-            "D03_cleaning",
             "D04_derived",
             "D06_metrics",
             "D07_analysis",

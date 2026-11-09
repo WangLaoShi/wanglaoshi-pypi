@@ -12,6 +12,7 @@ from .contracts import StageResult, RunRecord
 from .intake import intake_file
 from .pipeline import BusinessPipeline
 from .structuring import structure_dataframe, structure_file
+from .cleaning import clean_dataframe
 
 __all__ = [
     "StageResult",
@@ -20,4 +21,5 @@ __all__ = [
     "BusinessPipeline",
     "structure_dataframe",
     "structure_file",
+    "clean_dataframe",
 ]
