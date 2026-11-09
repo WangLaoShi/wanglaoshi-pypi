@@ -10,7 +10,7 @@
 
 | 工作流 | 状态 | Issue | 验证证据 |
 | --- | --- | --- | --- |
-| A 现有能力盘点 | 进行中 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 已对照公开 API；契约文档待补 |
+| A 现有能力盘点 | 进行中（A01 初版文档） | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | `docs/API_INVENTORY.md` |
 | B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` 8 passed |
 | C 回归测试体系 | 进行中（最小骨架） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + submission 用例 |
 | D Skill 增量固化 | 进行中（D01–D04 + pipeline MVP） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + `tests/test_business_intake.py` |
@@ -67,7 +67,7 @@
 
 ### A：盘点和公共契约
 
-- [ ] A01 完整盘点公开 API、依赖、返回值、异常及副作用，建立复用清单。
+- [x] A01 完整盘点公开 API、依赖、返回值、异常及副作用，建立复用清单。（初版：`docs/API_INVENTORY.md`，后续按模块补异常/副作用细表）
 - [ ] A02 建立 Skill 要求 → API/配置 → 校验 → 测试的映射。
 - [ ] A03 定义统一阶段结果、指标/图表/结论/建议编号与运行记录。
 - [ ] A04 定义字段角色和销售配置样例；关键配置缺失不得静默推断。
