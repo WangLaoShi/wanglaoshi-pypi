@@ -53,6 +53,10 @@ evidence / 证据编号
 
 pending uplift
   行动建议里收益目标暂无依据，标记待定，避免拍脑袋承诺。
+
+ready()
+  `wanglaoshi.ready`：Notebook 一键就绪（关警告 + 打印环境 + 可选种子）。
+  不要再叠写 ``warnings.filterwarnings`` 与 ``JE.no_warning()``，二者重复。
 ```
 
 ## 英文对照（便于读源码）

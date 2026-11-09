@@ -220,19 +220,16 @@ def install_kernel():
 
 def no_warning():
     """
-    禁用Python警告信息
-    
-    这个函数会忽略所有Python警告（warnings），
-    让代码运行时不会显示警告信息。
-    
+    禁用 Python 警告信息（仅做 filterwarnings('ignore')）。
+
     使用场景：
-    - 当代码会产生大量警告但不想看到时
-    - 在演示或报告中希望输出更简洁时
-    
+    - 演示时希望输出更简洁
+
     注意：
-    - 禁用警告可能会隐藏重要的问题提示
-    - 建议只在确认警告不影响功能时使用
+    - 会隐藏重要提示；调试时请关掉
+    - 若还要打印环境信息，请优先用 ``from wanglaoshi import ready; ready()``
+      （不要再写一遍 ``warnings.filterwarnings``，二者重复）
     """
     import warnings
-    # filterwarnings('ignore') 忽略所有警告
-    warnings.filterwarnings('ignore')
+
+    warnings.filterwarnings("ignore")

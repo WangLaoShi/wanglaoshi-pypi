@@ -11,7 +11,10 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
+from wanglaoshi import ready
 from wanglaoshi.CompetitionTools import SubmissionGenerator
+
+ready()  # 关警告 + 打印环境（不要再叠 JE.no_warning / filterwarnings）
 
 iris = load_iris(as_frame=True)
 X, y = iris.data, iris.target

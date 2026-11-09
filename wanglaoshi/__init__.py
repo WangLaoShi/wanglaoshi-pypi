@@ -5,12 +5,12 @@ wanglaoshi 顶层导出 (API)
 
 常见用法示例：
 
-    from wanglaoshi import JupyterEnv as JE
-    from wanglaoshi import VERSIONS as V
+    from wanglaoshi import ready
+    ready()  # 一键：关警告 + 打印环境（推荐，替代 JE.no_warning + V.show_env_info 拼盘）
+
     from wanglaoshi import Analyzer
     from wanglaoshi import CompetitionTools as CT
     from wanglaoshi import FeatureEngineering as FE
-
     from wanglaoshi import DataAnalyzer, analyze_data, analyze_multiple_files, analyze_notebook
 
 模块级别导出：
@@ -55,6 +55,7 @@ except ImportError:
 
 # 直接导出常用类和函数（方便用户少写一层模块前缀）
 from .Analyzer import DataAnalyzer, analyze_data, analyze_multiple_files, analyze_notebook
+from .ready import ready
 
 # 业务流水线（Skill 固化）；不依赖可选重型包
 from . import business
@@ -85,6 +86,7 @@ __all__ = [
     "Useful",
     "WebGetter",
     # 类 / 函数
+    "ready",
     "DataAnalyzer",
     "analyze_data",
     "analyze_multiple_files",

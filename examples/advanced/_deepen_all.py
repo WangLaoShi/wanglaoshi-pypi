@@ -56,14 +56,9 @@ def env_cells() -> list:
 QUICK = True
 RANDOM_STATE = 42
 
-import warnings
-warnings.filterwarnings('ignore')
-
-from wanglaoshi import VERSIONS as V
-from wanglaoshi import JupyterEnv as JE
-
-JE.no_warning()
-V.show_env_info()
+# 一键就绪：关警告 + 打印环境 + 设种子（勿再叠 JE.no_warning / filterwarnings）
+from wanglaoshi import ready
+ready(seed=RANDOM_STATE)
 """
         )
     ]

@@ -132,12 +132,11 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from wanglaoshi import VERSIONS as V
-from wanglaoshi import DataAnalyzer
+from wanglaoshi import ready, DataAnalyzer
 from wanglaoshi import CompetitionTools as CT
 
-# 1) 先看环境（Python / 系统信息），方便排查「别人机器能跑我不行」
-V.show_env_info()
+# 1) 一键就绪：关警告 + 打印环境（替代 filterwarnings + JE.no_warning + V.show_env_info）
+ready()
 
 # 2) 加载小样本多分类数据；as_frame=True 直接得到 DataFrame
 iris = load_iris(as_frame=True)
@@ -564,12 +563,18 @@ if __name__ == "__main__":
    - 在Jupyter环境中使用DataAnalyzer
    - 交互式数据分析和可视化
 
-### 6. 取消错误输出
+### 6. Notebook 一键就绪（推荐）
+
+旧写法里 `warnings.filterwarnings('ignore')` 与 `JE.no_warning()` **重复**，请改用：
 
 ```python
-from wanglaoshi import JupyterEnv as JE
-JE.no_warning()
+from wanglaoshi import ready
+ready()                 # quiet=True, show_env=True, seed=42
+# ready(quiet=False)    # 调试时保留警告
+# ready(check_core=True)  # 顺带检查 numpy/pandas/sklearn
 ```
+
+仅需关警告时仍可用：`from wanglaoshi import JupyterEnv as JE; JE.no_warning()`。
 
 ### 7. Wget 功能
 

@@ -323,14 +323,10 @@ def build_notebook(case: dict) -> dict:
 QUICK = True
 RANDOM_STATE = 42
 
-import warnings
-warnings.filterwarnings('ignore')
-
+from wanglaoshi import ready
 from wanglaoshi import VERSIONS as V
-from wanglaoshi import JupyterEnv as JE
 
-JE.no_warning()
-V.show_env_info()
+ready(seed=RANDOM_STATE)  # 关警告 + 环境信息；勿再叠 filterwarnings / JE.no_warning
 V.check_all_versions(version='simple', show_latest=False)
 """
         ),

@@ -9,12 +9,14 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | --- | --- | --- | --- |
 | `JupyterEnv` | 模块 | 标准库/Jupyter | `no_warning` 等 |
 | `VERSIONS` | 模块 | rich / requests | `show_env_info` / `check_all_versions` |
+| `ready` | 函数 | 标准库 (+ 可选 numpy) | **推荐** Notebook 一键就绪；合并关警告+环境信息，避免与 `JE.no_warning` 重复 |
 | `Analyzer` / `DataAnalyzer` | 模块/类 | pandas/sklearn/matplotlib | EDA 主入口 |
 | `Analyzer_Plain` | 模块 | 同上 | 精简版 |
 | `CompetitionTools` | 模块 | sklearn | 基线、提交、泄漏检查等 |
 | `FeatureEngineering` | 模块 | pandas/sklearn | 编码/变换 |
 | `MLDL` | 可选模块 | **torch** | 未装 torch 时顶层导入不失败；`MLDL` 可能为 `None` |
 | `JupyterFont` / `Useful` / `WebGetter` | 模块 | 视功能而定 | 辅助 |
+| `JupyterEnv.no_warning` | 函数 | warnings | 仅关警告；与 `warnings.filterwarnings` 同义，课堂请优先 `ready()` |
 | `business` | 模块 | pandas/matplotlib | Skill 固化流水线 |
 | `BusinessPipeline` / `intake_file` / `generate_insights` / `archive_delivery` / `archive_charts` / `run_eda_profile` … | 函数/类 | pandas | 见 `wanglaoshi.business` |
 
