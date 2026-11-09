@@ -99,6 +99,15 @@ class SubmissionGenerator:
                 
                 if id_column is None:
                     raise ValueError(f"未找到ID列。可用列: {sample_submission.columns.tolist()}")
+
+            # 自动检测目标列名：默认 'target' 不在样本文件中时，
+            # 取样本文件中除 ID 列外的第一列，保证输出列名与
+            # sample_submission 完全一致（Kaggle 对列名强校验）
+            if target_column not in sample_submission.columns:
+                non_id_cols = [c for c in sample_submission.columns if c != id_column]
+                if non_id_cols:
+                    target_column = non_id_cols[0]
+                    logger.info(f"自动检测到目标列: {target_column}")
             
             # 获取ID列
             submission_ids = sample_submission[id_column].values
@@ -149,7 +158,14 @@ class SubmissionGenerator:
             submission_df.to_csv(output_path, index=False)
             logger.info(f"提交文件已生成: {output_path}")
             logger.info(f"提交文件形状: {submission_df.shape}")
-            logger.info(f"预测值统计: min={predictions.min():.6f}, max={predictions.max():.6f}, mean={predictions.mean():.6f}")
+            # 数值型预测才输出统计量；分类任务的字符串标签用:.6f 会直接报错
+            if np.issubdtype(predictions.dtype, np.number):
+                logger.info(
+                    f"预测值统计: min={predictions.min():.6f}, "
+                    f"max={predictions.max():.6f}, mean={predictions.mean():.6f}"
+                )
+            else:
+                logger.info(f"预测值样例: {predictions[:5].tolist()}")
             
             return submission_df
             
@@ -368,32 +384,40 @@ class SubmissionGenerator:
                 target_columns = [col for col in submission.columns if col != id_column]
                 for col in target_columns:
                     values = submission[col].values
-                    
-                    # 检查NaN
+
+                    # 检查NaN（数值列与类别列通用）
                     nan_count = pd.isna(values).sum()
                     if nan_count > 0:
                         result['is_valid'] = False
                         result['errors'].append(f"列 {col} 包含 {nan_count} 个NaN值")
-                    
-                    # 检查无穷大
-                    inf_count = np.isinf(values).sum()
-                    if inf_count > 0:
-                        result['is_valid'] = False
-                        result['errors'].append(f"列 {col} 包含 {inf_count} 个无穷大值")
-                    
-                    # 统计信息
-                    result['info'][f'{col}_stats'] = {
-                        'min': float(values.min()),
-                        'max': float(values.max()),
-                        'mean': float(values.mean()),
-                        'std': float(values.std())
-                    }
-                    
-                    # 警告：值范围异常
-                    if values.min() < -1e10 or values.max() > 1e10:
-                        result['warnings'].append(
-                            f"列 {col} 的值范围异常: [{values.min()}, {values.max()}]"
-                        )
+
+                    # 数值列：检查无穷大与统计量；
+                    # 类别列（字符串标签等）：对字符串做 isinf/float() 会直接报错，
+                    # 改为统计类别分布
+                    if pd.api.types.is_numeric_dtype(submission[col]):
+                        inf_count = np.isinf(values).sum()
+                        if inf_count > 0:
+                            result['is_valid'] = False
+                            result['errors'].append(f"列 {col} 包含 {inf_count} 个无穷大值")
+
+                        result['info'][f'{col}_stats'] = {
+                            'min': float(values.min()),
+                            'max': float(values.max()),
+                            'mean': float(values.mean()),
+                            'std': float(values.std())
+                        }
+
+                        # 警告：值范围异常
+                        if values.min() < -1e10 or values.max() > 1e10:
+                            result['warnings'].append(
+                                f"列 {col} 的值范围异常: [{values.min()}, {values.max()}]"
+                            )
+                    else:
+                        unique_vals = submission[col].dropna().unique()
+                        result['info'][f'{col}_stats'] = {
+                            'n_classes': int(len(unique_vals)),
+                            'classes': [str(v) for v in unique_vals[:10]]
+                        }
             
             logger.info(f"提交文件验证完成: {'通过' if result['is_valid'] else '失败'}")
             if result['errors']:
