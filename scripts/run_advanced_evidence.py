@@ -40,6 +40,16 @@ DEFAULT_ORDER = [
     "10_adult_census",
     "05_credit_card_fraud",
     "11_house_prices",
+    "13_ab_testing",
+    "14_hypothesis_testing",
+    "15_timeseries_forecast",
+    "16_survival_churn",
+    "17_text_eda",
+    "18_anomaly_detection",
+    "19_association_rules",
+    "20_causal_did",
+    "21_order_refund_reconciliation",
+    "22_movielens_ndcg",
 ]
 
 
@@ -230,7 +240,7 @@ def main() -> int:
     docs_json.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")
 
     md_lines = [
-        "# E17 Advanced Notebook 跑通证据",
+        "# Advanced Notebook 跑通证据",
         "",
         f"- 生成时间(UTC): `{evidence['generated_at_utc']}`",
         f"- Python: `{evidence['python']}`",

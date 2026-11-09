@@ -1,57 +1,255 @@
 {
-  "generated_at_utc": "2026-11-09T06:17:58.998377+00:00",
+  "generated_at_utc": "2026-11-09T07:12:01.511827+00:00",
   "notebook_dir": "examples/advanced",
   "python": "/opt/anaconda3/bin/python",
   "timeout_sec": 240,
   "results": [
     {
+      "slug": "01_iris",
+      "path": "examples/advanced/01_iris.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:37:16.956482+00:00",
+      "error": null,
+      "cells_executed": 22,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:37:21.590238+00:00",
+      "log": "examples/advanced/outputs/evidence/01_iris.log"
+    },
+    {
+      "slug": "02_titanic",
+      "path": "examples/advanced/02_titanic.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:37:21.590714+00:00",
+      "error": null,
+      "cells_executed": 21,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:37:22.133397+00:00",
+      "log": "examples/advanced/outputs/evidence/02_titanic.log"
+    },
+    {
+      "slug": "04_breast_cancer",
+      "path": "examples/advanced/04_breast_cancer.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T07:12:14.346604+00:00",
+      "error": null,
+      "cells_executed": 22,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T07:12:21.008934+00:00",
+      "log": "examples/advanced/outputs/evidence/04_breast_cancer.log"
+    },
+    {
       "slug": "06_california_housing",
       "path": "examples/advanced/06_california_housing.ipynb",
       "status": "passed",
-      "started_at": "2026-11-09T06:18:06.725142+00:00",
+      "started_at": "2026-11-09T06:37:28.174059+00:00",
       "error": null,
       "cells_executed": 10,
       "mode": "inprocess",
-      "finished_at": "2026-11-09T06:18:16.258094+00:00",
+      "finished_at": "2026-11-09T06:37:34.053055+00:00",
       "log": "examples/advanced/outputs/evidence/06_california_housing.log"
+    },
+    {
+      "slug": "12_digit_recognizer",
+      "path": "examples/advanced/12_digit_recognizer.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:37:34.056187+00:00",
+      "error": null,
+      "cells_executed": 19,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:37:44.476622+00:00",
+      "log": "examples/advanced/outputs/evidence/12_digit_recognizer.log"
     },
     {
       "slug": "03_wine_quality",
       "path": "examples/advanced/03_wine_quality.ipynb",
       "status": "passed",
-      "started_at": "2026-11-09T06:17:58.998634+00:00",
+      "started_at": "2026-11-09T06:37:44.477062+00:00",
       "error": null,
       "cells_executed": 8,
       "mode": "inprocess",
-      "finished_at": "2026-11-09T06:18:06.724972+00:00",
+      "finished_at": "2026-11-09T06:37:45.251895+00:00",
       "log": "examples/advanced/outputs/evidence/03_wine_quality.log"
     },
     {
       "slug": "07_abalone",
       "path": "examples/advanced/07_abalone.ipynb",
       "status": "passed",
-      "started_at": "2026-11-09T06:18:16.261867+00:00",
+      "started_at": "2026-11-09T06:37:45.252011+00:00",
       "error": null,
       "cells_executed": 7,
       "mode": "inprocess",
-      "finished_at": "2026-11-09T06:18:17.270737+00:00",
+      "finished_at": "2026-11-09T06:37:46.204560+00:00",
       "log": "examples/advanced/outputs/evidence/07_abalone.log"
+    },
+    {
+      "slug": "09_mall_customers",
+      "path": "examples/advanced/09_mall_customers.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:37:46.205474+00:00",
+      "error": null,
+      "cells_executed": 11,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:37:48.456131+00:00",
+      "log": "examples/advanced/outputs/evidence/09_mall_customers.log"
     },
     {
       "slug": "08_bike_sharing",
       "path": "examples/advanced/08_bike_sharing.ipynb",
       "status": "passed",
-      "started_at": "2026-11-09T06:18:17.272857+00:00",
+      "started_at": "2026-11-09T06:37:48.456749+00:00",
       "error": null,
       "cells_executed": 8,
       "mode": "inprocess",
-      "finished_at": "2026-11-09T06:18:25.157619+00:00",
+      "finished_at": "2026-11-09T06:37:57.706377+00:00",
       "log": "examples/advanced/outputs/evidence/08_bike_sharing.log"
+    },
+    {
+      "slug": "10_adult_census",
+      "path": "examples/advanced/10_adult_census.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T07:12:21.009227+00:00",
+      "error": null,
+      "cells_executed": 17,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T07:12:21.942206+00:00",
+      "log": "examples/advanced/outputs/evidence/10_adult_census.log"
+    },
+    {
+      "slug": "05_credit_card_fraud",
+      "path": "examples/advanced/05_credit_card_fraud.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:37:58.452536+00:00",
+      "error": null,
+      "cells_executed": 16,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:38:01.312629+00:00",
+      "log": "examples/advanced/outputs/evidence/05_credit_card_fraud.log"
+    },
+    {
+      "slug": "11_house_prices",
+      "path": "examples/advanced/11_house_prices.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:38:01.312910+00:00",
+      "error": null,
+      "cells_executed": 14,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:38:02.250724+00:00",
+      "log": "examples/advanced/outputs/evidence/11_house_prices.log"
+    },
+    {
+      "slug": "13_ab_testing",
+      "path": "examples/advanced/13_ab_testing.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T07:12:14.133459+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T07:12:14.346417+00:00",
+      "log": "examples/advanced/outputs/evidence/13_ab_testing.log"
+    },
+    {
+      "slug": "14_hypothesis_testing",
+      "path": "examples/advanced/14_hypothesis_testing.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:38:02.354702+00:00",
+      "error": null,
+      "cells_executed": 6,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:38:02.377093+00:00",
+      "log": "examples/advanced/outputs/evidence/14_hypothesis_testing.log"
+    },
+    {
+      "slug": "15_timeseries_forecast",
+      "path": "examples/advanced/15_timeseries_forecast.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T07:12:12.956944+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T07:12:14.133008+00:00",
+      "log": "examples/advanced/outputs/evidence/15_timeseries_forecast.log"
+    },
+    {
+      "slug": "16_survival_churn",
+      "path": "examples/advanced/16_survival_churn.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:38:03.233713+00:00",
+      "error": null,
+      "cells_executed": 5,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:38:03.386108+00:00",
+      "log": "examples/advanced/outputs/evidence/16_survival_churn.log"
+    },
+    {
+      "slug": "17_text_eda",
+      "path": "examples/advanced/17_text_eda.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:38:03.386211+00:00",
+      "error": null,
+      "cells_executed": 4,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:38:03.403937+00:00",
+      "log": "examples/advanced/outputs/evidence/17_text_eda.log"
+    },
+    {
+      "slug": "18_anomaly_detection",
+      "path": "examples/advanced/18_anomaly_detection.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:38:03.404349+00:00",
+      "error": null,
+      "cells_executed": 4,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:38:03.653415+00:00",
+      "log": "examples/advanced/outputs/evidence/18_anomaly_detection.log"
+    },
+    {
+      "slug": "19_association_rules",
+      "path": "examples/advanced/19_association_rules.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:38:03.653649+00:00",
+      "error": null,
+      "cells_executed": 3,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:38:03.661868+00:00",
+      "log": "examples/advanced/outputs/evidence/19_association_rules.log"
+    },
+    {
+      "slug": "20_causal_did",
+      "path": "examples/advanced/20_causal_did.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T06:38:03.662012+00:00",
+      "error": null,
+      "cells_executed": 4,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T06:38:03.712722+00:00",
+      "log": "examples/advanced/outputs/evidence/20_causal_did.log"
+    },
+    {
+      "slug": "21_order_refund_reconciliation",
+      "path": "examples/advanced/21_order_refund_reconciliation.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T07:12:01.512860+00:00",
+      "error": null,
+      "cells_executed": 5,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T07:12:05.811301+00:00",
+      "log": "examples/advanced/outputs/evidence/21_order_refund_reconciliation.log"
+    },
+    {
+      "slug": "22_movielens_ndcg",
+      "path": "examples/advanced/22_movielens_ndcg.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T07:12:05.811532+00:00",
+      "error": null,
+      "cells_executed": 5,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T07:12:12.956829+00:00",
+      "log": "examples/advanced/outputs/evidence/22_movielens_ndcg.log"
     }
   ],
   "summary": {
-    "passed": 4,
+    "passed": 22,
     "failed": 0,
-    "total": 4
+    "total": 22
   }
 }

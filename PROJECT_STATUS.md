@@ -16,7 +16,7 @@
 | **路线图正式功能点（A/B/C/D/E13–17/F 勾选框）** | **45** | **34** | **11** | **75.6%** |
 | 其中：业务 Skill 主链 D01–D12 | 12 | 12 | 0 | 100%（**MVP**，深水区另计） |
 | 其中：回归体系 C01–C12 | 12 | 1 | 11 | 8.3% |
-| 进阶 Notebook 案例 E01–E12（表状态，非勾选框） | 12 | 12 | 0 | 100%（已加细 + E17 证据） |
+| 进阶 Notebook 案例 01–22（表状态，非勾选框） | 22 | 22 | 0 | 100%（含对账/NDCG/六缺口收口；证据 22/22） |
 | Skill 深水区待办（路线图正文「待补」，未单独编号） | 10 | 0 | 10 | 0%（见 §4） |
 | 教材站强化（本轮新增 backlog G） | 8 | 1 | 7 | 12.5%（见 §5） |
 
@@ -38,7 +38,8 @@
 | [docs/SKILL_API_MAPPING.md](docs/SKILL_API_MAPPING.md) | Skill → API → 测试映射 |
 | [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | **详尽 API 说明书**（可运行示例 + `scripts/verify_api_reference.py`） |
 | [docs/API_INVENTORY.md](docs/API_INVENTORY.md) | 公开 API 短盘点 |
-| [docs/evidence/ADVANCED_EVIDENCE.md](docs/evidence/ADVANCED_EVIDENCE.md) | 12 Notebook 跑通证据 |
+| [docs/evidence/ADVANCED_EVIDENCE.md](docs/evidence/ADVANCED_EVIDENCE.md) | 进阶 Notebook 跑通证据 |
+| [docs/ANALYSIS_COVERAGE.md](docs/ANALYSIS_COVERAGE.md) | 常见分析方法覆盖与包优化缺口 |
 | [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) | 历史记录；**不作为本轮完成率依据** |
 | GitHub Issues [#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6) 等 | 讨论与拆分；勾选以路线图为准 |
 
@@ -71,12 +72,15 @@
 | C01 | ✅ |
 | C02–C12 | ❌ 未做 |
 
-### E 进阶演示配套 — 5/5 勾选 = 100%；案例 12/12
+### E 进阶演示配套 — 5/5 勾选 = 100%；案例 Notebook 22/22
 
 | ID | 状态 |
 | --- | --- |
-| E01–E12 | ✅ Notebook 已加细（表状态） |
-| E13–E17 | ✅ |
+| 案例 01–12 | ✅ 竞赛/表格基线向，已加细 |
+| 案例 13–20 | ✅ 统计/试验/时序/生存/文本/异常/关联/DiD |
+| 案例 21–22 | ✅ 三表对账；MovieLens NDCG |
+| 并入增补 | ✅ 13 贝叶斯 A/B；15 同比边缘；04 校准；10 公平性 |
+| 路线图勾选 E13–E17 | ✅ 导航/证据配套（**编号≠案例文件名**） |
 
 ### F 发布门槛 — 6/6 = 100%（部分为烟测级）
 
@@ -100,10 +104,19 @@
 | S6 | 图表类型扩展（不止趋势/结构） | D08 | P2 |
 | S7 | 可量化 uplift（非一律 pending） | D09 | P1 |
 | S8 | 独立 recommendations 模块深化 | D09 | P2 |
-| S9 | 统计检验自动设计（非仅清单） | D12 / statistical-analysis | P2 |
+| S9 | 统计检验自动设计（非仅清单） | D12 / statistical-analysis | P2→升 P0（案例 14） |
 | S10 | 业务脏样例验收（退款/取消/隐私等，同 C09） | C09 ∩ D | P0 |
 
 **深水区完成率：0/10 = 0%。**
+
+### 4.1 由案例 13–20 反推的包 API 缺口（详见 `docs/ANALYSIS_COVERAGE.md`）
+
+| 优先级 | 建议 API | 依据案例 |
+| --- | --- | --- |
+| P0 | `StatsToolkit` / `ExperimentDesign` | 14 / 13 |
+| P0 | 业务多表关联膨胀（S2） | 覆盖矩阵仍弱 |
+| P1 | `TimeSeriesTools` / `SurvivalAnalyzer` / `AnomalyDetector` | 15 / 16 / 18 |
+| P2 | 文本中文分词、关联规则 extras、校准与公平性报表 | 17 / 19 / Adult·Fraud |
 
 ---
 
@@ -116,21 +129,23 @@
 | G01 | 建立本进度仪表盘并链到文档/手册 | ✅（本文件） |
 | G02 | 增加「精讲课」：泄露 / 划分 / 提交契约 / 业务数字追溯 | 进行中 |
 | G03 | 加厚三条主线文稿（Analyzer / 竞赛 / 业务）到可自学深度 | 进行中 |
-| G04 | 每课练习增加「参考思路」与最小可运行片段 | 待办 |
+| G04 | 每课练习增加「参考思路」与最小可运行片段 | 进行中（01–12 有；13–20 已挂练习页） |
 | G05 | 新增 2+ 端到端精讲 Notebook（竞赛一条 + 业务一条） | 待办 |
 | G06 | 手册内嵌「常见错误墙」与对照表 | 待办 |
 | G07 | 学习路径按课时（45/90 分钟）重排 | 待办 |
 | G08 | 教材完成度纳入发布检查 | ✅ `release_check.sh full` 含 build_book |
 | G09 | 详尽 API 说明书 + 自动校验 | ✅ `docs/API_REFERENCE.md` |
 | G10 | 发布步骤收成一条命令 | ✅ `scripts/release_check.sh` + `docs/RELEASE.md` |
+| G11 | 中文术语表扩到统计/时序/生存/因果 | ✅ `book/reference/glossary.md` |
+| G12 | 分析覆盖矩阵 + 案例扩到 22（六缺口收口） | ✅ `docs/ANALYSIS_COVERAGE.md` |
 
 ---
 
 ## 6. 建议下一期（让完成率「对学生也有意义」）
 
-1. **P0 工程：** C09 + S2/S3（业务脏数据与多表/缺期）  
-2. **P0 教材：** G02/G03/G05（精讲 + 端到端 Notebook）  
-3. **P1：** C02–C04、S1/S4/S7  
+1. **P0 工程：** `StatsToolkit` + `ExperimentDesign`；C09 + S2/S3  
+2. **P0 教材：** G02/G03/G05；构建 Pages 使 20 课上线  
+3. **P1：** `TimeSeriesTools` / 生存 / 异常封装；C02–C04  
 
 ---
 
@@ -141,3 +156,5 @@
 | 2026-11-09 | 初建仪表盘：45 点完成率 75.6%；登记深水区 10 项与教材 G01–G08 |
 | 2026-11-09 | 补 G09：`docs/API_REFERENCE.md` + `scripts/verify_api_reference.py`（19/19 通过）；修复 `analyze_notebook` |
 | 2026-11-09 | G10：`./scripts/release_check.sh` 统一日常/发版/大版本检查；见 `docs/RELEASE.md` |
+| 2026-11-09 | G11/G12：术语表扩写；案例 13–20；覆盖矩阵；证据 20/20 |
+| 2026-11-09 | wave3：案例 21–22 + 六缺口收口；证据 22/22 |

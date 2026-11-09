@@ -28,6 +28,16 @@ NOTEBOOKS = [
     "10_adult_census",
     "05_credit_card_fraud",
     "11_house_prices",
+    "13_ab_testing",
+    "14_hypothesis_testing",
+    "15_timeseries_forecast",
+    "16_survival_churn",
+    "17_text_eda",
+    "18_anomaly_detection",
+    "19_association_rules",
+    "20_causal_did",
+    "21_order_refund_reconciliation",
+    "22_movielens_ndcg",
 ]
 
 # (源相对仓库根, 同步到 book/cases/ 的文件名不含扩展名)
@@ -41,6 +51,7 @@ DOC_COPIES = {
     "SKILL_API_MAPPING.md": "skill-mapping.md",
     "DEPENDENCIES.md": "dependencies.md",
     "evidence/ADVANCED_EVIDENCE.md": "evidence.md",
+    "ANALYSIS_COVERAGE.md": "analysis-coverage.md",
 }
 
 

@@ -9,7 +9,8 @@
 | [API_INVENTORY.md](API_INVENTORY.md) | 公开 API / 可选依赖短盘点（A01） |
 | [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md) | Skill → API / 配置 / 测试映射（A02–A03） |
 | [DEPENDENCIES.md](DEPENDENCIES.md) | 依赖分层：默认核 / extras / requirements 文件 / torch（F02） |
-| [evidence/ADVANCED_EVIDENCE.md](evidence/ADVANCED_EVIDENCE.md) | 12 个进阶 Notebook 跑通证据（E17） |
+| [evidence/ADVANCED_EVIDENCE.md](evidence/ADVANCED_EVIDENCE.md) | 进阶 Notebook 跑通证据 |
+| [ANALYSIS_COVERAGE.md](ANALYSIS_COVERAGE.md) | 常见分析方法覆盖矩阵与 wanglaoshi 优化缺口 |
 | [../PROJECT_STATUS.md](../PROJECT_STATUS.md) | 功能点数量与完成率仪表盘 |
 | [../book/](../book/) | 基线工坊 · 从 EDA 到提交（Jupyter Book 教材站） |
 | [../DEVELOPMENT_ROADMAP.md](../DEVELOPMENT_ROADMAP.md) | 增量开发总计划与勾选状态 |

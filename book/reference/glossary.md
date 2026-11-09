@@ -1,71 +1,178 @@
 # 中文术语表
 
-检索或复习时可用本页。Jupyter Book 搜索框也支持这些中文关键词。
+按主题分组；与 [API 参考](api.md)、[分析覆盖矩阵](analysis-coverage.md) 对照。包内符号用反引号标出。
 
-```{glossary}
-分层划分
-  按类别比例划分训练/验证，避免某类在验证集中消失。小样本多分类常用。
+## 工作流与交付
 
-数据泄露
-  模型训练时用到了「预测时不可用」的信息，导致线下分数虚高、线上崩盘。
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 基线 | baseline | 可复现、可提交的第一版预测流水线 |
+| 快速基线 | `QuickBaseline` | 一键切分、训练、评估、可选提交文件 |
+| 就绪检查 | `ready` | 训练前结构体检（泄漏、目标、时间等） |
+| 阶段结果 | `StageResult` | 流水线每步的结构化产出（指标、工件、日志） |
+| 提交契约 | submission contract | 行序/ID/列名与评测机约定一致 |
+| 提交生成器 | `SubmissionGenerator` | 按模板写出提交 CSV |
+| 业务流水线 | `BusinessPipeline` | 可追溯多阶段业务分析管线 |
+| 证据回放 | evidence replay | CI/脚本重跑 notebook 并落盘摘要 |
 
-目标泄露
-  特征中直接或间接含有目标信息（如用结果字段当特征）。
+## 探索与质量
 
-时间泄露
-  用了未来信息（错误的时间划分、错误的滞后特征）。
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 探索性分析 | EDA | 描述、缺失、分布、相关、可视化 |
+| 数据剖析器 | `DataAnalyzer` | 一站式 EDA / 报告辅助 |
+| 缺失机制 | MCAR/MAR/MNAR | 完全随机 / 依赖观测 / 依赖未观测 |
+| 异常值 | outlier | 偏离主体分布的点；未必是错误 |
+| 重复行 | duplicate | 完全或键重复；需业务判定去留 |
+| 口径 | definition | 指标分子分母、时间窗、归属规则 |
+| 一致性校验 | consistency check | 主键、外键、汇总勾稽 |
 
-分布泄露 / 分布漂移
-  训练与测试特征分布显著不一致，泛化假设被破坏。
+## 特征与泄漏
 
-交叉验证（CV）
-  多次划分评估泛化；时间/分组场景要用对应的 CV，而非盲目 KFold。
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 特征工程 | FE / `FeatureEngineer` | 衍生、编码、缩放、文本/时间特征 |
+| 目标编码 | target encoding / `target_encode` | 用目标统计编码类别；**必须折内** |
+| 时间特征 | datetime features | 从时间戳拆出的周期与滞后候选 |
+| 滞后特征 | lag | 用历史值预测未来；禁止用「未来」 |
+| 数据泄漏 | leakage | 训练时用不该在预测时可得的信息 |
+| 时间泄漏 | time leakage | 用了预测时刻之后的信息 |
+| 目标泄漏 | target leakage | 特征直接或间接含目标 |
 
-目标编码
-  用目标均值等统计量编码类别；必须在训练折内拟合，并常需平滑。
+## 验证与模型
 
-提交文件（submission）
-  按竞赛 sample 模板生成的预测表；本地校验 ID/列/类型，不应用测试标签刷分。
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 交叉验证 | CV / `CrossValidator` | K 折等；估计泛化 |
+| 分组交叉验证 | GroupKFold | 同组样本同进同出，防泄漏 |
+| 时间序列切分 | TimeSeriesSplit | 训练窗严格早于验证窗 |
+| 分层抽样 | stratified | 保持类别比例 |
+| 过拟合 | overfitting | 训练集好、泛化差 |
+| 欠拟合 | underfitting | 模型容量不足或特征不足 |
+| 集成 | ensemble / `ModelEnsemble` | 多模型融合（平均、加权、堆叠） |
+| 校准 | calibration | 预测概率与真实频率对齐 |
 
-StageResult
-  业务流水线单阶段结果：含 status、data、warnings、block_reasons 等。
+## 分类与不均衡
 
-passed / warning / blocked / skipped
-  业务阶段状态：成功；可继续但有问题；阻断；因上游阻断等显式跳过。
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 准确率 | accuracy | 正确数 / 总数；类别不平衡时易误导 |
+| 精确率 | precision | 预测为正中真正为正的比例 |
+| 召回率 | recall / TPR | 真实为正中被找出的比例 |
+| F1 | F1-score | 精确率与召回的调和平均 |
+| ROC-AUC | ROC AUC | 排序能力；不关心阈值 |
+| PR-AUC | average precision | 不均衡下更敏感的排序/检出指标 |
+| 混淆矩阵 | confusion matrix | TP/FP/FN/TN |
+| 类别不平衡 | class imbalance | 正负样本比例悬殊 |
+| `class_weight` | class_weight | 提高少数类误分代价 |
 
-deliverable
-  交付索引中的「是否可正式交付」。上游 blocked 时应为 false。
+## 回归与变换
 
-PR-AUC
-  Precision-Recall 曲线下面积；极端不均衡时往往比 ROC-AUC 更贴业务。
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| MAE | mean absolute error | 绝对误差均值；稳健、可解释 |
+| RMSE | root mean squared error | 对大误差更敏感 |
+| R² | coefficient of determination | 相对基线方差的解释比例 |
+| 目标变换 | target transform | 如 log1p；逆变换后才可比业务单位 |
+| 残差 | residual | 真实 − 预测；用于诊断异方差/结构 |
 
-PCA
-  主成分分析；降维前通常先标准化，且只能在训练集上拟合。
+## 降维与相关
 
-滞后特征
-  用历史窗口构造特征；窗口只能包含预测时刻已发生的信息。
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 相关矩阵 | correlation | 线性相关强度；非因果 |
+| 共线性 | multicollinearity | 特征高度相关，系数不稳 |
+| PCA | `pca_analysis` | 主成分；方差方向，非监督 |
+| 方差解释比 | explained variance ratio | 各主成分解释的方差比例 |
 
-脱敏（redact）
-  归档时把敏感字段替换为占位符，避免交付包泄漏隐私。
+## 聚类
 
-evidence / 证据编号
-  结论与建议必须能指回的指标、图表或哈希等依据。
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| K-Means | k-means | 距离型划分聚类 |
+| 轮廓系数 | silhouette | 簇内紧、簇间离的综合分 |
+| 稳定性 | stability | 种子/子样扰动下簇是否可复现 |
+| 业务可读标签 | persona | 用统计画像给簇命名，避免只报簇号 |
 
-pending uplift
-  行动建议里收益目标暂无依据，标记待定，避免拍脑袋承诺。
+## 假设检验与试验
 
-ready()
-  `wanglaoshi.ready`：Notebook 一键就绪（关警告 + 打印环境 + 可选种子）。
-  不要再叠写 ``warnings.filterwarnings`` 与 ``JE.no_warning()``，二者重复。
-```
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 零假设 | H₀ | 默认「无效应 / 无差异」 |
+| 备择假设 | H₁ | 研究者关心的差异或效应 |
+| p 值 | p-value | 在 H₀ 下看到当前或更极端结果的概率 |
+| 效应量 | effect size | 差异「有多大」（如 Cohen's d、提升百分点） |
+| 功效 | power | 真实有效应时能检出的概率 |
+| 一类错误 | Type I / α | 误拒真 H₀（假阳性） |
+| 二类错误 | Type II / β | 未拒假 H₀（假阴性） |
+| t 检验 | t-test | 均值差（正态/大样本近似） |
+| 卡方检验 | χ² | 分类表独立性 / 拟合优度 |
+| 方差分析 | ANOVA | 多组均值是否有差异 |
+| A/B 试验 | A/B test | 随机分流比较两（多）版本 |
+| 样本量 | sample size | 达目标功效所需观测数 |
+| 多重比较 | multiple testing | 多次检验抬高假阳性；需校正 |
 
-## 英文对照（便于读源码）
+## 时间序列
 
-| 中文 | 常见英文 |
-| --- | --- |
-| 分层 | stratified |
-| 泄露 | leakage |
-| 基线 | baseline |
-| 集成 | ensemble / stacking / blending |
-| 特征工程 | feature engineering |
-| 业务流水线 | business pipeline |
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 趋势 | trend | 长期方向性变化 |
+| 季节性 | seasonality | 固定周期波动 |
+| 残差分量 | remainder | 分解后剩余项 |
+| 平稳性 | stationarity | 均值/方差不随时间系统性漂移 |
+| ADF | Augmented Dickey–Fuller | 单位根/平稳性检验之一 |
+| 季节分解 | STL / classical decomp | 拆成趋势+季节+残差 |
+| 前瞻偏差 | look-ahead bias | 用未来信息训练/评估 |
+
+## 生存与流失
+
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 删失 | censoring | 观测结束时事件未发生 |
+| 生存函数 | S(t) | t 时刻仍未事件的概率 |
+| Kaplan–Meier | KM | 非参数生存曲线估计 |
+| 风险比 | hazard ratio | 相对风险（模型语境） |
+| 流失 | churn | 客户停止使用等事件 |
+
+## 文本与异常
+
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 词袋 | bag-of-words | 词频向量，忽略语序 |
+| TF-IDF | tf-idf | 词频 × 逆文档频率 |
+| 文本特征 | `extract_text_features` | 长度、标点、简单统计等浅特征 |
+| 异常检测 | anomaly detection | 无标签或弱标签下找离群模式 |
+| Isolation Forest | iForest | 随机划分隔离异常点 |
+
+## 因果与进阶（矩阵中多为缺口）
+
+| 术语 | 英文 / 符号 | 含义 |
+| --- | --- | --- |
+| 相关 ≠ 因果 | association ≠ causation | 观测相关不能直接当干预效应 |
+| 混杂 | confounding | 同时影响处理与结果的变量 |
+| 双重差分 | DiD | 处理组与对照组的趋势差之差 |
+| 工具变量 | IV | 外生变异识别因果 |
+| 关联规则 | association rules | 购物篮「若买 A 则买 B」 |
+| NDCG | NDCG | 排序质量指标（归一化折损累计增益） |
+| 对称聚合 | symmetric aggregate | 一对多连接后防重复计数的度量语义 |
+| 对账 | reconciliation | 汇总结果与源表勾稽一致 |
+| 可靠性图 | reliability diagram | 预测概率分箱 vs 真实频率 |
+| ECE | expected calibration error | 分箱加权的校准误差 |
+| Brier 分数 | Brier score | 概率预测均方误差 |
+| 同比 | YoY | 与去年同期对比；需处理缺期/零基数/未完月 |
+| 先验敏感性 | prior sensitivity | 贝叶斯结论随先验变化的程度 |
+
+## 竞赛与业务常用缩写
+
+| 缩写 | 含义 |
+| --- | --- | --- |
+| OOF | Out-of-fold，折外预测 |
+| LB | Leaderboard，排行榜分 |
+| CV | Cross-validation |
+| SMOTE 等 | 过采样；竞赛慎用，优先 `class_weight` |
+| KPI | 关键业务指标 |
+| ETL | 抽取-转换-加载 |
+
+---
+
+**维护：** 新增进阶课时同步补词；包 API 变更以 `docs/API_REFERENCE.md` 为准。

@@ -23,7 +23,7 @@
 2. {doc}`lessons/overview` → 精讲（比案例更深）  
 3. {doc}`tracks/competition` / {doc}`tracks/analyzer` / {doc}`tracks/business` → 选主线  
 4. {doc}`start/first-hour` → 一小时最小闭环（全是包 API）  
-5. {doc}`cases/overview` → 12 课；每课练习必须点名 API  
+5. {doc}`cases/overview` → 22 课；每课练习必须点名 API；覆盖矩阵见 {doc}`reference/analysis-coverage`  
 6. {doc}`reference/api` → 查签名；冲突以仓库说明书为准  
 
 ```{warning}

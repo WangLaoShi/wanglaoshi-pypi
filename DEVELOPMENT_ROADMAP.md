@@ -17,7 +17,7 @@
 | B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` |
 | C 回归测试体系 | 进行中（quick/full/release 入口） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + `scripts/run_tests.sh` |
 | D Skill 增量固化 | 进行中（D 主链含 D08/D12 已通） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + tests |
-| E 12 个进阶演示 | 进行中（12 Notebook 已加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` + `_deepen_all.py` |
+| E 进阶演示 | 进行中（22 Notebook；六缺口已收口） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/` + `_add_curriculum_wave3.py` |
 | F 安装、兼容与发布验证 | 进行中（F01/F02 烟测与依赖文档） | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | `tests/test_release_smoke.py` + `docs/DEPENDENCIES.md` |
 | Epic 总跟踪 | 进行中 | [#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6) | 本文件 |
 
@@ -128,30 +128,44 @@
 
 快速档限制数据和模型预算；完整档运行全案例；发布档增加安装兼容验证。环境矩阵先核对实际依赖与 `python_requires`，再声明最低支持版本和当前稳定版本；不虚假承诺未经验证的兼容性。初期流水线可先单环境运行，再扩展 Linux/Windows/macOS。耗时与内存阈值在固定环境建立基准后启用。
 
-## 6. E：12 个进阶使用演示（独立 Feature Issue）
+## 6. E：进阶使用演示（独立 Feature Issue）
 
-每项包含 README、Notebook、Python 入口、至少两个难点、基线和同条件对比、错误分析、局限、quick/full 模式。Notebook 与脚本共用流程；包外能力显式标明，不为凑案例重写框架。
+每项包含 README、Notebook、至少两个难点、错误分析、局限；包外能力显式标明。  
+**方法覆盖与包缺口：** `docs/ANALYSIS_COVERAGE.md`。
 
 | 任务 | 数据集 | 技术难点与结果 | 状态 |
 | --- | --- | --- | --- |
-| E01 | Iris | 小样本分层验证、字符串/数字标签提交 | Notebook 已加细 |
-| E02 | Titanic | 缺失、文本特征、训练验证隔离 | Notebook 已加细 |
-| E03 | Wine Quality | 回归/有序分类比较、不均衡 | Notebook 已加细 |
-| E04 | Breast Cancer | 缩放/PCA、阈值与召回权衡 | Notebook 已加细 |
-| E05 | Credit Card Fraud | 时间划分、不均衡、PR-AUC与阈值 | Notebook 已加细 |
-| E06 | California Housing | 空间分组对比随机划分、分层误差 | Notebook 已加细 |
-| E07 | Abalone | 混合编码、目标变换和残差 | Notebook 已加细 |
-| E08 | Bike Sharing | 时间验证、预测时可用的滞后特征、RMSLE | Notebook 已加细 |
-| E09 | Mall Customers | 缩放、聚类数与稳定性、画像 | Notebook 已加细 |
-| E10 | Adult Census | 折内目标编码、分组表现差异 | Notebook 已加细 |
-| E11 | House Prices | 混合高维、缺失含义、对数目标与集成 | Notebook 已加细 |
-| E12 | Digit Recognizer | 高维EDA、PCA、精度与成本、错分分析 | Notebook 已加细 |
+| 案例 01 | Iris | 小样本分层验证、字符串/数字标签提交 | ✅ 已加细 |
+| 案例 02 | Titanic | 缺失、文本特征、训练验证隔离 | ✅ 已加细 |
+| 案例 03 | Wine Quality | 回归/有序分类比较、不均衡 | ✅ 已加细 |
+| 案例 04 | Breast Cancer | 缩放/PCA、阈值与召回权衡 | ✅ 已加细 |
+| 案例 05 | Credit Card Fraud | 时间划分、不均衡、PR-AUC与阈值 | ✅ 已加细 |
+| 案例 06 | California Housing | 空间分组对比随机划分、分层误差 | ✅ 已加细 |
+| 案例 07 | Abalone | 混合编码、目标变换和残差 | ✅ 已加细 |
+| 案例 08 | Bike Sharing | 时间验证、预测时可用的滞后特征、RMSLE | ✅ 已加细 |
+| 案例 09 | Mall Customers | 缩放、聚类数与稳定性、画像 | ✅ 已加细 |
+| 案例 10 | Adult Census | 折内目标编码、分组表现差异 | ✅ 已加细 |
+| 案例 11 | House Prices | 混合高维、缺失含义、对数目标与集成 | ✅ 已加细 |
+| 案例 12 | Digit Recognizer | 高维EDA、PCA、精度与成本、错分分析 | ✅ 已加细 |
+| 案例 13 | 合成 A/B | 功效、效应量、两比例检验 | ✅ |
+| 案例 14 | 合成多组 | t / χ² / ANOVA | ✅ |
+| 案例 15 | 合成日序列 | 分解、ADF、季节朴素预测 | ✅ |
+| 案例 16 | 合成订阅 | KM、删失、流失 | ✅ |
+| 案例 17 | 合成评论 | 文本浅特征 / 折内 TF-IDF | ✅ |
+| 案例 18 | 合成异常 | IsolationForest | ✅ |
+| 案例 19 | 合成购物篮 | 关联规则 lift | ✅ |
+| 案例 20 | 合成面板 | 双重差分入门 | ✅ |
+| 案例 21 | 合成订单/明细/退款 | 一对多膨胀与对账 | ✅ |
+| 案例 22 | MovieLens / DEMO | NDCG@10 与热门榜基线 | ✅ |
+| 并入 04/10/13/15 | — | 校准、公平性、贝叶斯 A/B、同比边缘 | ✅ |
+
+配套勾选（**编号历史遗留，勿与案例 13–17 文件名混淆**）：
 
 - [x] E13 建立 `examples/advanced/` 导航、共同运行入口和依赖说明。
 - [x] E14 每个案例的数据获取与使用条件核实；Wine Quality 不与 sklearn Wine 混淆，California 首次需下载。
 - [x] E15 比赛提交仅本地生成与校验；无标签测试集不用于本地评估。
-- [x] E16 Kaggle 时间预测的滞后特征只使用预测当时可用信息，不引用未知测试目标。（E08 Notebook 约束）
-- [x] E17 12 项完成后逐项补运行证据，README 提供学习顺序。（`docs/evidence/ADVANCED_EVIDENCE.md`；`scripts/run_advanced_evidence.py`）
+- [x] E16 Kaggle 时间预测的滞后特征只使用预测当时可用信息，不引用未知测试目标。（案例 08 Notebook 约束）
+- [x] E17 案例跑通证据与学习顺序。（`docs/evidence/ADVANCED_EVIDENCE.md`；`scripts/run_advanced_evidence.py`）
 
 原始大数据、模型和生成报告不默认提交。公共下载失败不应伪装成通过，也不绕过登录或条款。
 

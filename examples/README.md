@@ -5,7 +5,7 @@
 | [analyzer_demo.py](analyzer_demo.py) | 脚本 | `DataAnalyzer` EDA 与报告 | 是（合成数据） |
 | [business_intake_demo.ipynb](business_intake_demo.ipynb) | Notebook | 业务流水线短 demo | 是（合成订单） |
 | [business_pipeline_course.ipynb](business_pipeline_course.ipynb) | Notebook | 业务流水线**教材专章**（阻断/交付/脱敏） | 是（合成订单） |
-| [advanced/](advanced/) | 12 Notebook | 竞赛/学习进阶案例 | 部分需 OpenML/本地 CSV；有 DEMO 回退 |
+| [advanced/](advanced/) | 22 Notebook | 竞赛/统计/对账/推荐等全覆盖 | 部分需 OpenML/本地 CSV；13–22 多合成/DEMO |
 
 ## 建议学习顺序
 

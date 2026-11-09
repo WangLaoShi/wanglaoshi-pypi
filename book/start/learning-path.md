@@ -35,6 +35,23 @@
 | 11 | {doc}`../cases/05_credit_card_fraud` | 不均衡指标 |
 | 12 | {doc}`../cases/11_house_prices` | 集成 + 提交 |
 
+## 路径 D：统计 / 试验 / 时序 / 文本 / 对账 / 推荐（13–22）
+
+补齐常见分析方法；见 {doc}`../reference/analysis-coverage`。
+
+| 顺序 | 课 | 焦点 |
+| --- | --- | --- |
+| 13 | {doc}`../cases/13_ab_testing` | A/B、功效、贝叶斯门槛概率 |
+| 14 | {doc}`../cases/14_hypothesis_testing` | t / χ² / ANOVA |
+| 15 | {doc}`../cases/15_timeseries_forecast` | 分解 + 同比缺月/零基数 |
+| 16 | {doc}`../cases/16_survival_churn` | KM 与删失 |
+| 17 | {doc}`../cases/17_text_eda` | 文本特征 |
+| 18 | {doc}`../cases/18_anomaly_detection` | 无标签异常 |
+| 19 | {doc}`../cases/19_association_rules` | 购物篮规则 |
+| 20 | {doc}`../cases/20_causal_did` | DiD 入门 |
+| 21 | {doc}`../cases/21_order_refund_reconciliation` | 三表对账防翻倍 |
+| 22 | {doc}`../cases/22_movielens_ndcg` | NDCG@10 |
+
 ## 路径 C：业务分析流水线
 
 1. {doc}`../lessons/business_traceability`  

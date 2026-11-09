@@ -24,7 +24,7 @@ parts:
       - file: tracks/competition
       - file: tracks/business
 
-  - caption: 进阶案例（12 课）
+  - caption: 进阶案例（22 课）
     chapters:
       - file: cases/overview
       - file: cases/01_iris
@@ -63,6 +63,36 @@ parts:
       - file: cases/11_house_prices
         sections:
           - file: practice/11_house_prices
+      - file: cases/13_ab_testing
+        sections:
+          - file: practice/13_ab_testing
+      - file: cases/14_hypothesis_testing
+        sections:
+          - file: practice/14_hypothesis_testing
+      - file: cases/15_timeseries_forecast
+        sections:
+          - file: practice/15_timeseries_forecast
+      - file: cases/16_survival_churn
+        sections:
+          - file: practice/16_survival_churn
+      - file: cases/17_text_eda
+        sections:
+          - file: practice/17_text_eda
+      - file: cases/18_anomaly_detection
+        sections:
+          - file: practice/18_anomaly_detection
+      - file: cases/19_association_rules
+        sections:
+          - file: practice/19_association_rules
+      - file: cases/20_causal_did
+        sections:
+          - file: practice/20_causal_did
+      - file: cases/21_order_refund_reconciliation
+        sections:
+          - file: practice/21_order_refund_reconciliation
+      - file: cases/22_movielens_ndcg
+        sections:
+          - file: practice/22_movielens_ndcg
 
   - caption: 业务专章
     chapters:
@@ -74,6 +104,7 @@ parts:
     chapters:
       - file: practice/overview
       - file: reference/glossary
+      - file: reference/analysis-coverage
 
   - caption: 参考与证据
     chapters:
