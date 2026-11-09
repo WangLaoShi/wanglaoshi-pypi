@@ -13,8 +13,8 @@
 | A 现有能力盘点 | 进行中 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 已对照公开 API；契约文档待补 |
 | B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` 8 passed |
 | C 回归测试体系 | 进行中（最小骨架） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + submission 用例 |
-| D Skill 增量固化 | 待开发 | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | 待补充 |
-| E 12 个进阶演示 | 进行中（12 Notebook 已落盘，E01 加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` |
+| D Skill 增量固化 | 进行中（D01 intake + pipeline MVP） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + `tests/test_business_intake.py` |
+| E 12 个进阶演示 | 进行中（12 Notebook 全部案例专属加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` + `_deepen_all.py` |
 | F 安装、兼容与发布验证 | 待开发 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 待补充 |
 | Epic 总跟踪 | 进行中 | [#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6) | 本文件 |
 
@@ -83,7 +83,7 @@
 
 ### D：逐步固化 Skill
 
-- [ ] D01 接收备份、字段与周期检查。
+- [x] D01 接收备份、字段与周期检查。（`business/intake.py`）
 - [ ] D02 表头、类型、单位转换，多表关联风险检查。
 - [ ] D03 可配置清洗、新文件输出、逐规则影响日志；统计异常默认不等于删除。
 - [ ] D04 时间、同比环比、占比、分层；处理缺期、跨年和零分母。
@@ -93,7 +93,7 @@
 - [ ] D08 图表独立归档，标题/单位/周期/来源齐全。
 - [ ] D09 带证据的规则结论和行动建议。
 - [ ] D10 完整报告、脱敏、交付索引、缺项阻断。
-- [ ] D11 总控串联，阻断后不生成正式下游结果。
+- [x] D11 总控串联雏形，阻断后跳过下游。（`business/pipeline.py`；后续阶段仍为 skipped 占位）
 - [ ] D12 EDA 统一适配；统计首版方法清单及适用性检查。
 
 先完成一条销售纵向流程再扩大范围；不要求先写完所有模块。顺序为 A → 最小 C + B → 销售样例及 D01–D11 → 扩展能力与案例 → F。每项功能同步补测试，E 可在 API 稳定后逐个交付。

@@ -56,6 +56,10 @@ except ImportError:
 # 直接导出常用类和函数（方便用户少写一层模块前缀）
 from .Analyzer import DataAnalyzer, analyze_data, analyze_multiple_files, analyze_notebook
 
+# 业务流水线（Skill 固化）；不依赖可选重型包
+from . import business
+from .business import BusinessPipeline, StageResult, RunRecord, intake_file
+
 __all__ = [
     # 模块
     "JupyterEnv",
@@ -74,4 +78,10 @@ __all__ = [
     "analyze_data",
     "analyze_multiple_files",
     "analyze_notebook",
+    # business
+    "business",
+    "BusinessPipeline",
+    "StageResult",
+    "RunRecord",
+    "intake_file",
 ]

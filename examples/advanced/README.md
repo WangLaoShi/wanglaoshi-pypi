@@ -52,12 +52,18 @@ jupyter notebook examples/advanced/
 7. `SubmissionGenerator` 本地生成与校验
 8. 误差分析与检查清单
 
-## 重新生成骨架
+## 重新生成
 
-若需重置 Notebook 模板：
+- **详细版（推荐，案例专属）**：
+
+```bash
+python examples/advanced/_deepen_all.py
+```
+
+- **通用骨架（较薄，仅作模板）**：
 
 ```bash
 python examples/advanced/_generate_notebooks.py
 ```
 
-注意：会覆盖同名 `.ipynb`。个性化修改请先备份。
+注意：两个脚本都会覆盖同名 `.ipynb`。个性化修改请先备份。
