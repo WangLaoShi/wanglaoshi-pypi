@@ -1,4 +1,12 @@
-"""D10 analysis-report + delivery-archive：报告、脱敏、交付索引、缺项阻断。"""
+"""D10 analysis-report + delivery-archive：报告、脱敏、交付索引、缺项阻断。
+
+交付物至少包括：
+- report.md           给人读的报告
+- run_summary.json    阶段摘要
+- delivery_index.json 文件清单 + sha256 + 是否可交付
+
+若上游 blocked 或缺少必需文件 → 本阶段 blocked，deliverable=False。
+"""
 
 from __future__ import annotations
 

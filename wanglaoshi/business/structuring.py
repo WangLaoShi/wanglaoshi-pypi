@@ -1,4 +1,9 @@
-"""D02 data-structuring：列名标准化与基础类型规整（MVP）。"""
+"""D02 data-structuring：列名标准化与基础类型规整（MVP）。
+
+常见痛点：Excel/业务导出的列名带空格、括号、中英文混杂。
+本模块会把列名尽量变成 snake_case，并支持按配置做类型转换。
+注意：单位换算、多表关联膨胀检查仍属后续增强项。
+"""
 
 from __future__ import annotations
 

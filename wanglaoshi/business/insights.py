@@ -1,4 +1,10 @@
-"""D09 insight-conclusion + actionable-recommendations（规则版 MVP）。"""
+"""D09 insight-conclusion + actionable-recommendations（规则版 MVP）。
+
+结论怎么写才不算「拍脑袋」：
+1. 必须能指出 evidence_ids（来自指标/六视角）
+2. 没有对比或缺证据 → 降级为 observation（观察）
+3. 行动建议可以给，但收益目标没有依据时标记 expected_uplift='pending'
+"""
 
 from __future__ import annotations
 

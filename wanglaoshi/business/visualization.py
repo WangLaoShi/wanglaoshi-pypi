@@ -1,4 +1,8 @@
-"""D08 data-visualization：图表独立归档（标题/单位/周期/来源齐全）。"""
+"""D08 data-visualization：图表独立归档（标题/单位/周期/来源齐全）。
+
+每张图除了 png，还要有 sidecar json（title/unit/period/source）。
+没有元数据的图，后续报告很难追溯「这张图是什么口径」。
+"""
 
 from __future__ import annotations
 

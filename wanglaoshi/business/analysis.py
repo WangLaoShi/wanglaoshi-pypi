@@ -1,4 +1,8 @@
-"""D07 multidimensional-analysis：趋势/结构/对比/相关/二八/异动（MVP）。"""
+"""D07 multidimensional-analysis：趋势/结构/对比/相关/二八/异动（MVP）。
+
+六个视角帮助「从不同角度看同一张表」。
+特别提醒：二八/贡献分解给出的是数值贡献，**不证明业务因果**。
+"""
 
 from __future__ import annotations
 

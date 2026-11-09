@@ -1,4 +1,10 @@
-"""D06 metrics-calculation：指标字典、汇总底稿、占比一致性校验。"""
+"""D06 metrics-calculation：指标字典、汇总底稿、占比一致性校验。
+
+指标不是「随便 sum 一下」：
+- 先有 metric_dict（公式 / 聚合方式 / 方向）
+- 再产出可核对的 workbook（分组明细）
+- 分组占比之和应接近 1（share_check），否则给 warning
+"""
 
 from __future__ import annotations
 

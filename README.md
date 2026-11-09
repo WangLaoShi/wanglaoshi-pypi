@@ -104,24 +104,30 @@ from wanglaoshi import VERSIONS as V
 from wanglaoshi import DataAnalyzer
 from wanglaoshi import CompetitionTools as CT
 
+# 1) 先看环境（Python / 系统信息），方便排查「别人机器能跑我不行」
 V.show_env_info()
 
+# 2) 加载小样本多分类数据；as_frame=True 直接得到 DataFrame
 iris = load_iris(as_frame=True)
 df = iris.frame
 analyzer = DataAnalyzer(df)
-print(analyzer.get_basic_info())
+print(analyzer.get_basic_info())  # 行数、列名、类型等速览
 
+# 3) 分层划分：小样本多分类必须 stratify，否则某折可能缺类
 X = df.drop(columns=['target'])
 y = df['target']
 X_train, X_valid, y_train, y_valid = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
 )
 
+# 4) 一键多模型基线；compare_models 按验证集表现排序
 baseline = CT.QuickBaseline()
 results = baseline.run_all_models(X_train, y_train, X_valid, y_valid, task_type='classification')
 comparison = baseline.compare_models(results, top_n=5)
 print(comparison)
 
+# 5) 用最佳模型预测，本地模拟 sample_submission 并校验
+#    prediction_type='label'：写的是类别标签；概率提交请显式用 'probability'
 best = comparison.iloc[0]['Model']
 pred = results[best]['predictions']
 sample = pd.DataFrame({'Id': np.arange(len(pred)), 'target': y_valid.to_numpy()})
@@ -140,6 +146,7 @@ import pandas as pd
 from pathlib import Path
 from wanglaoshi import BusinessPipeline
 
+# 准备一份最小订单表（真实项目里换成业务 CSV 即可）
 demo = Path('outputs/biz_demo')
 demo.mkdir(parents=True, exist_ok=True)
 src = demo / 'orders.csv'
@@ -147,22 +154,23 @@ pd.DataFrame({
     'order_id': [1, 2, 3, 4],
     'order_date': ['2024-01-01', '2024-01-02', '2024-01-03', '2024-01-04'],
     'amount': [10.0, 20.0, 15.0, 30.0],
-    'channel': ['web', 'app', 'web', 'app'],
-    'user_tier': ['A', 'B', 'A', 'B'],
+    'channel': ['web', 'app', 'web', 'app'],   # 结构拆解维度
+    'user_tier': ['A', 'B', 'A', 'B'],          # 分层对比维度
 }).to_csv(src, index=False)
 
+# 字段角色尽量显式传入，避免流水线「猜列名」
 pipe = BusinessPipeline(
-    demo / 'archive',
-    required_columns=['order_id', 'amount'],
-    date_col='order_date',
-    value_col='amount',
+    demo / 'archive',                 # 中间产物 + 交付目录
+    required_columns=['order_id', 'amount'],  # D01 缺列会 warning
+    date_col='order_date',            # 趋势 / 异动
+    value_col='amount',               # 大盘指标（GMV 等）
     dim_cols=['channel'],
     segment_cols=['user_tier'],
     period='2024-Q1',
 )
 record = pipe.run(src)
-print(record.summary())
-# 正式交付在 archive/<run_id>__delivery/report.md
+print(record.summary())  # 看各阶段 passed/warning/blocked/skipped
+# 正式交付：archive/<run_id>__delivery/report.md 与 delivery_index.json
 ```
 
 配置样例：`wanglaoshi/business/config_sales_example.yaml`；Notebook：`examples/business_intake_demo.ipynb`。

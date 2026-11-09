@@ -1,4 +1,8 @@
-"""D05 analysis-decomposition：四大分析方向计划与不适用原因。"""
+"""D05 analysis-decomposition：四大分析方向计划与不适用原因。
+
+四大方向：overall（大盘）/ structure（结构）/ trend（趋势）/ segment（分层）。
+缺字段时不要硬算，应标记 not_applicable 并写明原因——这本身也是分析结果。
+"""
 
 from __future__ import annotations
 

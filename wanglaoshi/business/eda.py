@@ -1,4 +1,8 @@
-"""D12 exploratory-data-analysis 适配 + 统计方法清单（首版）。"""
+"""D12 exploratory-data-analysis 适配 + 统计方法清单（首版）。
+
+优先复用 DataAnalyzer；失败则退回轻量画像。
+统计方法清单只做「适不适用」提示，不会根据正态性自动替你选定检验。
+"""
 
 from __future__ import annotations
 

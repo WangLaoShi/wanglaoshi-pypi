@@ -1,7 +1,16 @@
 """业务分析流水线（Skill 固化入口）。
 
-主链：intake → structuring → cleaning → EDA → derived → planning → metrics
-→ analysis → visualization → insights → archive，以及总控 pipeline。
+主链：
+  intake → structuring → cleaning → EDA → derived → planning → metrics
+  → analysis → visualization → insights → archive
+  （总控：BusinessPipeline）
+
+怎么选入口？
+- 只想「收一份 CSV 入库」→ intake_file
+- 想跑完整销售分析主链 → BusinessPipeline(...).run(path)
+- 想单独算指标 / 出结论 → calculate_metrics / generate_insights
+
+状态约定见 contracts.StageResult（passed/warning/blocked/skipped）。
 """
 
 from .contracts import StageResult, RunRecord

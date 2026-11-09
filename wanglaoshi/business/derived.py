@@ -1,4 +1,10 @@
-"""D04 derived-metrics：时间维度、环比同比、占比（MVP）。"""
+"""D04 derived-metrics：时间维度、环比同比、占比（MVP）。
+
+衍生字段是「从已有列算出来的新列」，例如：
+- 从 order_date 拆 year/month/quarter
+- 按日算金额占比 share
+- 简单 WoW（周环比/期环比，缺期处理仍属后续增强）
+"""
 
 from __future__ import annotations
 
