@@ -10,6 +10,7 @@ from .contracts import RunRecord, StageResult
 from .intake import intake_file
 from .structuring import structure_file
 from .cleaning import clean_dataframe
+from .derived import derive_metrics
 
 
 class BusinessPipeline:
@@ -113,9 +114,22 @@ class BusinessPipeline:
         )
         record.add_stage(cleaning)
 
+        cleaned_df = getattr(cleaning, "frame", None)
+        if cleaned_df is None and cleaned_path.exists():
+            cleaned_df = pd.read_csv(cleaned_path)
+        date_candidates = [c for c in (cleaned_df.columns if cleaned_df is not None else []) if "date" in c or c.endswith("_dt") or c in {"dt", "day", "timestamp"}]
+        value_candidates = [c for c in (cleaned_df.columns if cleaned_df is not None else []) if c in {"amount", "gmv", "sales", "revenue", "cnt", "value"}]
+        derived = derive_metrics(
+            cleaned_df if cleaned_df is not None else pd.DataFrame(),
+            date_col=date_candidates[0] if date_candidates else None,
+            value_col=value_candidates[0] if value_candidates else None,
+            share_group_cols=None,
+            add_wow=bool(date_candidates and value_candidates),
+        )
+        record.add_stage(derived)
+
         # 占位：后续 Skill 未实现时显式 skipped，避免静默当作完成
         for stage_id in [
-            "D04_derived",
             "D06_metrics",
             "D07_analysis",
             "D09_insights",

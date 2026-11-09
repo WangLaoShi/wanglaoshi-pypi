@@ -13,6 +13,7 @@ from .intake import intake_file
 from .pipeline import BusinessPipeline
 from .structuring import structure_dataframe, structure_file
 from .cleaning import clean_dataframe
+from .derived import derive_metrics
 
 __all__ = [
     "StageResult",
@@ -22,4 +23,5 @@ __all__ = [
     "structure_dataframe",
     "structure_file",
     "clean_dataframe",
+    "derive_metrics",
 ]

@@ -6,7 +6,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from wanglaoshi.business import BusinessPipeline, clean_dataframe, intake_file, structure_dataframe
+from wanglaoshi.business import (
+    BusinessPipeline,
+    clean_dataframe,
+    derive_metrics,
+    intake_file,
+    structure_dataframe,
+)
 
 
 def test_intake_archives_and_hashes(tmp_path: Path) -> None:
@@ -57,7 +63,8 @@ def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
     assert record.stages[1].status == "passed"
     assert record.stages[2].stage_id == "D03_cleaning"
     assert record.stages[2].status == "passed"
-    assert any(s.status == "skipped" for s in record.stages[3:])
+    assert record.stages[3].stage_id == "D04_derived"
+    assert any(s.status == "skipped" for s in record.stages[4:])
 
 
 def test_structure_normalizes_columns() -> None:
@@ -82,3 +89,17 @@ def test_clean_drop_duplicates_and_clip(tmp_path: Path) -> None:
     assert result.data["rows_out"] == 2
     assert result.frame["amount"].max() <= 100.0  # type: ignore[attr-defined]
     assert (tmp_path / "log.json").exists()
+
+
+def test_derive_time_and_share() -> None:
+    df = pd.DataFrame(
+        {
+            "date": ["2024-01-01", "2024-01-02", "2024-01-01"],
+            "channel": ["web", "web", "app"],
+            "amount": [10.0, 20.0, 10.0],
+        }
+    )
+    result = derive_metrics(df, date_col="date", value_col="amount", share_group_cols=["date"], add_wow=True)
+    assert result.status == "passed"
+    assert "date_year" in result.data["created_columns"]
+    assert "share" in result.frame.columns  # type: ignore[attr-defined]

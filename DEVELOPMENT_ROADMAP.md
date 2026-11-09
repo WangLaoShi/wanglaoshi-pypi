@@ -13,7 +13,7 @@
 | A 现有能力盘点 | 进行中 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 已对照公开 API；契约文档待补 |
 | B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` 8 passed |
 | C 回归测试体系 | 进行中（最小骨架） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + submission 用例 |
-| D Skill 增量固化 | 进行中（D01/D02 + pipeline MVP） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + `tests/test_business_intake.py` |
+| D Skill 增量固化 | 进行中（D01–D04 + pipeline MVP） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + `tests/test_business_intake.py` |
 | E 12 个进阶演示 | 进行中（12 Notebook 全部案例专属加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` + `_deepen_all.py` |
 | F 安装、兼容与发布验证 | 待开发 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 待补充 |
 | Epic 总跟踪 | 进行中 | [#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6) | 本文件 |
@@ -85,8 +85,8 @@
 
 - [x] D01 接收备份、字段与周期检查。（`business/intake.py`）
 - [x] D02 列名标准化与基础类型规整（MVP；单位转换/多表关联待补）。（`business/structuring.py`）
-- [ ] D03 可配置清洗、新文件输出、逐规则影响日志；统计异常默认不等于删除。
-- [ ] D04 时间、同比环比、占比、分层；处理缺期、跨年和零分母。
+- [x] D03 可配置清洗、新文件输出、逐规则影响日志；统计异常默认 clip 不删行。（`business/cleaning.py`）
+- [x] D04 时间部件、占比、简单环比（MVP；缺期/跨年/分层标签待补）。（`business/derived.py`）
 - [ ] D05 四方向分析计划及不适用原因。
 - [ ] D06 指标字典与底稿；明细汇总、占比一致性校验。
 - [ ] D07 六视角分析；贡献分解与因果假设分开。
