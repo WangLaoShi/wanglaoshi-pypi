@@ -16,6 +16,8 @@ from .derived import derive_metrics
 from .planning import build_analysis_plan
 from .metrics import calculate_metrics
 from .analysis import run_multidimensional_analysis
+from .insights import generate_insights
+from .archive import archive_delivery
 
 
 _DOWNSTREAM_AFTER = {
@@ -39,7 +41,6 @@ _DOWNSTREAM_AFTER = {
         "D10_report_archive",
     ],
 }
-# NOTE: keep D07 in skip lists so blocked upstream does not pretend analysis ran.
 
 
 def _skip_remaining(record: RunRecord, stage_ids: Sequence[str], reason: str) -> None:
@@ -54,9 +55,10 @@ def _skip_remaining(record: RunRecord, stage_ids: Sequence[str], reason: str) ->
 
 
 class BusinessPipeline:
-    """最小可跑总控（D11）。
+    """业务分析总控（D11）。
 
-    已接线：D01 → D02 → D03 → D04 → D05 → D06 → D07；其后显式 skipped。
+    已接线：D01 → D02 → D03 → D04 → D05 → D06 → D07 → D09 → D10。
+    上游 blocked 时不生成正式交付（D10 也会 blocked）。
     """
 
     def __init__(
@@ -72,6 +74,7 @@ class BusinessPipeline:
         dim_cols: Optional[Sequence[str]] = None,
         segment_cols: Optional[Sequence[str]] = None,
         metric_group_cols: Optional[Sequence[str]] = None,
+        redact_fields: Optional[Sequence[str]] = None,
     ) -> None:
         self.archive_dir = Path(archive_dir)
         self.required_columns = list(required_columns) if required_columns else None
@@ -83,6 +86,7 @@ class BusinessPipeline:
         self.dim_cols = list(dim_cols) if dim_cols else None
         self.segment_cols = list(segment_cols) if segment_cols else None
         self.metric_group_cols = list(metric_group_cols) if metric_group_cols else None
+        self.redact_fields = list(redact_fields) if redact_fields else None
 
     def run(self, source_path: str | Path, run_id: Optional[str] = None) -> RunRecord:
         rid = run_id or uuid.uuid4().hex[:12]
@@ -193,14 +197,23 @@ class BusinessPipeline:
         )
         record.add_stage(analysis)
 
-        for stage_id in ["D09_insights", "D10_report_archive"]:
-            record.add_stage(
-                StageResult(
-                    stage_id=stage_id,
-                    status="skipped",
-                    warnings=["not implemented in MVP; placeholder"],
-                )
-            )
+        insights = generate_insights(
+            metrics_data=metrics.data,
+            analysis_data=analysis.data,
+            planning_data=planning.data,
+        )
+        record.add_stage(insights)
+
+        delivery_dir = self.archive_dir / f"{rid}__delivery"
+        archive = archive_delivery(
+            record,
+            delivery_dir,
+            insights_data=insights.data,
+            metrics_data=metrics.data,
+            analysis_data=analysis.data,
+            redact_fields=self.redact_fields,
+        )
+        record.add_stage(archive)
 
         return record
 

@@ -1127,6 +1127,7 @@ selected_features = engineer.select_features_by_mutual_info(
 | 环境与版本   | 检查 Python / 库版本         | `from wanglaoshi import VERSIONS as V` |
 | EDA 分析器   | 高级 EDA 与报告生成          | `from wanglaoshi import Analyzer, DataAnalyzer` |
 | 比赛工具     | 提交文件、基线模型、集成等   | `from wanglaoshi import CompetitionTools as CT` |
+| 业务流水线   | 接收→清洗→指标→结论→归档     | `from wanglaoshi import BusinessPipeline` |
 | 特征工程     | 时间 / 文本 / 编码 / 选择等  | `from wanglaoshi import FeatureEngineering as FE` |
 | ML/DL 基础   | 预处理、特征工程、ML/DL 模型 | `from wanglaoshi import MLDL` |
 | Jupyter 环境 | 管理内核、查看环境信息       | `from wanglaoshi import JupyterEnv as JE` |
@@ -1153,6 +1154,7 @@ selected_features = engineer.select_features_by_mutual_info(
 | `Analyzer`          | 高级 EDA：缺失值、异常值、相关性、PCA、HTML 报告            | `analyzer = DataAnalyzer(df)`、`analyzer.generate_report()` |
 | `Analyzer_Plain`    | 简化版文本 EDA：统计 + 文本报告 + 基本图表                  | `from wanglaoshi import Analyzer_Plain` |
 | `CompetitionTools`  | 比赛工具：提交文件、快速基线、模型集成、调参、实验追踪      | `CT.SubmissionGenerator`、`CT.QuickBaseline`、`CT.ModelEnsemble` 等 |
+| `business`          | 业务 Skill 流水线：intake/清洗/指标/六视角/结论/交付归档   | `BusinessPipeline`、`intake_file`、`generate_insights` |
 | `FeatureEngineering`| 增强特征工程：时间特征、文本特征、编码、变换、特征选择      | `engineer = FE.AdvancedFeatureEngineer()` |
 | `MLDL`              | ML/DL 封装：预处理、特征工程、传统 ML 模型、PyTorch DL 模型  | `from wanglaoshi import MLDL` |
 | `JupyterEnv`        | Jupyter 内核管理、环境信息                                   | `JE.jupyter_kernel_list()`、`JE.install_kernel()` |

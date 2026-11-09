@@ -10,7 +10,10 @@
 | derived-metrics | `derive_metrics` | `date_col`, `value_col`, `share_group_cols` | 缺关键列 `blocked` | `test_derive_*` |
 | analysis-decomposition | `build_analysis_plan` | `field_roles.*` | 无可用方向 `warning` | `test_planning_*` |
 | metrics-calculation | `calculate_metrics` | `metrics`, `group_cols`, `share_of` | 零分母/缺列 `warning`；占比不一致 `warning` | `test_metrics_*` |
-| data-analysis 总控 | `BusinessPipeline.run` | `pipeline.stop_on_block` | 上游 `blocked` → 下游 `skipped` | `test_pipeline_*` |
+| multidimensional-analysis | `run_multidimensional_analysis` | `date_col`, `dim_col`, `segment_col` | 视角不足 `warning`；pareto 非因果 | `test_analysis_*` |
+| insight-conclusion / recommendations | `generate_insights` | 阈值来自分析/指标 | 无证据→观察；收益无依据→pending | `test_insights_*` |
+| analysis-report / delivery-archive | `archive_delivery` | `redact_fields`, `required` | 缺交付项或上游 blocked → `blocked` | `test_archive_*` |
+| data-analysis 总控 | `BusinessPipeline.run` | `pipeline.stop_on_block` | 上游 `blocked` → 下游 `skipped`；无正式交付 | `test_pipeline_*` |
 | exploratory-data-analysis | `DataAnalyzer`（复用） | 抽样阈值 | 不阻断流水线 | 既有 Analyzer 用法 |
 | 竞赛提交 | `CompetitionTools.SubmissionGenerator` | `prediction_type`, `target_column` | 歧义/非法形状报错 | `tests/test_submission_generator.py` |
 

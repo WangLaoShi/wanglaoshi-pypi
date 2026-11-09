@@ -9,10 +9,14 @@ import pytest
 
 from wanglaoshi.business import (
     BusinessPipeline,
+    RunRecord,
+    StageResult,
+    archive_delivery,
     build_analysis_plan,
     calculate_metrics,
     clean_dataframe,
     derive_metrics,
+    generate_insights,
     intake_file,
     run_multidimensional_analysis,
     structure_dataframe,
@@ -84,7 +88,7 @@ def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
     record = pipe.run(src)
     assert not record.blocked()
     ids = [s.stage_id for s in record.stages]
-    assert ids[:7] == [
+    assert ids == [
         "D01_intake",
         "D02_structuring",
         "D03_cleaning",
@@ -92,9 +96,13 @@ def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
         "D05_planning",
         "D06_metrics",
         "D07_analysis",
+        "D09_insights",
+        "D10_report_archive",
     ]
-    assert all(s.status in {"passed", "warning"} for s in record.stages[:7])
-    assert any(s.stage_id == "D09_insights" and s.status == "skipped" for s in record.stages)
+    assert all(s.status in {"passed", "warning"} for s in record.stages)
+    d10 = record.stages[-1]
+    assert d10.data["delivery_index"]["deliverable"] is True
+    assert any(p.endswith("report.md") for p in d10.output_paths)
 
 
 @pytest.mark.quick
@@ -211,3 +219,59 @@ def test_analysis_six_views() -> None:
     assert result.data["ok_count"] >= 4
     assert result.data["views"]["pareto"]["status"] == "ok"
     assert "不证明业务因果" in result.data["views"]["pareto"]["note"]
+
+
+@pytest.mark.quick
+def test_insights_and_recommendations() -> None:
+    metrics = calculate_metrics(
+        pd.DataFrame({"order_id": [1, 2], "amount": [10.0, 30.0], "channel": ["web", "app"]}),
+        group_cols=["channel"],
+        share_of="gmv",
+    )
+    analysis = run_multidimensional_analysis(
+        pd.DataFrame(
+            {
+                "order_date": ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
+                "amount": [10, 12, 100, 11, 10],
+                "channel": ["web", "web", "app", "web", "app"],
+            }
+        ),
+        date_col="order_date",
+        value_col="amount",
+        dim_col="channel",
+    )
+    result = generate_insights(metrics_data=metrics.data, analysis_data=analysis.data)
+    assert result.status in {"passed", "warning"}
+    types = {f["type"] for f in result.data["findings"]}
+    assert "status" in types
+    assert result.data["counts"]["recommendations"] >= 1
+    assert all(r.get("expected_uplift") == "pending" for r in result.data["recommendations"])
+
+
+@pytest.mark.quick
+def test_archive_delivery_and_block_on_upstream(tmp_path: Path) -> None:
+    record = RunRecord(run_id="demo123", random_seed=42)
+    record.add_stage(StageResult(stage_id="D01_intake", status="passed"))
+    insights = generate_insights(
+        metrics_data={
+            "metrics": {"gmv": 10.0, "orders": 1.0, "aov": 10.0},
+            "share_check": {"ok": True, "share_sum": 1.0, "tol": 1e-6},
+        }
+    )
+    result = archive_delivery(
+        record,
+        tmp_path / "delivery",
+        insights_data=insights.data,
+        metrics_data={"metrics": {"gmv": 10.0}},
+    )
+    assert result.status == "passed"
+    assert (tmp_path / "delivery" / "report.md").exists()
+    assert result.data["delivery_index"]["deliverable"] is True
+
+    blocked = RunRecord(run_id="blocked1")
+    blocked.add_stage(
+        StageResult(stage_id="D01_intake", status="blocked", block_reasons=["missing file"])
+    )
+    bad = archive_delivery(blocked, tmp_path / "delivery_bad")
+    assert bad.status == "blocked"
+    assert bad.data["delivery_index"]["deliverable"] is False

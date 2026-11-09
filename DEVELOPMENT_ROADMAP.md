@@ -13,7 +13,7 @@
 | A 现有能力盘点 | 进行中（A01–A04 文档/样例） | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | `docs/API_INVENTORY.md` + `docs/SKILL_API_MAPPING.md` |
 | B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` |
 | C 回归测试体系 | 进行中（quick/full/release 入口） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + `scripts/run_tests.sh` |
-| D Skill 增量固化 | 进行中（D01–D07 + pipeline） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + tests |
+| D Skill 增量固化 | 进行中（D01–D07/D09–D11 主链已通） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + tests |
 | E 12 个进阶演示 | 进行中（12 Notebook 已加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` + `_deepen_all.py` |
 | F 安装、兼容与发布验证 | 待开发 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 待补充 |
 | Epic 总跟踪 | 进行中 | [#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6) | 本文件 |
@@ -91,9 +91,9 @@
 - [x] D06 指标字典与底稿；明细汇总、占比一致性校验。（`business/metrics.py`）
 - [x] D07 六视角分析；贡献分解与因果假设分开。（`business/analysis.py`；pareto 注明非因果）
 - [ ] D08 图表独立归档，标题/单位/周期/来源齐全。
-- [ ] D09 带证据的规则结论和行动建议。
-- [ ] D10 完整报告、脱敏、交付索引、缺项阻断。
-- [x] D11 总控串联雏形，阻断后跳过下游。（`business/pipeline.py`；D07+ 仍为 skipped 占位）
+- [x] D09 带证据的规则结论和行动建议。（`business/insights.py`）
+- [x] D10 完整报告、脱敏、交付索引、缺项阻断。（`business/archive.py`）
+- [x] D11 总控串联，阻断后跳过下游 / 禁止正式交付。（`business/pipeline.py`）
 - [ ] D12 EDA 统一适配；统计首版方法清单及适用性检查。
 
 先完成一条销售纵向流程再扩大范围；不要求先写完所有模块。顺序为 A → 最小 C + B → 销售样例及 D01–D11 → 扩展能力与案例 → F。每项功能同步补测试，E 可在 API 稳定后逐个交付。
@@ -172,3 +172,4 @@
 | 2026-11-09 | 规划 | 创建总计划，记录增量边界、Skill 接入、演示与测试要求 | 仅文档交付；代码任务尚未开始 |
 | 2026-11-09 | #6/#7/#8/#9 | 创建 Epic 与子 Issue；修复 SubmissionGenerator；pytest 8 通过；`examples/advanced` 落 12 个 Notebook（E01 加细）；修复 Useful import 刷屏 | 待：E02–E12 加细与真实数据路径；D business MVP；A 契约文档 |
 | 2026-11-09 | E/D/A/C | 12 Notebook 全部加细；D01–D06 + pipeline；A01–A04 文档/样例；`scripts/run_tests.sh` | 待：D07–D10/D12；E17 跑通证据；F 发布门槛；B 清单勾选对齐测试 |
+| 2026-11-09 | D09/D10/D11 | 结论建议、报告归档、主链跑通；上游 blocked 禁止正式交付 | 待：D08 图表归档；D12 EDA 适配；F01–F06 |
