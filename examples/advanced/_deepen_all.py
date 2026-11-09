@@ -70,10 +70,24 @@ def write(slug: str, cells: list) -> None:
     print("wrote", path.name, "cells=", len(cells))
 
 
+# Batch1 课程加深（01/02/04/12）由 _deepen_curriculum_batch1 维护
+try:
+    from _deepen_curriculum_batch1 import e01 as _e01_batch1
+    from _deepen_curriculum_batch1 import e02 as _e02_batch1
+    from _deepen_curriculum_batch1 import e04 as _e04_batch1
+    from _deepen_curriculum_batch1 import e12 as _e12_batch1
+
+    _USE_CURRICULUM_BATCH1 = True
+except ImportError:
+    _USE_CURRICULUM_BATCH1 = False
+
+
 # ---------------------------------------------------------------------------
 # E01 Iris
 # ---------------------------------------------------------------------------
 def e01() -> None:
+    if _USE_CURRICULUM_BATCH1:
+        return _e01_batch1()
     write(
         "01_iris",
         [
@@ -223,6 +237,8 @@ print(confusion_matrix(yte, pred_int))
 # E02 Titanic
 # ---------------------------------------------------------------------------
 def e02() -> None:
+    if _USE_CURRICULUM_BATCH1:
+        return _e02_batch1()
     write(
         "02_titanic",
         [
@@ -509,6 +525,8 @@ print(gen.validate_submission(str(out / 'submission.csv'), str(out / 'sample_sub
 # E04 Breast Cancer
 # ---------------------------------------------------------------------------
 def e04() -> None:
+    if _USE_CURRICULUM_BATCH1:
+        return _e04_batch1()
     write(
         "04_breast_cancer",
         [
@@ -1759,6 +1777,8 @@ sub.head()
 # E12 Digits
 # ---------------------------------------------------------------------------
 def e12() -> None:
+    if _USE_CURRICULUM_BATCH1:
+        return _e12_batch1()
     write(
         "12_digit_recognizer",
         [

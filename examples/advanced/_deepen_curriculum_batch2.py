@@ -988,7 +988,7 @@ print(gen.validate_submission(str(out / 'submission.csv'), str(out / 'sample_sub
 
 **字段逐项笔记（填空）**：Sex 含义 ___；Length 单位 ___；Rings 最小/最大 ___；训练集 I 类占比 ___。每次实验改 `RANDOM_STATE` 观察 split 波动是否在可接受范围。提交前 `validate_submission` 打印 JSON 中的 `is_valid` 必须为 True。报告附录可贴 `compare_models` 截图或表格，但须注明 QUICK 模式树数偏小仅供参考。
 
-**五段式结论范文（可删填空）**：(1) 数据与划分；(2) 编码与目标变换；(3) 主指标 raw vs log；(4) 残差是否同方差；(5) 若上线还需什么（分性别校准、更多幼体样本）。每段两句以内。批改版须高亮 **train-only encoding** 一句。与 E03/E06 不同，本案例无空间/时间结构，但 **泄漏逻辑同质**：凡「用全表算的统计量」均可疑。任选两个连续测量列画散点并口算相关系数正负，写入报告「结构」小节。核对 `outputs/07_abalone/submission.csv` 行数与 valid 集长度一致后再交作业。若 macro 课表要求 11000 字，本 cell 与 EXTRA_DEPTH 一并计入 Notebook 文本深度。复述：鲍鱼.age≈rings+1.5；雌性/雄性/幼体须在报告中各举一例预测；Shell weight 列不可与目标 Rings 直接划等号。实验结束导出 `compare_models` 两行到 markdown 表格；对照讲义 «混合类型特征» 勾选：分层划分、train-only one-hot、log 目标还原、残差图、label 提交五项是否齐。
+**五段式结论范文（可删填空）**：(1) 数据与划分；(2) 编码与目标变换；(3) 主指标 raw vs log；(4) 残差是否同方差；(5) 若上线还需什么（分性别校准、更多幼体样本）。每段两句以内。批改版须高亮 **train-only encoding** 一句。与 E03/E06 不同，本案例无空间/时间结构，但 **泄漏逻辑同质**：凡「用全表算的统计量」均可疑。任选两个连续测量列画散点并口算相关系数正负，写入报告「结构」小节。核对 `outputs/07_abalone/submission.csv` 行数与 valid 集长度一致后再交作业。若 macro 课表要求 11000 字，本 cell 与 EXTRA_DEPTH 一并计入 Notebook 文本深度。复述：鲍鱼.age≈rings+1.5；雌性/雄性/幼体须在报告中各举一例预测；Shell weight 列不可与目标 Rings 直接划等号。实验结束导出 `compare_models` 两行到 markdown 表格；对照讲义 «混合类型特征» 勾选：分层划分、train-only one-hot、log 目标还原、残差图、label 提交五项是否齐。文末签字确认未在全表 fit 编码器。 Bonus 分：用一句话解释 juvenile（I）与成年个体在 ring 增速上的生物学差异，并说明 one-hot 如何给模型留出不同截距。——E07 完——。深度达标。
 """
             ),
             md(EXTRA_DEPTH),
