@@ -30,6 +30,36 @@ def _sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def _json_safe(obj: Any) -> Any:
+    """把 numpy/pandas 等不可直接 JSON 序列化的对象转成基础类型。"""
+    if isinstance(obj, dict):
+        return {str(k): _json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_json_safe(x) for x in obj]
+    if isinstance(obj, Path):
+        return str(obj)
+    # numpy scalar / dtype
+    try:
+        import numpy as np
+
+        if isinstance(obj, np.generic):
+            return obj.item()
+        if isinstance(obj, np.dtype):
+            return str(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+    except Exception:  # noqa: BLE001
+        pass
+    if hasattr(obj, "item") and callable(obj.item):
+        try:
+            return obj.item()
+        except Exception:  # noqa: BLE001
+            pass
+    if isinstance(obj, (str, int, float, bool)) or obj is None:
+        return obj
+    return str(obj)
+
+
 def _redact(obj: Any, fields: Sequence[str]) -> Any:
     if isinstance(obj, dict):
         out = {}
@@ -41,7 +71,7 @@ def _redact(obj: Any, fields: Sequence[str]) -> Any:
         return out
     if isinstance(obj, list):
         return [_redact(x, fields) for x in obj]
-    return obj
+    return _json_safe(obj)
 
 
 def _render_report_md(
@@ -130,7 +160,8 @@ def archive_delivery(
     # 1) run summary（可脱敏）
     summary = record.summary()
     summary_path = out_dir / "run_summary.json"
-    summary_text = json.dumps(_redact(summary, redact_fields), ensure_ascii=False, indent=2)
+    summary_obj = _json_safe(_redact(summary, redact_fields))
+    summary_text = json.dumps(summary_obj, ensure_ascii=False, indent=2)
     summary_path.write_text(summary_text, encoding="utf-8")
     outputs.append(str(summary_path))
 
@@ -145,9 +176,9 @@ def archive_delivery(
     report_path.write_text(report_md, encoding="utf-8")
     outputs.append(str(report_path))
 
-    # 3) full record json（脱敏）
+    # 3) full record json（脱敏 + JSON-safe）
     full_path = out_dir / "run_record.json"
-    full_obj = _redact(record.to_dict(), redact_fields)
+    full_obj = _json_safe(_redact(record.to_dict(), redact_fields))
     full_path.write_text(json.dumps(full_obj, ensure_ascii=False, indent=2), encoding="utf-8")
     outputs.append(str(full_path))
 

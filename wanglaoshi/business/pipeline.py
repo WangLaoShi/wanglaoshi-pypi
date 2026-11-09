@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 import pandas as pd
 
@@ -12,10 +12,12 @@ from .contracts import RunRecord, StageResult
 from .intake import intake_file
 from .structuring import structure_file
 from .cleaning import clean_dataframe
+from .eda import run_eda_profile
 from .derived import derive_metrics
 from .planning import build_analysis_plan
 from .metrics import calculate_metrics
 from .analysis import run_multidimensional_analysis
+from .visualization import archive_charts
 from .insights import generate_insights
 from .archive import archive_delivery
 
@@ -24,19 +26,23 @@ _DOWNSTREAM_AFTER = {
     "D01": [
         "D02_structuring",
         "D03_cleaning",
+        "D12_eda",
         "D04_derived",
         "D05_planning",
         "D06_metrics",
         "D07_analysis",
+        "D08_visualization",
         "D09_insights",
         "D10_report_archive",
     ],
     "D02": [
         "D03_cleaning",
+        "D12_eda",
         "D04_derived",
         "D05_planning",
         "D06_metrics",
         "D07_analysis",
+        "D08_visualization",
         "D09_insights",
         "D10_report_archive",
     ],
@@ -57,8 +63,8 @@ def _skip_remaining(record: RunRecord, stage_ids: Sequence[str], reason: str) ->
 class BusinessPipeline:
     """业务分析总控（D11）。
 
-    已接线：D01 → D02 → D03 → D04 → D05 → D06 → D07 → D09 → D10。
-    上游 blocked 时不生成正式交付（D10 也会 blocked）。
+    主链：D01→D02→D03→D12→D04→D05→D06→D07→D08→D09→D10。
+    上游 blocked 时跳过下游，且不生成正式交付。
     """
 
     def __init__(
@@ -75,6 +81,7 @@ class BusinessPipeline:
         segment_cols: Optional[Sequence[str]] = None,
         metric_group_cols: Optional[Sequence[str]] = None,
         redact_fields: Optional[Sequence[str]] = None,
+        chart_unit: str = "currency_unit",
     ) -> None:
         self.archive_dir = Path(archive_dir)
         self.required_columns = list(required_columns) if required_columns else None
@@ -87,6 +94,7 @@ class BusinessPipeline:
         self.segment_cols = list(segment_cols) if segment_cols else None
         self.metric_group_cols = list(metric_group_cols) if metric_group_cols else None
         self.redact_fields = list(redact_fields) if redact_fields else None
+        self.chart_unit = chart_unit
 
     def run(self, source_path: str | Path, run_id: Optional[str] = None) -> RunRecord:
         rid = run_id or uuid.uuid4().hex[:12]
@@ -160,6 +168,18 @@ class BusinessPipeline:
         dim_cols = self.dim_cols or [c for c in ["channel", "region", "category"] if c in cleaned_df.columns]
         segment_cols = self.segment_cols or [c for c in ["user_tier", "segment", "vip"] if c in cleaned_df.columns]
 
+        eda = run_eda_profile(
+            cleaned_df,
+            field_roles={
+                "date_col": date_col,
+                "value_col": value_col,
+                "dim_cols": dim_cols,
+                "segment_cols": segment_cols,
+            },
+            random_seed=self.random_seed,
+        )
+        record.add_stage(eda)
+
         derived = derive_metrics(
             cleaned_df,
             date_col=date_col,
@@ -196,6 +216,19 @@ class BusinessPipeline:
             segment_col=segment_cols[0] if segment_cols else None,
         )
         record.add_stage(analysis)
+
+        charts_dir = self.archive_dir / f"{rid}__charts"
+        charts = archive_charts(
+            derived_df,
+            charts_dir,
+            date_col=date_col,
+            value_col=value_col,
+            dim_col=dim_cols[0] if dim_cols else None,
+            period=self.period,
+            source=f"run:{rid}",
+            unit=self.chart_unit,
+        )
+        record.add_stage(charts)
 
         insights = generate_insights(
             metrics_data=metrics.data,

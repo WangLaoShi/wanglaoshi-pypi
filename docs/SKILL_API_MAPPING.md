@@ -11,6 +11,8 @@
 | analysis-decomposition | `build_analysis_plan` | `field_roles.*` | 无可用方向 `warning` | `test_planning_*` |
 | metrics-calculation | `calculate_metrics` | `metrics`, `group_cols`, `share_of` | 零分母/缺列 `warning`；占比不一致 `warning` | `test_metrics_*` |
 | multidimensional-analysis | `run_multidimensional_analysis` | `date_col`, `dim_col`, `segment_col` | 视角不足 `warning`；pareto 非因果 | `test_analysis_*` |
+| data-visualization | `archive_charts` | `period`, `source`, `unit` | 无图 `warning`；元数据 sidecar | `test_archive_charts_*` |
+| exploratory-data-analysis | `run_eda_profile` | `field_roles`, `sample_n` | Analyzer 失败则轻量画像 | `test_eda_*` |
 | insight-conclusion / recommendations | `generate_insights` | 阈值来自分析/指标 | 无证据→观察；收益无依据→pending | `test_insights_*` |
 | analysis-report / delivery-archive | `archive_delivery` | `redact_fields`, `required` | 缺交付项或上游 blocked → `blocked` | `test_archive_*` |
 | data-analysis 总控 | `BusinessPipeline.run` | `pipeline.stop_on_block` | 上游 `blocked` → 下游 `skipped`；无正式交付 | `test_pipeline_*` |

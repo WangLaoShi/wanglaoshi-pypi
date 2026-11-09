@@ -67,6 +67,8 @@ from .business import (
     calculate_metrics,
     generate_insights,
     archive_delivery,
+    archive_charts,
+    run_eda_profile,
 )
 
 __all__ = [
@@ -97,4 +99,6 @@ __all__ = [
     "calculate_metrics",
     "generate_insights",
     "archive_delivery",
+    "archive_charts",
+    "run_eda_profile",
 ]

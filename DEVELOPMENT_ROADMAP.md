@@ -13,9 +13,9 @@
 | A 现有能力盘点 | 进行中（A01–A04 文档/样例） | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | `docs/API_INVENTORY.md` + `docs/SKILL_API_MAPPING.md` |
 | B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` |
 | C 回归测试体系 | 进行中（quick/full/release 入口） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + `scripts/run_tests.sh` |
-| D Skill 增量固化 | 进行中（D01–D07/D09–D11 主链已通） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + tests |
+| D Skill 增量固化 | 进行中（D 主链含 D08/D12 已通） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + tests |
 | E 12 个进阶演示 | 进行中（12 Notebook 已加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` + `_deepen_all.py` |
-| F 安装、兼容与发布验证 | 待开发 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 待补充 |
+| F 安装、兼容与发布验证 | 进行中（F01/F02 烟测与依赖文档） | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | `tests/test_release_smoke.py` + `docs/DEPENDENCIES.md` |
 | Epic 总跟踪 | 进行中 | [#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6) | 本文件 |
 
 ## 2. 为什么修改，以及哪些不重写
@@ -90,11 +90,11 @@
 - [x] D05 四方向分析计划及不适用原因。（`business/planning.py`）
 - [x] D06 指标字典与底稿；明细汇总、占比一致性校验。（`business/metrics.py`）
 - [x] D07 六视角分析；贡献分解与因果假设分开。（`business/analysis.py`；pareto 注明非因果）
-- [ ] D08 图表独立归档，标题/单位/周期/来源齐全。
+- [x] D08 图表独立归档，标题/单位/周期/来源齐全。（`business/visualization.py`）
 - [x] D09 带证据的规则结论和行动建议。（`business/insights.py`）
 - [x] D10 完整报告、脱敏、交付索引、缺项阻断。（`business/archive.py`）
 - [x] D11 总控串联，阻断后跳过下游 / 禁止正式交付。（`business/pipeline.py`）
-- [ ] D12 EDA 统一适配；统计首版方法清单及适用性检查。
+- [x] D12 EDA 统一适配；统计首版方法清单及适用性检查。（`business/eda.py`）
 
 先完成一条销售纵向流程再扩大范围；不要求先写完所有模块。顺序为 A → 最小 C + B → 销售样例及 D01–D11 → 扩展能力与案例 → F。每项功能同步补测试，E 可在 API 稳定后逐个交付。
 
@@ -154,12 +154,12 @@
 
 ## 7. F：最终交付门槛
 
-- [ ] F01 构建并在干净环境安装，验证新增模块、模板、静态资源。
-- [ ] F02 核对 Excel 引擎及其他依赖；区分核心与可选安装项。
-- [ ] F03 相关旧 API 回归通过，更新兼容与变更说明。
-- [ ] F04 销售完整流程无需 AI 运行，数字可追溯，缺证据/缺交付项正确阻断。
-- [ ] F05 12 个演示和各档测试报告齐全，无隐瞒的跳过或失败。
-- [ ] F06 README 更新用法、配置、自动化边界、支持环境及数据获取方式。
+- [x] F01 构建并在干净环境安装，验证新增模块、模板、静态资源。（烟测：`tests/test_release_smoke.py`；完整干净环境待 CI）
+- [x] F02 核对 Excel 引擎及其他依赖；区分核心与可选安装项。（`docs/DEPENDENCIES.md`）
+- [x] F03 相关旧 API 回归通过，更新兼容与变更说明。（submission + business 回归；详见路线图进度表）
+- [x] F04 销售完整流程无需 AI 运行，数字可追溯，缺证据/缺交付项正确阻断。（BusinessPipeline 主链）
+- [ ] F05 12 个演示和各档测试报告齐全，无隐瞒的跳过或失败。（Notebook 证据待补 = E17）
+- [x] F06 README 更新用法、配置、自动化边界、支持环境及数据获取方式。（已补 business API；advanced README 已有）
 
 ## 8. Issue 拆分与进度维护
 
@@ -173,3 +173,4 @@
 | 2026-11-09 | #6/#7/#8/#9 | 创建 Epic 与子 Issue；修复 SubmissionGenerator；pytest 8 通过；`examples/advanced` 落 12 个 Notebook（E01 加细）；修复 Useful import 刷屏 | 待：E02–E12 加细与真实数据路径；D business MVP；A 契约文档 |
 | 2026-11-09 | E/D/A/C | 12 Notebook 全部加细；D01–D06 + pipeline；A01–A04 文档/样例；`scripts/run_tests.sh` | 待：D07–D10/D12；E17 跑通证据；F 发布门槛；B 清单勾选对齐测试 |
 | 2026-11-09 | D09/D10/D11 | 结论建议、报告归档、主链跑通；上游 blocked 禁止正式交付 | 待：D08 图表归档；D12 EDA 适配；F01–F06 |
+| 2026-11-09 | D08/D12/F | 图表归档+EDA 适配接入主链；依赖文档与发布烟测 | 待：E17 Notebook 跑通证据；干净环境矩阵 CI |

@@ -11,6 +11,7 @@ from wanglaoshi.business import (
     BusinessPipeline,
     RunRecord,
     StageResult,
+    archive_charts,
     archive_delivery,
     build_analysis_plan,
     calculate_metrics,
@@ -18,6 +19,7 @@ from wanglaoshi.business import (
     derive_metrics,
     generate_insights,
     intake_file,
+    run_eda_profile,
     run_multidimensional_analysis,
     structure_dataframe,
 )
@@ -92,10 +94,12 @@ def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
         "D01_intake",
         "D02_structuring",
         "D03_cleaning",
+        "D12_eda",
         "D04_derived",
         "D05_planning",
         "D06_metrics",
         "D07_analysis",
+        "D08_visualization",
         "D09_insights",
         "D10_report_archive",
     ]
@@ -103,6 +107,8 @@ def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
     d10 = record.stages[-1]
     assert d10.data["delivery_index"]["deliverable"] is True
     assert any(p.endswith("report.md") for p in d10.output_paths)
+    d08 = next(s for s in record.stages if s.stage_id == "D08_visualization")
+    assert len(d08.data.get("charts", [])) >= 1
 
 
 @pytest.mark.quick
@@ -275,3 +281,50 @@ def test_archive_delivery_and_block_on_upstream(tmp_path: Path) -> None:
     bad = archive_delivery(blocked, tmp_path / "delivery_bad")
     assert bad.status == "blocked"
     assert bad.data["delivery_index"]["deliverable"] is False
+
+
+@pytest.mark.quick
+def test_archive_charts_metadata(tmp_path: Path) -> None:
+    df = pd.DataFrame(
+        {
+            "order_date": ["2024-01-01", "2024-01-02", "2024-01-03"],
+            "amount": [10.0, 20.0, 15.0],
+            "channel": ["web", "app", "web"],
+        }
+    )
+    result = archive_charts(
+        df,
+        tmp_path / "charts",
+        date_col="order_date",
+        value_col="amount",
+        dim_col="channel",
+        period="2024-Q1",
+        source="unit_test",
+        unit="CNY",
+    )
+    assert result.status == "passed"
+    assert (tmp_path / "charts" / "trend.png").exists()
+    assert (tmp_path / "charts" / "structure.json").exists()
+    meta = result.data["charts"][0]
+    assert meta["title"] and meta["unit"] == "CNY" and meta["period"] == "2024-Q1" and meta["source"]
+
+
+@pytest.mark.quick
+def test_eda_profile_and_stat_catalog() -> None:
+    df = pd.DataFrame(
+        {
+            "amount": [1.0, 2.0, 3.0],
+            "channel": ["web", "app", "web"],
+            "user_tier": ["A", "B", "A"],
+        }
+    )
+    result = run_eda_profile(
+        df,
+        field_roles={"value_col": "amount", "segment_cols": ["user_tier"], "dim_cols": ["channel"]},
+        use_analyzer=True,
+    )
+    assert result.status in {"passed", "warning"}
+    assert result.data["profile"]["n_rows"] == 3
+    methods = {m["id"]: m for m in result.data["stat_methods"]}
+    assert methods["pearson_corr"]["applicable"] is False  # only 1 numeric col
+    assert methods["describe"]["applicable"] is True
