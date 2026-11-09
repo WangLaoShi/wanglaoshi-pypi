@@ -58,7 +58,14 @@ from .Analyzer import DataAnalyzer, analyze_data, analyze_multiple_files, analyz
 
 # 业务流水线（Skill 固化）；不依赖可选重型包
 from . import business
-from .business import BusinessPipeline, StageResult, RunRecord, intake_file
+from .business import (
+    BusinessPipeline,
+    StageResult,
+    RunRecord,
+    intake_file,
+    build_analysis_plan,
+    calculate_metrics,
+)
 
 __all__ = [
     # 模块
@@ -84,4 +91,6 @@ __all__ = [
     "StageResult",
     "RunRecord",
     "intake_file",
+    "build_analysis_plan",
+    "calculate_metrics",
 ]

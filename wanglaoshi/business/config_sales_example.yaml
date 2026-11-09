@@ -1,0 +1,46 @@
+# A04 销售分析字段角色样例（关键字段不得静默推断）
+# 用法：业务流水线应显式读取本配置；缺字段 → warning/blocked，不猜测。
+
+period: "2024-Q1"
+random_seed: 42
+
+field_roles:
+  date_col: order_date          # 必需（趋势分析）
+  value_col: amount             # 必需（大盘/结构）
+  id_col: order_id              # 订单唯一键
+  dim_cols:                     # 结构拆解维度
+    - channel
+    - region
+  segment_cols:                 # 分层对比
+    - user_tier
+  required_columns:             # D01 接收检查
+    - order_id
+    - order_date
+    - amount
+    - channel
+
+metrics:
+  gmv:
+    formula: "sum(amount)"
+    value_col: amount
+    agg: sum
+    direction: higher_better
+  orders:
+    formula: "count(order_id)"
+    value_col: order_id
+    agg: count
+    direction: higher_better
+  aov:
+    formula: "gmv / orders"
+    depends_on: [gmv, orders]
+    direction: higher_better
+
+pipeline:
+  stop_on_block: true
+  enable_stages:
+    - D01_intake
+    - D02_structuring
+    - D03_cleaning
+    - D04_derived
+    - D05_planning
+    - D06_metrics

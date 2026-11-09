@@ -1,13 +1,16 @@
-"""D01 intake / pipeline 最小回归。"""
+"""D01–D06 / pipeline 最小回归。"""
 
 from __future__ import annotations
 
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from wanglaoshi.business import (
     BusinessPipeline,
+    build_analysis_plan,
+    calculate_metrics,
     clean_dataframe,
     derive_metrics,
     intake_file,
@@ -15,6 +18,7 @@ from wanglaoshi.business import (
 )
 
 
+@pytest.mark.quick
 def test_intake_archives_and_hashes(tmp_path: Path) -> None:
     src = tmp_path / "orders.csv"
     pd.DataFrame({"order_id": [1, 2], "amount": [10.0, 20.0]}).to_csv(src, index=False)
@@ -30,6 +34,7 @@ def test_intake_archives_and_hashes(tmp_path: Path) -> None:
     assert "sha256" in ledger.read_text(encoding="utf-8")
 
 
+@pytest.mark.quick
 def test_intake_missing_columns_warning(tmp_path: Path) -> None:
     src = tmp_path / "orders.csv"
     pd.DataFrame({"order_id": [1]}).to_csv(src, index=False)
@@ -38,35 +43,59 @@ def test_intake_missing_columns_warning(tmp_path: Path) -> None:
     assert "amount" in result.data["missing_columns"]
 
 
+@pytest.mark.quick
 def test_intake_missing_file_blocked(tmp_path: Path) -> None:
     result = intake_file(tmp_path / "nope.csv", tmp_path / "archive")
     assert result.status == "blocked"
     assert result.block_reasons
 
 
+@pytest.mark.quick
 def test_pipeline_stops_on_block(tmp_path: Path) -> None:
     pipe = BusinessPipeline(tmp_path / "archive", stop_on_block=True)
     record = pipe.run(tmp_path / "missing.csv")
     assert record.blocked()
     assert record.stages[0].stage_id == "D01_intake"
     assert record.stages[1].status == "skipped"
+    assert any(s.stage_id == "D05_planning" and s.status == "skipped" for s in record.stages)
 
 
+@pytest.mark.quick
 def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
     src = tmp_path / "sales.csv"
-    pd.DataFrame({"user_id": [1], "gmv": [9.9]}).to_csv(src, index=False)
-    pipe = BusinessPipeline(tmp_path / "archive", required_columns=["user_id", "gmv"])
+    pd.DataFrame(
+        {
+            "order_id": [1, 2, 3],
+            "order_date": ["2024-01-01", "2024-01-02", "2024-01-02"],
+            "amount": [10.0, 20.0, 30.0],
+            "channel": ["web", "app", "web"],
+            "user_tier": ["A", "B", "A"],
+        }
+    ).to_csv(src, index=False)
+    pipe = BusinessPipeline(
+        tmp_path / "archive",
+        required_columns=["order_id", "amount"],
+        date_col="order_date",
+        value_col="amount",
+        dim_cols=["channel"],
+        segment_cols=["user_tier"],
+    )
     record = pipe.run(src)
     assert not record.blocked()
-    assert record.stages[0].status == "passed"
-    assert record.stages[1].stage_id == "D02_structuring"
-    assert record.stages[1].status == "passed"
-    assert record.stages[2].stage_id == "D03_cleaning"
-    assert record.stages[2].status == "passed"
-    assert record.stages[3].stage_id == "D04_derived"
-    assert any(s.status == "skipped" for s in record.stages[4:])
+    ids = [s.stage_id for s in record.stages]
+    assert ids[:6] == [
+        "D01_intake",
+        "D02_structuring",
+        "D03_cleaning",
+        "D04_derived",
+        "D05_planning",
+        "D06_metrics",
+    ]
+    assert all(s.status in {"passed", "warning"} for s in record.stages[:6])
+    assert any(s.stage_id == "D07_analysis" and s.status == "skipped" for s in record.stages)
 
 
+@pytest.mark.quick
 def test_structure_normalizes_columns() -> None:
     df = pd.DataFrame({"Order ID": [1], "GMV ($)": ["3.5"]})
     result = structure_dataframe(df, dtype_map={"gmv": "float64"})
@@ -76,6 +105,7 @@ def test_structure_normalizes_columns() -> None:
     assert result.frame["gmv"].dtype == "float64"  # type: ignore[attr-defined]
 
 
+@pytest.mark.quick
 def test_clean_drop_duplicates_and_clip(tmp_path: Path) -> None:
     df = pd.DataFrame({"id": [1, 1, 2], "amount": [10.0, 10.0, 999.0]})
     result = clean_dataframe(
@@ -91,6 +121,7 @@ def test_clean_drop_duplicates_and_clip(tmp_path: Path) -> None:
     assert (tmp_path / "log.json").exists()
 
 
+@pytest.mark.quick
 def test_derive_time_and_share() -> None:
     df = pd.DataFrame(
         {
@@ -103,3 +134,55 @@ def test_derive_time_and_share() -> None:
     assert result.status == "passed"
     assert "date_year" in result.data["created_columns"]
     assert "share" in result.frame.columns  # type: ignore[attr-defined]
+
+
+@pytest.mark.quick
+def test_planning_four_directions() -> None:
+    df = pd.DataFrame(
+        {
+            "order_date": ["2024-01-01"],
+            "amount": [10.0],
+            "channel": ["web"],
+            "user_tier": ["A"],
+        }
+    )
+    result = build_analysis_plan(
+        df,
+        date_col="order_date",
+        value_col="amount",
+        dim_cols=["channel"],
+        segment_cols=["user_tier"],
+    )
+    assert result.status == "passed"
+    assert result.data["applicable_count"] == 4
+    statuses = {t["direction"]: t["status"] for t in result.data["tasks"]}
+    assert statuses["trend"] == "applicable"
+    assert statuses["segment"] == "applicable"
+
+
+@pytest.mark.quick
+def test_planning_missing_fields_not_applicable() -> None:
+    df = pd.DataFrame({"amount": [1.0]})
+    result = build_analysis_plan(df, value_col="amount")
+    assert result.status == "warning"
+    by_dir = {t["direction"]: t for t in result.data["tasks"]}
+    assert by_dir["overall"]["status"] == "applicable"
+    assert by_dir["trend"]["status"] == "not_applicable"
+
+
+@pytest.mark.quick
+def test_metrics_gmv_aov_and_share() -> None:
+    df = pd.DataFrame(
+        {
+            "order_id": [1, 2, 3],
+            "amount": [10.0, 20.0, 30.0],
+            "channel": ["web", "app", "web"],
+        }
+    )
+    result = calculate_metrics(df, group_cols=["channel"], share_of="gmv")
+    assert result.status == "passed"
+    assert result.data["metrics"]["gmv"] == 60.0
+    assert result.data["metrics"]["orders"] == 3.0
+    assert result.data["metrics"]["aov"] == 20.0
+    assert result.data["share_check"]["ok"] is True
+    assert abs(sum(r["share"] for r in result.data["workbook"]) - 1.0) < 1e-9

@@ -10,11 +10,11 @@
 
 | 工作流 | 状态 | Issue | 验证证据 |
 | --- | --- | --- | --- |
-| A 现有能力盘点 | 进行中（A01 初版文档） | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | `docs/API_INVENTORY.md` |
-| B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` 8 passed |
-| C 回归测试体系 | 进行中（最小骨架） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + submission 用例 |
-| D Skill 增量固化 | 进行中（D01–D04 + pipeline MVP） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + `tests/test_business_intake.py` |
-| E 12 个进阶演示 | 进行中（12 Notebook 全部案例专属加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` + `_deepen_all.py` |
+| A 现有能力盘点 | 进行中（A01–A04 文档/样例） | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | `docs/API_INVENTORY.md` + `docs/SKILL_API_MAPPING.md` |
+| B 提交功能修复 | 进行中（核心修复已提交） | [#7](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/7) | `pytest tests/test_submission_generator.py` |
+| C 回归测试体系 | 进行中（quick/full/release 入口） | [#8](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/8) | `pytest.ini` + `scripts/run_tests.sh` |
+| D Skill 增量固化 | 进行中（D01–D06 + pipeline） | [#10](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/10) | `wanglaoshi/business/` + tests |
+| E 12 个进阶演示 | 进行中（12 Notebook 已加细） | [#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9) | `examples/advanced/*.ipynb` + `_deepen_all.py` |
 | F 安装、兼容与发布验证 | 待开发 | [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) | 待补充 |
 | Epic 总跟踪 | 进行中 | [#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6) | 本文件 |
 
@@ -68,18 +68,18 @@
 ### A：盘点和公共契约
 
 - [x] A01 完整盘点公开 API、依赖、返回值、异常及副作用，建立复用清单。（初版：`docs/API_INVENTORY.md`，后续按模块补异常/副作用细表）
-- [ ] A02 建立 Skill 要求 → API/配置 → 校验 → 测试的映射。
-- [ ] A03 定义统一阶段结果、指标/图表/结论/建议编号与运行记录。
-- [ ] A04 定义字段角色和销售配置样例；关键配置缺失不得静默推断。
+- [x] A02 建立 Skill 要求 → API/配置 → 校验 → 测试的映射。（`docs/SKILL_API_MAPPING.md`）
+- [x] A03 定义统一阶段结果、指标/图表/结论/建议编号与运行记录。（`StageResult`/`RunRecord` + 映射文档编号约定）
+- [x] A04 定义字段角色和销售配置样例；关键配置缺失不得静默推断。（`wanglaoshi/business/config_sales_example.yaml`）
 
 ### B：修复提交生成与校验
 
-- [ ] B01 用小数据复现模板目标列名未推断的问题。
-- [ ] B02 用字符串标签复现写出后统计失败及校验误判。
-- [ ] B03 明确参数优先级，按模板保持列名、顺序和 ID；歧义时报错。
-- [ ] B04 标签使用类别统计，数值使用数值统计；统一缺失与无穷值策略。
-- [ ] B05 明确一维标签、单列二维、多列概率、多输出及类别映射契约；不得静默 argmax。
-- [ ] B06 生成与校验共用格式规则；覆盖 ID 不匹配、长度不匹配、非法形状和空输入。
+- [x] B01 用小数据复现模板目标列名未推断的问题。
+- [x] B02 用字符串标签复现写出后统计失败及校验误判。
+- [x] B03 明确参数优先级，按模板保持列名、顺序和 ID；歧义时报错。
+- [x] B04 标签使用类别统计，数值使用数值统计；统一缺失与无穷值策略。
+- [x] B05 明确一维标签、单列二维、多列概率、多输出及类别映射契约；不得静默 argmax。
+- [x] B06 生成与校验共用格式规则；覆盖 ID 不匹配、长度不匹配、非法形状和空输入。
 
 ### D：逐步固化 Skill
 
@@ -87,13 +87,13 @@
 - [x] D02 列名标准化与基础类型规整（MVP；单位转换/多表关联待补）。（`business/structuring.py`）
 - [x] D03 可配置清洗、新文件输出、逐规则影响日志；统计异常默认 clip 不删行。（`business/cleaning.py`）
 - [x] D04 时间部件、占比、简单环比（MVP；缺期/跨年/分层标签待补）。（`business/derived.py`）
-- [ ] D05 四方向分析计划及不适用原因。
-- [ ] D06 指标字典与底稿；明细汇总、占比一致性校验。
+- [x] D05 四方向分析计划及不适用原因。（`business/planning.py`）
+- [x] D06 指标字典与底稿；明细汇总、占比一致性校验。（`business/metrics.py`）
 - [ ] D07 六视角分析；贡献分解与因果假设分开。
 - [ ] D08 图表独立归档，标题/单位/周期/来源齐全。
 - [ ] D09 带证据的规则结论和行动建议。
 - [ ] D10 完整报告、脱敏、交付索引、缺项阻断。
-- [x] D11 总控串联雏形，阻断后跳过下游。（`business/pipeline.py`；后续阶段仍为 skipped 占位）
+- [x] D11 总控串联雏形，阻断后跳过下游。（`business/pipeline.py`；D07+ 仍为 skipped 占位）
 - [ ] D12 EDA 统一适配；统计首版方法清单及适用性检查。
 
 先完成一条销售纵向流程再扩大范围；不要求先写完所有模块。顺序为 A → 最小 C + B → 销售样例及 D01–D11 → 扩展能力与案例 → F。每项功能同步补测试，E 可在 API 稳定后逐个交付。
@@ -110,7 +110,7 @@
 | 业务流程 | 订单、用户、渠道、目标：口径与证据 | PR |
 | 安装兼容 | 构建包、模板、可选依赖、环境矩阵 | 发布前 |
 
-- [ ] C01 配置 pytest、分层标记和快速/完整/发布运行入口。
+- [x] C01 配置 pytest、分层标记和快速/完整/发布运行入口。（`pytest.ini` + `scripts/run_tests.sh`）
 - [ ] C02 数据登记来源、使用条件、版本、哈希和缓存；下载与测试分离。
 - [ ] C03 固定划分、种子、抽样和搜索预算；记录环境。
 - [ ] C04 数值公式用明确容差；字段、行数、顺序用精确断言。
@@ -131,24 +131,24 @@
 
 | 任务 | 数据集 | 技术难点与结果 | 状态 |
 | --- | --- | --- | --- |
-| E01 | Iris | 小样本分层验证、字符串/数字标签提交 | 待开发 |
-| E02 | Titanic | 缺失、文本特征、训练验证隔离 | 待开发 |
-| E03 | Wine Quality | 回归/有序分类比较、不均衡 | 待开发 |
-| E04 | Breast Cancer | 缩放/PCA、阈值与召回权衡 | 待开发 |
-| E05 | Credit Card Fraud | 时间划分、不均衡、PR-AUC与阈值 | 待开发 |
-| E06 | California Housing | 空间分组对比随机划分、分层误差 | 待开发 |
-| E07 | Abalone | 混合编码、目标变换和残差 | 待开发 |
-| E08 | Bike Sharing | 时间验证、预测时可用的滞后特征、RMSLE | 待开发 |
-| E09 | Mall Customers | 缩放、聚类数与稳定性、画像 | 待开发 |
-| E10 | Adult Census | 折内目标编码、分组表现差异 | 待开发 |
-| E11 | House Prices | 混合高维、缺失含义、对数目标与集成 | 待开发 |
-| E12 | Digit Recognizer | 高维EDA、PCA、精度与成本、错分分析 | 待开发 |
+| E01 | Iris | 小样本分层验证、字符串/数字标签提交 | Notebook 已加细 |
+| E02 | Titanic | 缺失、文本特征、训练验证隔离 | Notebook 已加细 |
+| E03 | Wine Quality | 回归/有序分类比较、不均衡 | Notebook 已加细 |
+| E04 | Breast Cancer | 缩放/PCA、阈值与召回权衡 | Notebook 已加细 |
+| E05 | Credit Card Fraud | 时间划分、不均衡、PR-AUC与阈值 | Notebook 已加细 |
+| E06 | California Housing | 空间分组对比随机划分、分层误差 | Notebook 已加细 |
+| E07 | Abalone | 混合编码、目标变换和残差 | Notebook 已加细 |
+| E08 | Bike Sharing | 时间验证、预测时可用的滞后特征、RMSLE | Notebook 已加细 |
+| E09 | Mall Customers | 缩放、聚类数与稳定性、画像 | Notebook 已加细 |
+| E10 | Adult Census | 折内目标编码、分组表现差异 | Notebook 已加细 |
+| E11 | House Prices | 混合高维、缺失含义、对数目标与集成 | Notebook 已加细 |
+| E12 | Digit Recognizer | 高维EDA、PCA、精度与成本、错分分析 | Notebook 已加细 |
 
-- [ ] E13 建立 `examples/advanced/` 导航、共同运行入口和依赖说明。
-- [ ] E14 每个案例的数据获取与使用条件核实；Wine Quality 不与 sklearn Wine 混淆，California 首次需下载。
-- [ ] E15 比赛提交仅本地生成与校验；无标签测试集不用于本地评估。
-- [ ] E16 Kaggle 时间预测的滞后特征只使用预测当时可用信息，不引用未知测试目标。
-- [ ] E17 12 项完成后逐项补运行证据，README 提供学习顺序。
+- [x] E13 建立 `examples/advanced/` 导航、共同运行入口和依赖说明。
+- [x] E14 每个案例的数据获取与使用条件核实；Wine Quality 不与 sklearn Wine 混淆，California 首次需下载。
+- [x] E15 比赛提交仅本地生成与校验；无标签测试集不用于本地评估。
+- [x] E16 Kaggle 时间预测的滞后特征只使用预测当时可用信息，不引用未知测试目标。（E08 Notebook 约束）
+- [ ] E17 12 项完成后逐项补运行证据，README 提供学习顺序。（学习顺序已有；完整跑通证据待补）
 
 原始大数据、模型和生成报告不默认提交。公共下载失败不应伪装成通过，也不绕过登录或条款。
 
@@ -171,3 +171,4 @@
 | --- | --- | --- | --- |
 | 2026-11-09 | 规划 | 创建总计划，记录增量边界、Skill 接入、演示与测试要求 | 仅文档交付；代码任务尚未开始 |
 | 2026-11-09 | #6/#7/#8/#9 | 创建 Epic 与子 Issue；修复 SubmissionGenerator；pytest 8 通过；`examples/advanced` 落 12 个 Notebook（E01 加细）；修复 Useful import 刷屏 | 待：E02–E12 加细与真实数据路径；D business MVP；A 契约文档 |
+| 2026-11-09 | E/D/A/C | 12 Notebook 全部加细；D01–D06 + pipeline；A01–A04 文档/样例；`scripts/run_tests.sh` | 待：D07–D10/D12；E17 跑通证据；F 发布门槛；B 清单勾选对齐测试 |
