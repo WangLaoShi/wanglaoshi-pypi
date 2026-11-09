@@ -46,16 +46,29 @@ jupyter notebook examples/advanced/
 
 请遵守各数据集许可与竞赛条款；Notebook 不会自动绕过登录或上传提交。
 
-## 每个 Notebook 固定结构
+## 每个 Notebook 课程结构（已加厚至约 3×）
 
-1. 环境检查（`VERSIONS`）
-2. 数据加载
-3. `DataAnalyzer` 快速 EDA
-4. 正确的划分方式（分层/时间/分组）
-5. `QuickBaseline` 对比
-6. `FeatureEngineering` 提示
-7. `SubmissionGenerator` 本地生成与校验
-8. 误差分析与检查清单
+正统数据分析叙事（问题 → 质量 → **协议** → 基线 → 诊断 → 交付），并绑定 `wanglaoshi` API：
+
+1. 问题形式化与经典文献/教材背景（含外链）
+2. `ready()` 环境就绪
+3. 数据加载（本地 `data/` 或 DEMO 回退）
+4. 理论驱动 EDA（`DataAnalyzer` + 关键可视化）
+5. **本课专属验证协议**（分层 / 时间 / 空间分组）及错误对照
+6. 特征工程纪律（折内 fit；`FeatureEngineering`）
+7. `QuickBaseline` / 专项模型与指标选择理论
+8. 误差分析、阈值/代价、提交契约（`SubmissionGenerator`）
+9. 附录：深度阅读、书面作业、API 地图
+
+重新生成加厚版：
+
+```bash
+python examples/advanced/_deepen_curriculum_batch1.py
+python examples/advanced/_deepen_curriculum_batch2.py
+python examples/advanced/_deepen_curriculum_batch3.py
+# 旧版通用加深（较薄）：
+# python examples/advanced/_deepen_all.py
+```
 
 ## 跑通证据（E17）
 
