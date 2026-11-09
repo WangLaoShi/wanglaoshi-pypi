@@ -1155,21 +1155,23 @@ class ModelEnsemble:
             logger.info("使用加权平均作为第二层")
             
             # 返回一个可以预测的函数
+            # 注意：分类概率矩阵不能直接与「按模型数」的权重做 axis=1 平均；
+            # 先把每个模型压成一维分数（二分类取正类概率），再按模型加权。
             def predict(X_test):
-                test_predictions = []
+                model_scores = []
                 for model in models:
                     if hasattr(model, 'predict_proba') and len(y_train.unique()) < 20:
                         pred = model.predict_proba(X_test)
-                        if pred.ndim > 1:
-                            test_predictions.append(pred)
+                        if pred.ndim > 1 and pred.shape[1] > 1:
+                            # 二分类取正类；多分类取最大类概率作为可比较分数
+                            model_scores.append(pred[:, 1] if pred.shape[1] == 2 else pred.max(axis=1))
                         else:
-                            test_predictions.append(pred.reshape(-1, 1))
+                            model_scores.append(np.asarray(pred).reshape(-1))
                     else:
-                        pred = model.predict(X_test)
-                        test_predictions.append(pred.reshape(-1, 1))
-                
-                test_predictions = np.hstack(test_predictions)
-                return np.average(test_predictions, axis=1, weights=weights)
+                        model_scores.append(np.asarray(model.predict(X_test)).reshape(-1))
+
+                stacked = np.vstack(model_scores)
+                return np.average(stacked, axis=0, weights=weights)
             
             return {
                 'models': models,
