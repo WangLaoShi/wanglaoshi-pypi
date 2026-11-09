@@ -1,0 +1,62 @@
+# Jupyter Book 配置 —— 王老师 wanglaoshi 公开学习手册
+# 构建：python scripts/build_book.py
+# 说明：book/README.md 与 docs/DEPENDENCIES.md
+
+title: 王老师 wanglaoshi 学习手册
+author: WangLaoShi
+copyright: "2026"
+logo: ""
+
+exclude_patterns:
+  - README.md
+  - _build
+  - Thumbs.db
+  - .DS_Store
+  - "**.ipynb_checkpoints"
+
+execute:
+  # 公开站点默认不重跑 Notebook（证据已在 docs/evidence/）
+  # 本地若要强制执行：改成 "force" 或构建时传参
+  execute_notebooks: "off"
+  timeout: 120
+
+parse:
+  myst_enable_extensions:
+    - colon_fence
+    - deflist
+    - dollarmath
+    - html_image
+    - linkify
+    - substitution
+  myst_url_schemes: [http, https, mailto]
+
+html:
+  favicon: ""
+  use_edit_page_button: true
+  use_repository_button: true
+  use_issues_button: true
+  home_page_in_navbar: true
+  baseurl: ""
+  extra_navbar: ""
+  extra_footer: |
+    <p>开源学习手册 · 源码与 Issues 见 GitHub · Notebook 可本地复现</p>
+  announcement: "按左侧学习路径阅读；进阶案例来自 examples/advanced，可本地 Jupyter 复现。"
+
+repository:
+  url: https://github.com/WangLaoShi/wanglaoshi-pypi
+  path_to_book: book
+  branch: master
+
+launch_buttons:
+  notebook_interface: jupyterlab
+  binderhub_url: ""
+  thebe: false
+
+sphinx:
+  config:
+    language: zh_CN
+    html_show_copyright: true
+    nb_execution_show_tb: true
+    suppress_warnings:
+      - myst.domains
+      - mystnb.unknown_mime_type

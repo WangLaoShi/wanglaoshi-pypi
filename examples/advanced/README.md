@@ -5,6 +5,7 @@
 上级索引：[examples/README.md](../README.md)
 
 本目录用于在 Jupyter 中验证 `wanglaoshi` 的 EDA、特征工程、基线模型与提交生成能力。  
+这些 Notebook 同时是 **Jupyter Book 公开学习手册** 的正文来源（见仓库 `book/`，构建：`python scripts/build_book.py`）。  
 **演示跑通 ≠ 单元测试通过**；回归测试见仓库根目录 `tests/`。  
 批量证据：`docs/evidence/ADVANCED_EVIDENCE.md`（最近一次 **12/12 passed**）。
 

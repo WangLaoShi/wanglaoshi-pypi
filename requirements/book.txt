@@ -1,0 +1,5 @@
+# 构建 Jupyter Book 学习手册
+# pip install -r requirements/book.txt
+# 或：pip install -e ".[book]"
+-r examples.txt
+jupyter-book>=1.0.0,<2

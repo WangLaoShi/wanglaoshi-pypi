@@ -1,0 +1,38 @@
+format: jb-book
+root: intro
+parts:
+  - caption: 开始学习
+    chapters:
+      - file: start/learning-path
+      - file: start/install
+      - file: start/first-hour
+
+  - caption: 三条主线
+    chapters:
+      - file: tracks/analyzer
+      - file: tracks/competition
+      - file: tracks/business
+
+  - caption: 进阶案例（12 课）
+    chapters:
+      - file: cases/overview
+      - file: cases/01_iris
+      - file: cases/02_titanic
+      - file: cases/04_breast_cancer
+      - file: cases/12_digit_recognizer
+      - file: cases/06_california_housing
+      - file: cases/03_wine_quality
+      - file: cases/07_abalone
+      - file: cases/08_bike_sharing
+      - file: cases/09_mall_customers
+      - file: cases/10_adult_census
+      - file: cases/05_credit_card_fraud
+      - file: cases/11_house_prices
+
+  - caption: 参考与证据
+    chapters:
+      - file: reference/api
+      - file: reference/skill-mapping
+      - file: reference/dependencies
+      - file: reference/evidence
+      - file: reference/contribute

@@ -21,3 +21,13 @@ build
 dist
 *.egg-info
 HowToUpload.txt
+
+# Jupyter Book 构建产物与同步进来的 Notebook/参考页
+book/_build/
+_build/
+book/cases/*.ipynb
+book/reference/api.md
+book/reference/skill-mapping.md
+book/reference/dependencies.md
+book/reference/evidence.md
+.coverage

@@ -63,6 +63,12 @@ setup(
         'jupyter': ['jupyter', 'ipykernel'],
         'optuna': ['optuna'],
         'dev': ['pytest', 'pytest-cov', 'flake8'],
+        'book': [
+            # 1.x = Sphinx 经典 Jupyter Book；2.x 换成 MystMD，配置不兼容
+            'jupyter-book>=1.0.0,<2',
+            'jupyter',
+            'ipykernel',
+        ],
         'all': ['openpyxl', 'jupyter', 'ipykernel', 'optuna'],
     },
     author='WangLaoShi',  # 作者

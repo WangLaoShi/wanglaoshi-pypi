@@ -19,6 +19,7 @@
 
 | 入口 | 说明 |
 | --- | --- |
+| [book/](book/) | **Jupyter Book 公开学习手册**（Notebook 教材 + 学习路径） |
 | [examples/README.md](examples/README.md) | 示例总览（Analyzer / 业务 / 12 进阶案例） |
 | [examples/advanced/README.md](examples/advanced/README.md) | 12 个进阶 Notebook 学习顺序 |
 | [docs/README.md](docs/README.md) | 开发文档索引（API、Skill 映射、依赖、证据） |
@@ -33,13 +34,14 @@ wanglaoshi-pypi
 ├── setup.py                      # install_requires + extras_require
 ├── requirements.txt              # 转发到 requirements/core.txt
 ├── requirements/                 # core / examples / dev
+├── book/                         # Jupyter Book 学习手册（公开站点源）
 ├── DEVELOPMENT_ROADMAP.md
 ├── docs/                         # API / Skill / 依赖 / 跑通证据
 ├── examples/                     # 可运行示例
 │   ├── analyzer_demo.py
 │   ├── business_intake_demo.ipynb
-│   └── advanced/                 # 12 个进阶 Jupyter 案例
-├── scripts/                      # 测试与证据脚本
+│   └── advanced/                 # 12 个进阶 Jupyter 案例（手册内容源）
+├── scripts/                      # 测试 / 证据 / 构建手册
 ├── tests/                        # pytest
 └── wanglaoshi/
     ├── Analyzer.py / Analyzer_Plain.py
@@ -87,6 +89,22 @@ pip install wanglaoshi
 ```
 
 深度学习请按 [PyTorch 官网](https://pytorch.org/) 自行安装 `torch`；未安装不影响其他功能。
+
+### 学习手册（Jupyter Book / GitHub Pages）
+
+把 12 个进阶 Notebook 与学习路径做成可浏览教材：
+
+```bash
+python -m pip install -e ".[book]"
+python scripts/build_book.py
+# 打开 book/_build/html/index.html
+```
+
+推送到 `master` 后，工作流 `.github/workflows/jupyter-book.yml` 会发布到 `gh-pages`。  
+请在仓库 **Settings → Pages → Source** 选择 `gh-pages` 分支。站点启用后地址一般为：
+
+`https://wanglaoshi.github.io/wanglaoshi-pypi/`  
+（若组织/用户名为 `WangLaoShi`，也可能是 `https://WangLaoShi.github.io/wanglaoshi-pypi/`，以 Pages 设置为准。）
 
 > 说明：PyPI 版本可能略滞后于 GitHub；若要用最新 `business` / 进阶示例，请用源码 `-e` 安装。
 
