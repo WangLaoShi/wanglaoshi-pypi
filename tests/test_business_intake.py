@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from wanglaoshi.business import BusinessPipeline, intake_file
+from wanglaoshi.business import BusinessPipeline, intake_file, structure_dataframe
 
 
 def test_intake_archives_and_hashes(tmp_path: Path) -> None:
@@ -53,4 +53,15 @@ def test_pipeline_happy_path_placeholders(tmp_path: Path) -> None:
     record = pipe.run(src)
     assert not record.blocked()
     assert record.stages[0].status == "passed"
-    assert any(s.status == "skipped" for s in record.stages[1:])
+    assert record.stages[1].stage_id == "D02_structuring"
+    assert record.stages[1].status == "passed"
+    assert any(s.status == "skipped" for s in record.stages[2:])
+
+
+def test_structure_normalizes_columns() -> None:
+    df = pd.DataFrame({"Order ID": [1], "GMV ($)": ["3.5"]})
+    result = structure_dataframe(df, dtype_map={"gmv": "float64"})
+    assert result.status in {"passed", "warning"}
+    assert "order_id" in result.data["columns"]
+    assert "gmv" in result.data["columns"]
+    assert result.frame["gmv"].dtype == "float64"  # type: ignore[attr-defined]

@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from .contracts import RunRecord, StageResult
 from .intake import intake_file
+from .structuring import structure_file
 
 
 class BusinessPipeline:
@@ -58,18 +59,47 @@ class BusinessPipeline:
             record.input_hashes[str(source_path)] = intake.data["sha256"]
 
         if intake.status == "blocked" and self.stop_on_block:
-            record.add_stage(
-                StageResult(
-                    stage_id="D02_structuring",
-                    status="skipped",
-                    warnings=["skipped because upstream blocked"],
+            for stage_id in [
+                "D02_structuring",
+                "D03_cleaning",
+                "D04_derived",
+                "D06_metrics",
+                "D07_analysis",
+                "D09_insights",
+                "D10_report_archive",
+            ]:
+                record.add_stage(
+                    StageResult(
+                        stage_id=stage_id,
+                        status="skipped",
+                        warnings=["skipped because upstream blocked"],
+                    )
                 )
-            )
+            return record
+
+        structured_path = self.archive_dir / f"{rid}__structured.csv"
+        structuring = structure_file(source_path, structured_path)
+        record.add_stage(structuring)
+        if structuring.status == "blocked" and self.stop_on_block:
+            for stage_id in [
+                "D03_cleaning",
+                "D04_derived",
+                "D06_metrics",
+                "D07_analysis",
+                "D09_insights",
+                "D10_report_archive",
+            ]:
+                record.add_stage(
+                    StageResult(
+                        stage_id=stage_id,
+                        status="skipped",
+                        warnings=["skipped because upstream blocked"],
+                    )
+                )
             return record
 
         # 占位：后续 Skill 未实现时显式 skipped，避免静默当作完成
         for stage_id in [
-            "D02_structuring",
             "D03_cleaning",
             "D04_derived",
             "D06_metrics",

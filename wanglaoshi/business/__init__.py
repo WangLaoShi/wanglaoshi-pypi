@@ -11,10 +11,13 @@
 from .contracts import StageResult, RunRecord
 from .intake import intake_file
 from .pipeline import BusinessPipeline
+from .structuring import structure_dataframe, structure_file
 
 __all__ = [
     "StageResult",
     "RunRecord",
     "intake_file",
     "BusinessPipeline",
+    "structure_dataframe",
+    "structure_file",
 ]
