@@ -268,5 +268,6 @@ def helps():
     print("helps()  # 查看帮助信息")
     print("styles()  # 查看 JupyterNotebook 支持的样式")
 
-# 模块加载时自动显示样式信息
-styles()
+# 仅直接运行本文件时打印样式帮助，避免 import 时刷屏
+if __name__ == "__main__":
+    styles()

@@ -9,6 +9,11 @@ __pycache__/
 # Ignore Jupyter Notebook checkpoints (if you're using notebooks)
 .ipynb_checkpoints/
 
+# Local virtualenv and example outputs
+.venv/
+examples/advanced/outputs/
+data/
+
 # Ignore system files (macOS, Linux, Windows)
 .DS_Store
 Thumbs.db
