@@ -6,6 +6,7 @@ parts:
       - file: start/learning-path
       - file: start/install
       - file: start/first-hour
+      - file: start/binder
 
   - caption: 三条主线
     chapters:
@@ -17,17 +18,52 @@ parts:
     chapters:
       - file: cases/overview
       - file: cases/01_iris
+        sections:
+          - file: practice/01_iris
       - file: cases/02_titanic
+        sections:
+          - file: practice/02_titanic
       - file: cases/04_breast_cancer
+        sections:
+          - file: practice/04_breast_cancer
       - file: cases/12_digit_recognizer
+        sections:
+          - file: practice/12_digit_recognizer
       - file: cases/06_california_housing
+        sections:
+          - file: practice/06_california_housing
       - file: cases/03_wine_quality
+        sections:
+          - file: practice/03_wine_quality
       - file: cases/07_abalone
+        sections:
+          - file: practice/07_abalone
       - file: cases/08_bike_sharing
+        sections:
+          - file: practice/08_bike_sharing
       - file: cases/09_mall_customers
+        sections:
+          - file: practice/09_mall_customers
       - file: cases/10_adult_census
+        sections:
+          - file: practice/10_adult_census
       - file: cases/05_credit_card_fraud
+        sections:
+          - file: practice/05_credit_card_fraud
       - file: cases/11_house_prices
+        sections:
+          - file: practice/11_house_prices
+
+  - caption: 业务专章
+    chapters:
+      - file: cases/business_pipeline
+        sections:
+          - file: practice/business_pipeline
+
+  - caption: 练习与术语
+    chapters:
+      - file: practice/overview
+      - file: reference/glossary
 
   - caption: 参考与证据
     chapters:

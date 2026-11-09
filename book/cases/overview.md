@@ -18,6 +18,14 @@ python -m pip install -e ".[jupyter]"
 jupyter lab examples/advanced/
 ```
 
+## 练习
+
+每课下方有「练习」子页（目标 + 自测 + 动手）。总表见 {doc}`../practice/overview`。
+
+## 业务专章
+
+竞赛案例如上；业务可追溯交付见 {doc}`business_pipeline`。
+
 ## 批量证据
 
 {doc}`../reference/evidence`

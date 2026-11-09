@@ -30,6 +30,11 @@ NOTEBOOKS = [
     "11_house_prices",
 ]
 
+# (源相对仓库根, 同步到 book/cases/ 的文件名不含扩展名)
+EXTRA_NOTEBOOKS = [
+    ("examples/business_pipeline_course.ipynb", "business_pipeline"),
+]
+
 DOC_COPIES = {
     "API_INVENTORY.md": "api.md",
     "SKILL_API_MAPPING.md": "skill-mapping.md",
@@ -50,6 +55,14 @@ def main() -> None:
         dst = CASES / f"{name}.ipynb"
         shutil.copy2(src, dst)
         print(f"synced case {dst.relative_to(ROOT)}")
+
+    for src_rel, name in EXTRA_NOTEBOOKS:
+        src = ROOT / src_rel
+        if not src.exists():
+            raise FileNotFoundError(f"missing notebook: {src}")
+        dst = CASES / f"{name}.ipynb"
+        shutil.copy2(src, dst)
+        print(f"synced case {dst.relative_to(ROOT)} <- {src_rel}")
 
     for src_rel, dst_name in DOC_COPIES.items():
         src = ROOT / "docs" / src_rel

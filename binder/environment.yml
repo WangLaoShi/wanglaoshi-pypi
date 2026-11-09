@@ -1,0 +1,23 @@
+# MyBinder 环境：打开仓库 Notebook 一键运行
+# https://mybinder.org/
+name: wanglaoshi-book
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - numpy
+      - pandas
+      - matplotlib
+      - seaborn
+      - scipy
+      - scikit-learn
+      - statsmodels
+      - missingno
+      - jinja2
+      - rich
+      - tqdm
+      - requests
+      - jupyterlab
+      - ipykernel

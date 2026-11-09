@@ -92,13 +92,17 @@ pip install wanglaoshi
 
 ### 学习手册（Jupyter Book / GitHub Pages）
 
-把 12 个进阶 Notebook 与学习路径做成可浏览教材：
+把 12 个进阶 Notebook、**每课练习**、**中文术语表**、**业务流水线专章**做成可浏览教材：
 
 ```bash
 python -m pip install -e ".[book]"
 python scripts/build_book.py
 # 打开 book/_build/html/index.html
 ```
+
+云端一键打开 Notebook（MyBinder）：
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/WangLaoShi/wanglaoshi-pypi/master)
 
 推送到 `master` 后，工作流 `.github/workflows/jupyter-book.yml` 会发布到 `gh-pages`。  
 请在仓库 **Settings → Pages → Source** 选择 `gh-pages` 分支。站点启用后地址一般为：

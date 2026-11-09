@@ -7,6 +7,8 @@ on:
     paths:
       - "book/**"
       - "examples/advanced/**"
+      - "examples/business_pipeline_course.ipynb"
+      - "binder/**"
       - "docs/**"
       - "scripts/prepare_book.py"
       - "scripts/build_book.py"

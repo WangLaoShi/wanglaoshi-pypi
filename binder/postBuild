@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Binder 构建末尾：以可编辑方式安装本仓库
+set -euo pipefail
+python -m pip install -e ".[jupyter]"

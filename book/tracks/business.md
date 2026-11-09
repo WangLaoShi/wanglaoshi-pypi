@@ -36,6 +36,8 @@ print(record.summary())
 
 见 {doc}`../reference/skill-mapping`。
 
-## 本地 Notebook
+## 本地 / 手册 Notebook
 
-仓库：`examples/business_intake_demo.ipynb`（合成订单，可离线）。
+- 教材专章：{doc}`../cases/business_pipeline`（源：`examples/business_pipeline_course.ipynb`）  
+- 短 demo：`examples/business_intake_demo.ipynb`  
+- 练习：{doc}`../practice/business_pipeline`

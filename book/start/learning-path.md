@@ -37,8 +37,9 @@
 适合：销售/运营表，要可追溯交付，而不是只拟合模型。
 
 1. {doc}`../tracks/business`  
-2. 对照 {doc}`../reference/skill-mapping`  
-3. 本地打开 `examples/business_intake_demo.ipynb`
+2. 专章 Notebook：{doc}`../cases/business_pipeline`  
+3. 练习：{doc}`../practice/business_pipeline`  
+4. 对照 {doc}`../reference/skill-mapping`  
 
 ## 每课 Notebook 固定结构
 

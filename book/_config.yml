@@ -40,7 +40,7 @@ html:
   extra_navbar: ""
   extra_footer: |
     <p>开源学习手册 · 源码与 Issues 见 GitHub · Notebook 可本地复现</p>
-  announcement: "按左侧学习路径阅读；进阶案例来自 examples/advanced，可本地 Jupyter 复现。"
+  announcement: "按左侧路径学习；每课含练习；可用 Binder 云端打开 Notebook。"
 
 repository:
   url: https://github.com/WangLaoShi/wanglaoshi-pypi
@@ -49,7 +49,7 @@ repository:
 
 launch_buttons:
   notebook_interface: jupyterlab
-  binderhub_url: ""
+  binderhub_url: "https://mybinder.org"
   thebe: false
 
 sphinx:

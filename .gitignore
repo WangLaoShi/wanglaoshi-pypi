@@ -26,6 +26,7 @@ HowToUpload.txt
 book/_build/
 _build/
 book/cases/*.ipynb
+!book/cases/overview.md
 book/reference/api.md
 book/reference/skill-mapping.md
 book/reference/dependencies.md

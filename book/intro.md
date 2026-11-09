@@ -12,10 +12,11 @@
 ## 建议读法
 
 1. {doc}`start/learning-path`：选一条主线  
-2. {doc}`start/install`：装好环境  
+2. {doc}`start/install`：装好环境（或 {doc}`start/binder` 云端打开）  
 3. {doc}`start/first-hour`：一小时最小闭环  
-4. 进入「进阶案例」按编号阅读 Notebook  
-5. 需要查函数时看「参考与证据」
+4. 进入「进阶案例」阅读 Notebook，并完成课下「练习」  
+5. 业务向同学加读「业务专章」  
+6. 术语查 {doc}`reference/glossary`；API 查「参考与证据」
 
 ```{note}
 Notebook **演示跑通 ≠ 单元测试通过**。回归测试在仓库 `tests/`；案例批量证据见 {doc}`reference/evidence`。
