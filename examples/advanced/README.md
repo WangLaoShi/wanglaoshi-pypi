@@ -1,10 +1,12 @@
 # 进阶演示（12 个案例）
 
 对应 GitHub Issue：[#9](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/9)  
-总跟踪：[#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6)
+总跟踪：[#6](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/6)  
+上级索引：[examples/README.md](../README.md)
 
 本目录用于在 Jupyter 中验证 `wanglaoshi` 的 EDA、特征工程、基线模型与提交生成能力。  
-**演示跑通 ≠ 单元测试通过**；回归测试见仓库根目录 `tests/`。
+**演示跑通 ≠ 单元测试通过**；回归测试见仓库根目录 `tests/`。  
+批量证据：`docs/evidence/ADVANCED_EVIDENCE.md`（最近一次 **12/12 passed**）。
 
 ## 学习顺序（建议）
 

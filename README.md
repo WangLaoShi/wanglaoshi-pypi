@@ -1,77 +1,90 @@
 # 王老师 WangLaoShi
 
+当前版本：**0.14.0**
+
 ## 项目介绍
 
 `wanglaoshi` 是一个面向 **数据分析入门学生** 和 **数据科学竞赛选手（如 Kaggle）** 的学习与实战工具包，主要特点：
 
-- **一键EDA**：`Analyzer` 模块可以对数据集做全面的探索性分析（缺失值、异常值、相关性、PCA、报告生成等）
-- **比赛工具链**：`CompetitionTools` 模块提供提交文件生成、快速基线模型、模型集成、超参数搜索、实验追踪等功能
-- **特征工程增强**：`FeatureEngineering` 模块支持时间特征、文本特征、编码、数值变换、特征选择等
-- **环境辅助**：`VERSIONS`、`JupyterEnv`、`JupyterFont`、`Useful` 等模块帮助检查环境、管理内核、配置字体和常用工具
+- **一键 EDA**：`Analyzer` / `DataAnalyzer` 做缺失、异常、相关、PCA 与 HTML 报告
+- **比赛工具链**：`CompetitionTools` 提供提交生成与校验、快速基线、集成、调参、实验追踪
+- **特征工程**：`FeatureEngineering` 支持时间/文本/编码/变换/特征选择
+- **业务流水线**：`business` / `BusinessPipeline` 固化接收→清洗→指标→六视角→结论→归档（无需 AI Key）
+- **环境辅助**：`VERSIONS`、`JupyterEnv`、`JupyterFont`、`Useful` 等
+- **可选深度学习**：`MLDL`（需自行安装 `torch`；未安装不影响其他功能）
 
-适用人群：
+适用人群：数据分析初学者、Kaggle 选手、需要可追溯业务分析模板的同学。
 
-- 正在学习 Python 数据分析 / 机器学习的同学
-- 想要参加 Kaggle 等比赛、需要一套快速 EDA + 基线建模工具的选手
-- 想要复用一套「可解释、带注释」代码模板做课程作业或项目 Demo 的同学
+## 文档与示例导航
+
+| 入口 | 说明 |
+| --- | --- |
+| [examples/README.md](examples/README.md) | 示例总览（Analyzer / 业务 / 12 进阶案例） |
+| [examples/advanced/README.md](examples/advanced/README.md) | 12 个进阶 Notebook 学习顺序 |
+| [docs/README.md](docs/README.md) | 开发文档索引（API、Skill 映射、依赖、证据） |
+| [docs/evidence/ADVANCED_EVIDENCE.md](docs/evidence/ADVANCED_EVIDENCE.md) | 12 案例跑通证据 |
+| [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md) | 增量开发路线图 |
 
 ## 项目结构（简要）
 
 ```text
 wanglaoshi-pypi
-├── README.md                     # 项目文档（本文件）
-├── setup.py                      # 安装配置
-├── wanglaoshi/
-│   ├── Analyzer.py               # 高级 EDA 与报告生成（HTML + 图表 + 解释）
-│   ├── Analyzer_Plain.py         # 简化版文本 EDA（输出到 txt + 基本图表）
-│   ├── CompetitionTools.py       # 比赛工具：提交文件生成、基线模型、集成、调参、实验追踪
-│   ├── FeatureEngineering.py     # 增强特征工程：时间/文本/编码/变换/特征选择
-│   ├── VERSIONS.py               # 环境与库版本检查工具（简单/完整库表，支持 PyPI 最新版本比对）
-│   ├── JupyterEnv.py             # Jupyter 内核管理与环境信息
-│   ├── JupyterFont.py            # Matplotlib 中文字体自动下载与配置
-│   ├── Useful.py                 # 常用工具函数（pip 源、Jupyter 样式等）
-│   ├── WebGetter.py              # 通用文件下载工具（带进度条）
-│   ├── MLDL.py                   # 机器学习 + 深度学习基础封装（预处理、特征工程、ML/DL 模型）
-│   ├── utils.py                  # 小工具（对齐、中文检测等）
-│   ├── __init__.py               # 包导出入口（根据版本逐步完善）
-│   └── ...（static/templates 等，用于报告渲染）
+├── README.md
+├── setup.py
+├── DEVELOPMENT_ROADMAP.md
+├── docs/                         # API / Skill / 依赖 / 跑通证据
+├── examples/                     # 可运行示例
+│   ├── analyzer_demo.py
+│   ├── business_intake_demo.ipynb
+│   └── advanced/                 # 12 个进阶 Jupyter 案例
+├── scripts/                      # 测试与证据脚本
+├── tests/                        # pytest
+└── wanglaoshi/
+    ├── Analyzer.py / Analyzer_Plain.py
+    ├── CompetitionTools.py
+    ├── FeatureEngineering.py
+    ├── business/                 # 业务 Skill 流水线
+    ├── VERSIONS.py / JupyterEnv.py / JupyterFont.py / Useful.py / WebGetter.py
+    ├── MLDL.py                   # 可选（torch）
+    └── __init__.py
 ```
 
-## 项目版本
+## 项目版本（摘要）
 
-- 0.0.1 初始化版本，项目开始
-- 0.0.2 增加列表输出
-- 0.0.3 增加字典输出,使用 Rich 输出
-- 0.0.4 实现 JupyterNotebook 环境创建
-- 0.0.5 增加几个有用的库
-- 0.0.6 修改获取 version 的方法
-- 0.0.7 增加获取当前安装包的版本号，增加获取当前每一个安装包最新版本的方法
-- 0.0.8 增加对数据文件的基本分析的部分
-- 0.0.9 增加 jinja2 的模板输出的 Analyzer
-- 0.10.0 增加 no_waring,字体获取，安装字体
-- 0.10.6 增加 Analyzer 的使用部分(需要 statsmodels)
-- 0.10.7 增加 MLDL 部分(需要 sklearn,torch)
-- 0.10.10 增加分析结果 Render notebook 部分
-- 0.10.13 修复分析结果
-- 0.11.1 增加 static 和 template 修改 html 报告生成
-- 0.11.2 添加 js 的引用
-- 0.12.0 【阶段一：比赛核心功能】新增 CompetitionTools 模块，包含提交文件生成器、快速基线模型、数据泄露检测三大核心功能，专为数据科学比赛优化
-- 0.13.0 【阶段二：增强功能】新增 FeatureEngineering 模块（时间特征、文本特征、目标编码、数值变换、特征选择），CompetitionTools 增强（模型集成、特征重要性分析、交叉验证增强、超参数优化、实验追踪）
-- 0.13.1 修改 pytorch 的导入
+完整历史见下方「版本历史」；近期：
+
+- **0.14.0** 业务流水线 `wanglaoshi.business`（D01–D12 主链）、进阶 12 案例与跑通证据、提交生成加固、文档与 CI 更新
+- 0.13.1 `MLDL`/torch 改为可选导入，避免未装 torch 时整包失败
+- 0.13.0 FeatureEngineering + CompetitionTools 增强
+- 0.12.0 CompetitionTools 初版（提交 / 基线 / 泄漏检测）
 
 ## 安装方式
 
-### 1. 源码安装方式
+推荐 Python `>=3.8`。
 
-- 检出项目
-- 进入项目目录
-- 执行`python setup.py install`
-- 安装完成
+### 1. 开发安装（推荐，跟仓库文档一致）
 
-### 2. pip安装方式
+```bash
+git clone https://github.com/WangLaoShi/wanglaoshi-pypi.git
+cd wanglaoshi-pypi
+python -m pip install -e .
+# 跑进阶 Notebook 时建议再装：
+python -m pip install jupyter seaborn
+```
 
-```shell
+### 2. PyPI 安装
+
+```bash
 pip install wanglaoshi
+```
+
+> 说明：PyPI 版本可能略滞后于 GitHub；若要用最新 `business` / 进阶示例，请用源码 `-e` 安装。
+
+### 3. 验证安装
+
+```bash
+python scripts/smoke_docs_examples.py
+bash scripts/run_tests.sh quick
 ```
 
 ## 使用方法
@@ -80,56 +93,89 @@ pip install wanglaoshi
 
 ### 0. 典型比赛工作流示例（从 0 到 baseline）
 
+下面是**可本地跑通**的最小版本（用 sklearn Iris，不依赖外部 `train.csv`）：
+
 ```python
+import numpy as np
 import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
 from wanglaoshi import VERSIONS as V
-from wanglaoshi import Analyzer
+from wanglaoshi import DataAnalyzer
 from wanglaoshi import CompetitionTools as CT
-from wanglaoshi import FeatureEngineering as FE
 
-# 1）检查环境和常用库
 V.show_env_info()
-V.check_all_versions(version='simple', show_latest=True, only_problems=True)
 
-# 2）读取数据并做快速 EDA
-train = pd.read_csv('train.csv')
-test = pd.read_csv('test.csv')
-analyzer = Analyzer.DataAnalyzer(train)
-analyzer.generate_report('train_eda_report.html')  # 生成详细 HTML 报告
+iris = load_iris(as_frame=True)
+df = iris.frame
+analyzer = DataAnalyzer(df)
+print(analyzer.get_basic_info())
 
-# 3）特征工程示例
-engineer = FE.AdvancedFeatureEngineer()
-if 'date' in train.columns:
-    train = engineer.extract_datetime_features(train, 'date')
-    test = engineer.extract_datetime_features(test, 'date')
-
-# 假设 target 是监督任务的目标列
-target_col = 'target'
-feature_cols = [c for c in train.columns if c != target_col]
-X_train = train[feature_cols]
-y_train = train[target_col]
-
-# 4）快速基线模型
-baseline = CT.QuickBaseline()
-results = baseline.run_all_models(X_train, y_train, task_type='auto')
-baseline.compare_models(results, top_n=5)
-
-# 5）选择一个模型，生成预测和提交文件（示例）
-best_model_name = list(results.keys())[0]
-best_model = results[best_model_name]['model']
-best_model.fit(X_train, y_train)
-X_test = test[feature_cols]
-y_pred = best_model.predict(X_test)
-
-sub_gen = CT.SubmissionGenerator()
-sub_gen.create_submission(
-    predictions=y_pred,
-    sample_submission_path='sample_submission.csv',
-    output_path='submission.csv'
+X = df.drop(columns=['target'])
+y = df['target']
+X_train, X_valid, y_train, y_valid = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
 )
+
+baseline = CT.QuickBaseline()
+results = baseline.run_all_models(X_train, y_train, X_valid, y_valid, task_type='classification')
+comparison = baseline.compare_models(results, top_n=5)
+print(comparison)
+
+best = comparison.iloc[0]['Model']
+pred = results[best]['predictions']
+sample = pd.DataFrame({'Id': np.arange(len(pred)), 'target': y_valid.to_numpy()})
+sample.to_csv('sample_submission.csv', index=False)
+gen = CT.SubmissionGenerator()
+gen.create_submission(pred, 'sample_submission.csv', 'submission.csv', prediction_type='label')
+print(gen.validate_submission('submission.csv', 'sample_submission.csv'))
 ```
 
-> 上面的代码展示了：**环境检查 → EDA 报告 → 特征工程 → 快速基线 → 生成 submission** 的一条完整路径，非常适合作为 Kaggle 比赛的起步模板。
+完整竞赛流程（读 `train.csv` / 特征工程 / 提交）见下文各章节与 `examples/advanced/`。
+
+### 0b. 业务分析流水线（Skill 固化，无需 AI）
+
+```python
+import pandas as pd
+from pathlib import Path
+from wanglaoshi import BusinessPipeline
+
+demo = Path('outputs/biz_demo')
+demo.mkdir(parents=True, exist_ok=True)
+src = demo / 'orders.csv'
+pd.DataFrame({
+    'order_id': [1, 2, 3, 4],
+    'order_date': ['2024-01-01', '2024-01-02', '2024-01-03', '2024-01-04'],
+    'amount': [10.0, 20.0, 15.0, 30.0],
+    'channel': ['web', 'app', 'web', 'app'],
+    'user_tier': ['A', 'B', 'A', 'B'],
+}).to_csv(src, index=False)
+
+pipe = BusinessPipeline(
+    demo / 'archive',
+    required_columns=['order_id', 'amount'],
+    date_col='order_date',
+    value_col='amount',
+    dim_cols=['channel'],
+    segment_cols=['user_tier'],
+    period='2024-Q1',
+)
+record = pipe.run(src)
+print(record.summary())
+# 正式交付在 archive/<run_id>__delivery/report.md
+```
+
+配置样例：`wanglaoshi/business/config_sales_example.yaml`；Notebook：`examples/business_intake_demo.ipynb`。
+
+### 0c. 进阶 12 案例
+
+```bash
+jupyter notebook examples/advanced/
+# 或批量跑通证据：
+python scripts/run_advanced_evidence.py
+```
+
+学习顺序与数据说明见 [examples/advanced/README.md](examples/advanced/README.md)。
 
 ---
 

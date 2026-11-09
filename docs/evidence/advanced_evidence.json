@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-11-09T04:46:32.002476+00:00",
+  "generated_at_utc": "2026-11-09T04:50:16.966984+00:00",
   "notebook_dir": "examples/advanced",
   "python": "/opt/anaconda3/bin/python",
   "timeout_sec": 240,
@@ -8,11 +8,11 @@
       "slug": "01_iris",
       "path": "examples/advanced/01_iris.ipynb",
       "status": "passed",
-      "started_at": "2026-11-09T04:36:32.571624+00:00",
+      "started_at": "2026-11-09T04:50:16.968148+00:00",
       "error": null,
       "cells_executed": 7,
       "mode": "inprocess",
-      "finished_at": "2026-11-09T04:36:36.032416+00:00",
+      "finished_at": "2026-11-09T04:50:19.537738+00:00",
       "log": "examples/advanced/outputs/evidence/01_iris.log"
     },
     {

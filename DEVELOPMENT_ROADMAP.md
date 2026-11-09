@@ -175,3 +175,4 @@
 | 2026-11-09 | D09/D10/D11 | 结论建议、报告归档、主链跑通；上游 blocked 禁止正式交付 | 待：D08 图表归档；D12 EDA 适配；F01–F06 |
 | 2026-11-09 | D08/D12/F | 图表归档+EDA 适配接入主链；依赖文档与发布烟测 | 待：E17 Notebook 跑通证据；干净环境矩阵 CI |
 | 2026-11-09 | E17/F05/CI | 12 Notebook 进程内跑通证据全绿；修复 Abalone/Adult；升级 Actions 安装 `-e .` | 可选：矩阵扩到 3.12；发布 PyPI |
+| 2026-11-09 | 文档整理 | README 0.14.0 导航/可跑示例；docs/examples 索引；`smoke_docs_examples.py` | 持续与 API 同步 |

@@ -27,4 +27,7 @@
 ```bash
 python -c "import wanglaoshi; from wanglaoshi import BusinessPipeline, DataAnalyzer, CompetitionTools; print('ok')"
 bash scripts/run_tests.sh release
+python scripts/smoke_docs_examples.py
 ```
+
+演示额外依赖：`jupyter`、`seaborn`（见 `examples/advanced/README.md`）。

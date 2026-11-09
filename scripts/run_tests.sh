@@ -20,6 +20,7 @@ case "$MODE" in
   release)
     python -m pytest tests/
     python -c "import wanglaoshi; from wanglaoshi import BusinessPipeline, CompetitionTools, DataAnalyzer; print('import_ok', wanglaoshi.__file__)"
+    python scripts/smoke_docs_examples.py
     ;;
   *)
     echo "usage: $0 {quick|full|release}" >&2
