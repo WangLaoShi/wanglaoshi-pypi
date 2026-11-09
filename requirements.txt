@@ -1,0 +1,3 @@
+# 兼容旧习惯：默认等于核心依赖。
+# 分层说明与可选安装请看：docs/DEPENDENCIES.md
+-r requirements/core.txt

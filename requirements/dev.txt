@@ -1,0 +1,6 @@
+# 本地开发与 CI 测试
+# pip install -e ".[dev]"  或  pip install -r requirements/dev.txt
+-r core.txt
+pytest
+pytest-cov
+flake8

@@ -30,7 +30,9 @@
 ```text
 wanglaoshi-pypi
 ├── README.md
-├── setup.py
+├── setup.py                      # install_requires + extras_require
+├── requirements.txt              # 转发到 requirements/core.txt
+├── requirements/                 # core / examples / dev
 ├── DEVELOPMENT_ROADMAP.md
 ├── docs/                         # API / Skill / 依赖 / 跑通证据
 ├── examples/                     # 可运行示例
@@ -62,21 +64,29 @@ wanglaoshi-pypi
 
 推荐 Python `>=3.8`。
 
+依赖怎么分层（核心 / Excel / Jupyter / Optuna / torch）、以及 `requirements/` 文件说明，见 **[docs/DEPENDENCIES.md](docs/DEPENDENCIES.md)**。
+
 ### 1. 开发安装（推荐，跟仓库文档一致）
 
 ```bash
 git clone https://github.com/WangLaoShi/wanglaoshi-pypi.git
 cd wanglaoshi-pypi
-python -m pip install -e .
-# 跑进阶 Notebook 时建议再装：
-python -m pip install jupyter seaborn
+python -m pip install -e ".[dev]"
+# 跑进阶 Notebook：
+python -m pip install -e ".[dev,jupyter]"
 ```
 
 ### 2. PyPI 安装
 
 ```bash
 pip install wanglaoshi
+# 常用可选：
+# pip install "wanglaoshi[excel]"
+# pip install "wanglaoshi[jupyter]"
+# pip install "wanglaoshi[all]"          # excel+jupyter+optuna（不含 torch）
 ```
+
+深度学习请按 [PyTorch 官网](https://pytorch.org/) 自行安装 `torch`；未安装不影响其他功能。
 
 > 说明：PyPI 版本可能略滞后于 GitHub；若要用最新 `business` / 进阶示例，请用源码 `-e` 安装。
 

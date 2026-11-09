@@ -43,7 +43,7 @@ setup(
     version=about['__version__'],  # 版本号
     packages=find_packages(),  # 自动找到所有模块
     include_package_data=True,
-    install_requires=[         # 依赖的库
+    install_requires=[         # 默认课堂核（与 requirements/core.txt 对齐）
         'rich',
         'requests',
         'pandas',
@@ -56,8 +56,15 @@ setup(
         'tqdm',
         'statsmodels',
         'scikit-learn',
-        # 在这里列出其他依赖的库
     ],
+    extras_require={
+        # 说明见 docs/DEPENDENCIES.md；保持少量分组，避免维护成本过高
+        'excel': ['openpyxl'],
+        'jupyter': ['jupyter', 'ipykernel'],
+        'optuna': ['optuna'],
+        'dev': ['pytest', 'pytest-cov', 'flake8'],
+        'all': ['openpyxl', 'jupyter', 'ipykernel', 'optuna'],
+    },
     author='WangLaoShi',  # 作者
     author_email='ginger547@gmail.com',  # 邮箱
     description='A utility module for DA and ML and DL tasks',  # 简短描述

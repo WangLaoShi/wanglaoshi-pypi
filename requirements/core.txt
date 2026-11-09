@@ -1,0 +1,14 @@
+# 与 setup.py install_requires 对齐（默认课堂核）
+# 详细说明见 docs/DEPENDENCIES.md
+rich
+requests
+pandas
+numpy
+matplotlib
+seaborn
+scipy
+missingno
+jinja2
+tqdm
+statsmodels
+scikit-learn

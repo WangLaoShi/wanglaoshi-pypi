@@ -1,0 +1,5 @@
+# 跑 examples/ / Jupyter Notebook 时使用
+# pip install -r requirements/examples.txt
+-r core.txt
+jupyter
+ipykernel

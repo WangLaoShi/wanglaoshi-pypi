@@ -27,14 +27,16 @@
 
 ## 环境准备
 
+依赖分层详见 [docs/DEPENDENCIES.md](../../docs/DEPENDENCIES.md)。
+
 ```bash
 cd /path/to/wanglaoshi-pypi
-python -m pip install -e .
-python -m pip install jupyter seaborn scikit-learn
+python -m pip install -e ".[jupyter]"
+# 或：pip install -r requirements/examples.txt && pip install -e .
 jupyter notebook examples/advanced/
 ```
 
-可选深度学习相关模块需要自行安装 `torch`，不影响本目录大多数案例。
+可选深度学习请自行安装 `torch`（见依赖文档），不影响本目录大多数案例。
 
 ## 数据说明
 

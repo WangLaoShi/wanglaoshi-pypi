@@ -24,9 +24,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest
-        python -m pip install -e .
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # 核心 + pytest/flake8；分层说明见 docs/DEPENDENCIES.md
+        python -m pip install -e ".[dev]"
     - name: Lint with flake8
       run: |
         flake8 wanglaoshi tests --count --select=E9,F63,F7,F82 --show-source --statistics
