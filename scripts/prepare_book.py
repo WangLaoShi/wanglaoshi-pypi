@@ -35,8 +35,9 @@ EXTRA_NOTEBOOKS = [
     ("examples/business_pipeline_course.ipynb", "business_pipeline"),
 ]
 
+# api.md 由手册手写维护（链到 API_REFERENCE）；短盘点同步为 api-inventory.md
 DOC_COPIES = {
-    "API_INVENTORY.md": "api.md",
+    "API_INVENTORY.md": "api-inventory.md",
     "SKILL_API_MAPPING.md": "skill-mapping.md",
     "DEPENDENCIES.md": "dependencies.md",
     "evidence/ADVANCED_EVIDENCE.md": "evidence.md",
@@ -72,7 +73,8 @@ def main() -> None:
         text = src.read_text(encoding="utf-8")
         # 手册内相对链接：docs 互链 → book/reference 文件名
         text = text.replace("](SKILL_API_MAPPING.md)", "](skill-mapping.md)")
-        text = text.replace("](API_INVENTORY.md)", "](api.md)")
+        text = text.replace("](API_INVENTORY.md)", "](api-inventory.md)")
+        text = text.replace("](API_REFERENCE.md)", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/API_REFERENCE.md)")
         text = text.replace("](DEPENDENCIES.md)", "](dependencies.md)")
         banner = (
             "```{note}\n"

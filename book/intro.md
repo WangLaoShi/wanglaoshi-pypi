@@ -1,36 +1,41 @@
 # 基线工坊 · 从 EDA 到提交
 
-欢迎来到 **基线工坊**。这是一套可运行的数据分析 / 竞赛入门教材：把仓库里的 Jupyter 案例与 Python 包 `wanglaoshi` 的 API，整理成一条能自学的路径。
+这是 **Python 包 `wanglaoshi`**（仓库 [WangLaoShi/wanglaoshi-pypi](https://github.com/WangLaoShi/wanglaoshi-pypi)）的公开教材站，不是另一套玩具教程。
 
-> 作者印记：WangLaoShi · 安装：`pip install wanglaoshi`
+> 安装：`pip install wanglaoshi` · 开发：`pip install -e ".[dev]"` · API 真源：仓库 `docs/API_REFERENCE.md`
 
-## 你能学到什么
+## 本站 ↔ 仓库怎么对应
 
-- 用 `DataAnalyzer` 做可交付的 EDA 与 HTML 报告  
-- 用 `CompetitionTools` 做基线、校验提交、查泄露  
-- 用 `FeatureEngineering` 做时间/文本/编码与特征选择  
-- 用 `BusinessPipeline` 跑通「接收→清洗→指标→结论→归档」业务主链  
+| 你在本站看到的 | 仓库里真实存在的 |
+| --- | --- |
+| Notebook 案例课 | `examples/advanced/*.ipynb` |
+| 业务专章 | `examples/business_pipeline_course.ipynb` + `wanglaoshi/business/` |
+| 三条主线文稿 | 直接讲 `DataAnalyzer` / `CompetitionTools` / `BusinessPipeline` |
+| 精讲课 | 讲清泄露、划分、提交契约——对应包里的检测器与生成器 |
+| API / 进度 | `docs/API_REFERENCE.md`、`PROJECT_STATUS.md` |
+| 发版检查 | `./scripts/release_check.sh` |
 
-## 建议读法
+学完一课，你应该能指出：**用了哪个类、哪个方法、对应仓库哪段测试或说明书**。
 
-1. {doc}`start/learning-path`：选一条主线  
-2. {doc}`start/install`：装好环境（或 {doc}`start/binder` 云端打开）  
-3. {doc}`start/first-hour`：一小时最小闭环  
-4. 进入「进阶案例」阅读 Notebook，并完成课下「练习」  
-5. 业务向同学加读「业务专章」  
-6. 术语查 {doc}`reference/glossary`；API 查「参考与证据」  
+## 建议读法（别只看 Notebook）
 
-```{note}
-Notebook **演示跑通 ≠ 单元测试通过**。回归测试在仓库 `tests/`；案例批量证据见 {doc}`reference/evidence`。
+1. {doc}`start/install` → 装上**同一个** `wanglaoshi`  
+2. {doc}`lessons/overview` → 精讲（比案例更深）  
+3. {doc}`tracks/competition` / {doc}`tracks/analyzer` / {doc}`tracks/business` → 选主线  
+4. {doc}`start/first-hour` → 一小时最小闭环（全是包 API）  
+5. {doc}`cases/overview` → 12 课；每课练习必须点名 API  
+6. {doc}`reference/api` → 查签名；冲突以仓库说明书为准  
+
+```{warning}
+只「跑通 Notebook」不算学会。练习页要求你说出方法名（例如 `SubmissionGenerator.validate_submission`），并知道失败时错误从哪来。
 ```
 
-## 源码与站点
+## 你能练到的包能力
 
-| 资源 | 位置 |
-| --- | --- |
-| GitHub 仓库 | [WangLaoShi/wanglaoshi-pypi](https://github.com/WangLaoShi/wanglaoshi-pypi) |
-| PyPI 包 | `pip install wanglaoshi` |
-| 原始 Notebook | 仓库 `examples/advanced/` |
-| 依赖分层说明 | {doc}`reference/dependencies` |
+- `ready()`：环境就绪（别叠三次 `filterwarnings`）  
+- `DataAnalyzer` / `analyze_data` / `analyze_notebook`：可交付 EDA  
+- `CompetitionTools`：基线、提交、泄露、集成、CV、实验记录  
+- `FeatureEngineering.AdvancedFeatureEngineer`：时间/文本/编码/选特征  
+- `BusinessPipeline`：Skill 固化主链（接收→归档）  
 
 开始：{doc}`start/learning-path`

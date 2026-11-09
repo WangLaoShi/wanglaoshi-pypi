@@ -20,6 +20,9 @@
 | 入口 | 说明 |
 | --- | --- |
 | [book/](book/) | **基线工坊** 公开教材站（Notebook + 练习 + 学习路径） |
+| **[docs/API_REFERENCE.md](docs/API_REFERENCE.md)** | **详尽 API 说明书**（签名 + 已校验可运行示例；与源码冲突时以它为准） |
+| **[docs/RELEASE.md](docs/RELEASE.md)** | **发布只记三句**（`./scripts/release_check.sh`） |
+| [PROJECT_STATUS.md](PROJECT_STATUS.md) | 功能点数量与完成率 |
 | [examples/README.md](examples/README.md) | 示例总览（Analyzer / 业务 / 12 进阶案例） |
 | [examples/advanced/README.md](examples/advanced/README.md) | 12 个进阶 Notebook 学习顺序 |
 | [docs/README.md](docs/README.md) | 开发文档索引（API、Skill 映射、依赖、证据） |
@@ -112,16 +115,22 @@ python scripts/build_book.py
 
 > 说明：PyPI 版本可能略滞后于 GitHub；若要用最新 `business` / 进阶示例，请用源码 `-e` 安装。
 
-### 3. 验证安装
+### 3. 验证安装 / 发版检查（只记这一句）
 
 ```bash
-python scripts/smoke_docs_examples.py
-bash scripts/run_tests.sh quick
+./scripts/release_check.sh quick   # 日常
+./scripts/release_check.sh         # 发版前
+./scripts/release_check.sh full    # 大版本（含 12 案例证据 + 教材构建）
 ```
+
+说明见 [docs/RELEASE.md](docs/RELEASE.md)。
 
 ## 使用方法
 
 下面给出几个典型使用场景，你可以按需选用。
+
+> **API 真源：** 完整签名、返回值与全部自洽可运行示例见 [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md)（`python scripts/verify_api_reference.py`）。  
+> 下文若与说明书冲突（例如旧的 `from WebGetter import Wget`、`prediction_type='probability'`、未定义的 `X_val`），以说明书与源码为准。
 
 ### 0. 典型比赛工作流示例（从 0 到 baseline）
 
@@ -588,7 +597,7 @@ ready()                 # quiet=True, show_env=True, seed=42
 使用方法：
 
 ```python
-from WebGetter import Wget
+from wanglaoshi.WebGetter import Wget  # 勿写 from WebGetter import Wget
 
 # 创建下载器实例
 downloader = Wget(
@@ -697,20 +706,16 @@ evaluator.plot_confusion_matrix(y, y_pred)
 ## 11. render notebook
 
 ```python
-# 方法1：使用工具函数
-from wanglaoshi import analyze_notebook
+# 推荐：模块函数（类上没有 analyze_notebook 方法）
+from wanglaoshi import analyze_notebook, DataAnalyzer
 import pandas as pd
 
 df = pd.read_csv('your_data.csv')
-analyze_notebook(df)
+result = analyze_notebook(df, show_plots=False)  # 返回探索结果 dict
 
-# 方法2：使用类方法
-from wanglaoshi import DataAnalyzer
-import pandas as pd
-
-df = pd.read_csv('your_data.csv')
+# 等价写法
 analyzer = DataAnalyzer(df)
-analyzer.analyze_notebook()
+result = analyzer.explore_dataframe(show_plots=False)
 ```
 
 ## 12. 比赛工具 (CompetitionTools) - 专为数据科学比赛设计
@@ -840,9 +845,11 @@ distribution_leakage = detector.detect_distribution_leakage(
     test_df=test_df,
     threshold=0.1
 )
-            if distribution_leakage['has_leakage']:
+if distribution_leakage['has_leakage']:
     print("警告：训练集和测试集分布不一致！")
 ```
+
+> 完整自洽示例（含 `train_df` / `test_df` 定义）见 [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) §3.3。
 
 ### 12.4 模型集成工具
 

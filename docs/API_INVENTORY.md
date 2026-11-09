@@ -3,6 +3,9 @@
 对应 Issue [#11](https://github.com/WangLaoShi/wanglaoshi-pypi/issues/11) / 路线图 A01。  
 Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 
+> **详尽签名 + 已校验可运行示例** 见 **[API_REFERENCE.md](API_REFERENCE.md)**（`python scripts/verify_api_reference.py`）。  
+> 本文件只做短盘点；有冲突以 `API_REFERENCE.md` 与源码为准。
+
 ## 顶层导出（`from wanglaoshi import ...`）
 
 | 名称 | 类型 | 依赖 | 备注 |

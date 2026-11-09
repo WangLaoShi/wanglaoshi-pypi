@@ -1592,28 +1592,22 @@ def analyze_multiple_files(folder_path: str, output_dir: str = "reports") -> Non
                 # 如果分析失败，打印错误信息但继续处理其他文件
                 print(f"分析文件 {file} 时出错: {str(e)}")
 
-def analyze_notebook(df: pd.DataFrame) -> None:
+def analyze_notebook(df: pd.DataFrame, show_plots: bool = True) -> Dict[str, Any]:
     """
-    在Jupyter Notebook中分析数据并显示报告
-    
-    这个函数专门用于Jupyter Notebook环境，可以直接显示分析结果。
-    
+    在 Jupyter Notebook / 交互环境中做探索性分析。
+
+    实现上委托 ``DataAnalyzer.explore_dataframe``（类上没有单独的
+    ``analyze_notebook`` 方法；请用本函数或 ``explore_dataframe``）。
+
     参数:
-        df: pandas DataFrame，要分析的数据集
-        
-    示例（在Jupyter Notebook中）:
-        import pandas as pd
-        df = pd.read_csv("data.csv")
-        analyze_notebook(df)
+        df: 要分析的 DataFrame
+        show_plots: 是否生成分布/相关等图（base64 字符串，可能较慢）
+
+    返回:
+        与 ``explore_dataframe`` 相同的分析结果字典
     """
-    try:
-        # 创建分析器
-        analyzer = DataAnalyzer(df)
-        # 调用notebook专用的分析方法（如果存在）
-        # 注意：这个方法在代码中可能没有实现，这里只是示例
-        analyzer.analyze_notebook()
-    except Exception as e:
-        print(f"分析数据时出错: {str(e)}")
+    analyzer = DataAnalyzer(df)
+    return analyzer.explore_dataframe(name="DataFrame", show_plots=show_plots)
 
 class ReportGenerator:
     """

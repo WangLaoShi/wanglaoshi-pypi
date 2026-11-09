@@ -39,8 +39,9 @@ html:
   baseurl: ""
   extra_navbar: ""
   extra_footer: |
-    <p>基线工坊 · 从 EDA 到提交 · 包名 <code>wanglaoshi</code> · Notebook 可本地 / Binder 复现</p>
-  announcement: "基线工坊：按左侧路径学习；每课含练习；可用 Binder 云端打开 Notebook。"
+    <p>基线工坊 · 从 EDA 到提交 · 包名 <code>wanglaoshi</code>（仓库 wanglaoshi-pypi）·
+    API 说明书见仓库 <code>docs/API_REFERENCE.md</code></p>
+  announcement: "本站教的就是 pip 包 wanglaoshi（仓库 WangLaoShi/wanglaoshi-pypi）。先精讲课，再案例；版面已加宽，手机可横滑代码。"
 
 repository:
   url: https://github.com/WangLaoShi/wanglaoshi-pypi
@@ -57,6 +58,14 @@ sphinx:
     language: zh_CN
     html_show_copyright: true
     nb_execution_show_tb: true
+    html_static_path:
+      - _static
+    html_css_files:
+      - custom.css
+    html_theme_options:
+      # 放宽主题默认页宽（与 _static/custom.css 双保险）
+      show_toc_level: 2
+      navigation_with_keys: true
     suppress_warnings:
       - myst.domains
       - mystnb.unknown_mime_type

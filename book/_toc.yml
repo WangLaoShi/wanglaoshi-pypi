@@ -8,6 +8,16 @@ parts:
       - file: start/first-hour
       - file: start/binder
 
+  - caption: 精讲课（先于案例）
+    chapters:
+      - file: lessons/overview
+      - file: lessons/leakage
+      - file: lessons/cv_and_splits
+      - file: lessons/submission_contracts
+      - file: lessons/feature_fit_discipline
+      - file: lessons/business_traceability
+      - file: lessons/common_mistakes
+
   - caption: 三条主线
     chapters:
       - file: tracks/analyzer
@@ -68,6 +78,8 @@ parts:
   - caption: 参考与证据
     chapters:
       - file: reference/api
+      - file: reference/api-inventory
+      - file: reference/project-status
       - file: reference/skill-mapping
       - file: reference/dependencies
       - file: reference/evidence

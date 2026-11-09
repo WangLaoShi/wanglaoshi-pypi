@@ -27,7 +27,8 @@ book/_build/
 _build/
 book/cases/*.ipynb
 !book/cases/overview.md
-book/reference/api.md
+# api.md 手写维护（链到 API_REFERENCE）；下列为 prepare_book 生成物
+book/reference/api-inventory.md
 book/reference/skill-mapping.md
 book/reference/dependencies.md
 book/reference/evidence.md

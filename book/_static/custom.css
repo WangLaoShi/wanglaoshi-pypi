@@ -1,0 +1,81 @@
+/* 基线工坊：加宽正文 + 自适应
+ * 默认 sphinx-book / pydata 主题正文偏窄；这里放宽并保证小屏可读。
+ */
+
+:root {
+  --wl-content-max: min(110rem, 96vw);
+  --wl-article-max: min(78rem, 100%);
+}
+
+/* 整页最大宽度 */
+.bd-page-width {
+  max-width: var(--wl-content-max) !important;
+}
+
+/* 文章区加宽（桌面） */
+.bd-main .bd-content .bd-article-container {
+  max-width: var(--wl-article-max) !important;
+}
+
+.bd-article {
+  max-width: 100% !important;
+}
+
+/* Notebook / 代码块：小屏可横滑，避免撑破 */
+div.cell_output,
+div.highlight,
+pre,
+.bd-article table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.bd-article table {
+  display: block;
+  width: 100%;
+}
+
+/* 图片自适应 */
+.bd-article img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 平板及以下：侧栏折叠后正文吃满 */
+@media (max-width: 992px) {
+  .bd-main .bd-content .bd-article-container {
+    max-width: 100% !important;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .bd-page-width {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .bd-header .navbar-header-items {
+    gap: 0.25rem;
+  }
+
+  .bd-article h1 {
+    font-size: 1.6rem;
+  }
+
+  .bd-article h2 {
+    font-size: 1.3rem;
+  }
+
+  /* 代码字号略收，减少横向溢出 */
+  .bd-article pre,
+  .bd-article code {
+    font-size: 0.85em;
+  }
+}
+
+/* 顶栏公告：小屏换行 */
+.bd-header-announcement {
+  white-space: normal !important;
+  line-height: 1.4;
+}
