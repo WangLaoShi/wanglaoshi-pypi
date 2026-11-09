@@ -1,0 +1,145 @@
+{
+  "generated_at_utc": "2026-11-09T04:46:32.002476+00:00",
+  "notebook_dir": "examples/advanced",
+  "python": "/opt/anaconda3/bin/python",
+  "timeout_sec": 240,
+  "results": [
+    {
+      "slug": "01_iris",
+      "path": "examples/advanced/01_iris.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:36:32.571624+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:36:36.032416+00:00",
+      "log": "examples/advanced/outputs/evidence/01_iris.log"
+    },
+    {
+      "slug": "02_titanic",
+      "path": "examples/advanced/02_titanic.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:36:36.032822+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:36:38.184911+00:00",
+      "log": "examples/advanced/outputs/evidence/02_titanic.log"
+    },
+    {
+      "slug": "04_breast_cancer",
+      "path": "examples/advanced/04_breast_cancer.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:36:38.185372+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:36:38.798739+00:00",
+      "log": "examples/advanced/outputs/evidence/04_breast_cancer.log"
+    },
+    {
+      "slug": "06_california_housing",
+      "path": "examples/advanced/06_california_housing.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:36:38.800659+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:36:44.151214+00:00",
+      "log": "examples/advanced/outputs/evidence/06_california_housing.log"
+    },
+    {
+      "slug": "12_digit_recognizer",
+      "path": "examples/advanced/12_digit_recognizer.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:36:44.153130+00:00",
+      "error": null,
+      "cells_executed": 8,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:36:52.371505+00:00",
+      "log": "examples/advanced/outputs/evidence/12_digit_recognizer.log"
+    },
+    {
+      "slug": "03_wine_quality",
+      "path": "examples/advanced/03_wine_quality.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:38:45.992820+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:38:50.053787+00:00",
+      "log": "examples/advanced/outputs/evidence/03_wine_quality.log"
+    },
+    {
+      "slug": "07_abalone",
+      "path": "examples/advanced/07_abalone.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:39:37.796814+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:39:42.506655+00:00",
+      "log": "examples/advanced/outputs/evidence/07_abalone.log"
+    },
+    {
+      "slug": "09_mall_customers",
+      "path": "examples/advanced/09_mall_customers.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:39:43.001389+00:00",
+      "error": null,
+      "cells_executed": 6,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:39:48.005501+00:00",
+      "log": "examples/advanced/outputs/evidence/09_mall_customers.log"
+    },
+    {
+      "slug": "08_bike_sharing",
+      "path": "examples/advanced/08_bike_sharing.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:39:48.534450+00:00",
+      "error": null,
+      "cells_executed": 6,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:39:57.835029+00:00",
+      "log": "examples/advanced/outputs/evidence/08_bike_sharing.log"
+    },
+    {
+      "slug": "10_adult_census",
+      "path": "examples/advanced/10_adult_census.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:46:32.002808+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:46:36.579918+00:00",
+      "log": "examples/advanced/outputs/evidence/10_adult_census.log"
+    },
+    {
+      "slug": "05_credit_card_fraud",
+      "path": "examples/advanced/05_credit_card_fraud.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:39:58.240006+00:00",
+      "error": null,
+      "cells_executed": 7,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:40:02.275990+00:00",
+      "log": "examples/advanced/outputs/evidence/05_credit_card_fraud.log"
+    },
+    {
+      "slug": "11_house_prices",
+      "path": "examples/advanced/11_house_prices.ipynb",
+      "status": "passed",
+      "started_at": "2026-11-09T04:40:17.291239+00:00",
+      "error": null,
+      "cells_executed": 6,
+      "mode": "inprocess",
+      "finished_at": "2026-11-09T04:40:37.601010+00:00",
+      "log": "examples/advanced/outputs/evidence/11_house_prices.log"
+    }
+  ],
+  "summary": {
+    "passed": 12,
+    "failed": 0,
+    "total": 12
+  }
+}

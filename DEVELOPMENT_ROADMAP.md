@@ -148,7 +148,7 @@
 - [x] E14 每个案例的数据获取与使用条件核实；Wine Quality 不与 sklearn Wine 混淆，California 首次需下载。
 - [x] E15 比赛提交仅本地生成与校验；无标签测试集不用于本地评估。
 - [x] E16 Kaggle 时间预测的滞后特征只使用预测当时可用信息，不引用未知测试目标。（E08 Notebook 约束）
-- [ ] E17 12 项完成后逐项补运行证据，README 提供学习顺序。（学习顺序已有；完整跑通证据待补）
+- [x] E17 12 项完成后逐项补运行证据，README 提供学习顺序。（`docs/evidence/ADVANCED_EVIDENCE.md`；`scripts/run_advanced_evidence.py`）
 
 原始大数据、模型和生成报告不默认提交。公共下载失败不应伪装成通过，也不绕过登录或条款。
 
@@ -158,7 +158,7 @@
 - [x] F02 核对 Excel 引擎及其他依赖；区分核心与可选安装项。（`docs/DEPENDENCIES.md`）
 - [x] F03 相关旧 API 回归通过，更新兼容与变更说明。（submission + business 回归；详见路线图进度表）
 - [x] F04 销售完整流程无需 AI 运行，数字可追溯，缺证据/缺交付项正确阻断。（BusinessPipeline 主链）
-- [ ] F05 12 个演示和各档测试报告齐全，无隐瞒的跳过或失败。（Notebook 证据待补 = E17）
+- [x] F05 12 个演示和各档测试报告齐全，无隐瞒的跳过或失败。（见 `docs/evidence/`；CI quick 档已接）
 - [x] F06 README 更新用法、配置、自动化边界、支持环境及数据获取方式。（已补 business API；advanced README 已有）
 
 ## 8. Issue 拆分与进度维护
@@ -174,3 +174,4 @@
 | 2026-11-09 | E/D/A/C | 12 Notebook 全部加细；D01–D06 + pipeline；A01–A04 文档/样例；`scripts/run_tests.sh` | 待：D07–D10/D12；E17 跑通证据；F 发布门槛；B 清单勾选对齐测试 |
 | 2026-11-09 | D09/D10/D11 | 结论建议、报告归档、主链跑通；上游 blocked 禁止正式交付 | 待：D08 图表归档；D12 EDA 适配；F01–F06 |
 | 2026-11-09 | D08/D12/F | 图表归档+EDA 适配接入主链；依赖文档与发布烟测 | 待：E17 Notebook 跑通证据；干净环境矩阵 CI |
+| 2026-11-09 | E17/F05/CI | 12 Notebook 进程内跑通证据全绿；修复 Abalone/Adult；升级 Actions 安装 `-e .` | 可选：矩阵扩到 3.12；发布 PyPI |

@@ -52,6 +52,14 @@ jupyter notebook examples/advanced/
 7. `SubmissionGenerator` 本地生成与校验
 8. 误差分析与检查清单
 
+## 跑通证据（E17）
+
+```bash
+python scripts/run_advanced_evidence.py
+```
+
+汇总见 `docs/evidence/ADVANCED_EVIDENCE.md`（JSON：`docs/evidence/advanced_evidence.json`）。
+
 ## 重新生成
 
 - **详细版（推荐，案例专属）**：

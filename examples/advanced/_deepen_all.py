@@ -1013,9 +1013,10 @@ else:
 rename = {c: c.strip() for c in df.columns}
 df = df.rename(columns=rename)
 if 'Rings' not in df.columns:
-    # OpenML 有时叫 class
+    # OpenML 常见: Class_number_of_rings / class
     for c in df.columns:
-        if c.lower() in ('rings', 'class'):
+        cl = c.lower()
+        if cl in ('rings', 'class') or 'ring' in cl:
             df = df.rename(columns={c: 'Rings'})
             break
 df['Rings'] = pd.to_numeric(df['Rings'], errors='coerce')
@@ -1458,6 +1459,12 @@ for c in ['income', 'class', 'target', '>50K']:
         target_col = c
         break
 assert target_col, list(df.columns)
+
+# QUICK：抽样，避免全量 + SVM 过慢
+if QUICK and len(df) > 4000:
+    df = df.sample(4000, random_state=RANDOM_STATE).reset_index(drop=True)
+    print('QUICK sampled', df.shape)
+
 print('target', target_col, df[target_col].value_counts())
 df.head()
 """
@@ -1514,15 +1521,42 @@ Xte_f = Xte_te[feat].apply(pd.to_numeric, errors='coerce').fillna(0)
 print(Xtr_f.shape)
 """
             ),
-            md("## 4. QuickBaseline"),
+            md("## 4. QuickBaseline（先缩放；QUICK 跳过慢速 SVM）"),
             code(
                 """
 from wanglaoshi import CompetitionTools as CT
-from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
+import pandas as pd
 
-baseline = CT.QuickBaseline()
-results = baseline.run_all_models(Xtr_f, pd.Series(ytr), Xte_f, pd.Series(yte), task_type='classification')
-comparison = baseline.compare_models(results, top_n=5)
+scaler = StandardScaler()
+Xtr_s = pd.DataFrame(scaler.fit_transform(Xtr_f), columns=Xtr_f.columns, index=Xtr_f.index)
+Xte_s = pd.DataFrame(scaler.transform(Xte_f), columns=Xte_f.columns, index=Xte_f.index)
+
+if QUICK:
+    # 避免 SVC 在未调参全量上过慢
+    models = {
+        'Logistic Regression': LogisticRegression(max_iter=500, random_state=RANDOM_STATE),
+        'Random Forest': RandomForestClassifier(n_estimators=80, random_state=RANDOM_STATE, n_jobs=-1),
+        'Naive Bayes': GaussianNB(),
+    }
+    results = {}
+    rows = []
+    for name, model in models.items():
+        model.fit(Xtr_s, ytr)
+        pred_i = model.predict(Xte_s)
+        acc = float((pred_i == np.asarray(yte)).mean())
+        results[name] = {'model': model, 'predictions': pred_i}
+        rows.append({'Model': name, 'Test Accuracy': acc})
+    comparison = pd.DataFrame(rows).sort_values('Test Accuracy', ascending=False).reset_index(drop=True)
+else:
+    baseline = CT.QuickBaseline()
+    results = baseline.run_all_models(Xtr_s, pd.Series(ytr), Xte_s, pd.Series(yte), task_type='classification')
+    comparison = baseline.compare_models(results, top_n=5)
+
 display(comparison)
 best = comparison.iloc[0]['Model']
 pred = results[best]['predictions']
