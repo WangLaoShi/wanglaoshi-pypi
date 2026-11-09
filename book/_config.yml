@@ -1,8 +1,8 @@
-# Jupyter Book 配置 —— 王老师 wanglaoshi 公开学习手册
+# Jupyter Book 配置 —— 基线工坊（产品名）；包名仍为 wanglaoshi
 # 构建：python scripts/build_book.py
 # 说明：book/README.md 与 docs/DEPENDENCIES.md
 
-title: 王老师 wanglaoshi 学习手册
+title: 基线工坊 · 从 EDA 到提交
 author: WangLaoShi
 copyright: "2026"
 logo: ""
@@ -39,8 +39,8 @@ html:
   baseurl: ""
   extra_navbar: ""
   extra_footer: |
-    <p>开源学习手册 · 源码与 Issues 见 GitHub · Notebook 可本地复现</p>
-  announcement: "按左侧路径学习；每课含练习；可用 Binder 云端打开 Notebook。"
+    <p>基线工坊 · 从 EDA 到提交 · 包名 <code>wanglaoshi</code> · Notebook 可本地 / Binder 复现</p>
+  announcement: "基线工坊：按左侧路径学习；每课含练习；可用 Binder 云端打开 Notebook。"
 
 repository:
   url: https://github.com/WangLaoShi/wanglaoshi-pypi

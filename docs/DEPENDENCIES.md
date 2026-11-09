@@ -27,7 +27,7 @@
 | 还要用 Optuna 贝叶斯调参 | `pip install "wanglaoshi[optuna]"` |
 | 上面非深度学习的可选一次装齐 | `pip install "wanglaoshi[all]"` |
 | 本地开发 / 跑 pytest | `pip install -e ".[dev]"` |
-| 构建 Jupyter Book 学习手册 | `pip install -e ".[book]"` 后执行 `python scripts/build_book.py` |
+| 构建基线工坊教材站（Jupyter Book） | `pip install -e ".[book]"` 后执行 `python scripts/build_book.py` |
 | 深度学习 `MLDL` | **不要**指望 extras；请按 [PyTorch 官网](https://pytorch.org/) 安装匹配的 `torch` |
 
 组合写法：
@@ -77,7 +77,7 @@ pip install -e ".[dev,excel]"
 | `jupyter` | `jupyter`, `ipykernel` | `examples/`、进阶 Notebook |
 | `optuna` | `optuna` | `HyperparameterOptimizer.bayesian_optimize` |
 | `dev` | `pytest`, `pytest-cov`, `flake8` | 开发与 CI |
-| `book` | `jupyter-book`, `jupyter`, `ipykernel` | 构建公开学习手册 / Pages |
+| `book` | `jupyter-book`, `jupyter`, `ipykernel` | 构建基线工坊 / Pages |
 | `all` | `excel` + `jupyter` + `optuna` | 一次性装齐（**不含** torch / dev / book） |
 
 ### 未安装时的行为

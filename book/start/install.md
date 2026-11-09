@@ -40,7 +40,7 @@ python -c "import wanglaoshi; from wanglaoshi import DataAnalyzer, BusinessPipel
 python scripts/smoke_docs_examples.py
 ```
 
-## 构建本学习手册（维护者）
+## 构建基线工坊站点（维护者）
 
 ```bash
 python -m pip install -e ".[book]"

@@ -1,10 +1,10 @@
-# 王老师 WangLaoShi
+# 基线工坊 · 从 EDA 到提交
 
-当前版本：**0.14.0**
+当前版本：**0.14.0** · Python 包名：`wanglaoshi`（作者 WangLaoShi）
 
 ## 项目介绍
 
-`wanglaoshi` 是一个面向 **数据分析入门学生** 和 **数据科学竞赛选手（如 Kaggle）** 的学习与实战工具包，主要特点：
+**基线工坊** 是面向 **数据分析入门学生** 与 **数据科学竞赛选手（如 Kaggle）** 的学习与实战工具包（`pip install wanglaoshi`），主要特点：
 
 - **一键 EDA**：`Analyzer` / `DataAnalyzer` 做缺失、异常、相关、PCA 与 HTML 报告
 - **比赛工具链**：`CompetitionTools` 提供提交生成与校验、快速基线、集成、调参、实验追踪
@@ -19,7 +19,7 @@
 
 | 入口 | 说明 |
 | --- | --- |
-| [book/](book/) | **Jupyter Book 公开学习手册**（Notebook 教材 + 学习路径） |
+| [book/](book/) | **基线工坊** 公开教材站（Notebook + 练习 + 学习路径） |
 | [examples/README.md](examples/README.md) | 示例总览（Analyzer / 业务 / 12 进阶案例） |
 | [examples/advanced/README.md](examples/advanced/README.md) | 12 个进阶 Notebook 学习顺序 |
 | [docs/README.md](docs/README.md) | 开发文档索引（API、Skill 映射、依赖、证据） |
@@ -34,7 +34,7 @@ wanglaoshi-pypi
 ├── setup.py                      # install_requires + extras_require
 ├── requirements.txt              # 转发到 requirements/core.txt
 ├── requirements/                 # core / examples / dev
-├── book/                         # Jupyter Book 学习手册（公开站点源）
+├── book/                         # 基线工坊 Jupyter Book（公开站点源）
 ├── DEVELOPMENT_ROADMAP.md
 ├── docs/                         # API / Skill / 依赖 / 跑通证据
 ├── examples/                     # 可运行示例
@@ -90,9 +90,9 @@ pip install wanglaoshi
 
 深度学习请按 [PyTorch 官网](https://pytorch.org/) 自行安装 `torch`；未安装不影响其他功能。
 
-### 学习手册（Jupyter Book / GitHub Pages）
+### 基线工坊（Jupyter Book / GitHub Pages）
 
-把 12 个进阶 Notebook、**每课练习**、**中文术语表**、**业务流水线专章**做成可浏览教材：
+把 12 个进阶 Notebook、**每课练习**、**中文术语表**、**业务流水线专章**做成可浏览教材（**基线工坊 · 从 EDA 到提交**）：
 
 ```bash
 python -m pip install -e ".[book]"
