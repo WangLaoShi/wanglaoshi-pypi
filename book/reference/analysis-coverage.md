@@ -20,37 +20,37 @@
 | 不均衡 / PR-AUC | ✅ | E05、E04 | 无专用 API（自写 sklearn） |
 | 回归 + 目标变换 | ✅ | E06、E07、E11、E03 | `QuickBaseline` |
 | 空间 / 分组 CV | ✅ | E06 | `CrossValidator.group_cv` |
-| 时间划分 + 滞后 | ✅ | E08；E15 | `extract_datetime_features` / `detect_time_leakage` |
+| 时间划分 + 滞后 | ✅ | E08；E15 | `extract_datetime_features` / `detect_time_leakage`；**P1 `TimeSeriesTools.safe_lag`** |
 | 聚类稳定性 | ✅ | E09 | 无专用 API |
 | 目标编码防泄漏 | ✅ | E10 | `target_encode`（须折内） |
 | 集成 | ✅ | E11 | `ModelEnsemble` |
 | 业务可追溯流水线 | ✅ | business_pipeline | `BusinessPipeline` |
-| 假设检验（t / χ² / ANOVA） | ✅ | E14 | ❌ 无统一接口 |
-| A/B 试验 / 功效 / 效应量 | ✅ | E13 | ❌ 无试验设计 API |
-| 贝叶斯 A/B / 先验敏感性 | ✅ | **并入 E13** | ❌（共轭解析；pymc 可选） |
-| 时序分解 / 平稳性 / 简单预测 | ✅ | E15 | ❌ 无分解封装 |
-| 缺期对齐 / 同比（零基数/未完月） | ✅ | **并入 E15** | ❌ 业务 D04 深水区 |
+| 假设检验（t / χ² / ANOVA） | ✅ | E14 | ✅ `StatsToolkit` |
+| A/B 试验 / 功效 / 效应量 | ✅ | E13 | ✅ `ExperimentDesign` |
+| 贝叶斯 A/B / 先验敏感性 | ✅ | **并入 E13** | ✅ `bayes_prob_beat`（共轭；pymc 可选） |
+| 时序分解 / 平稳性 / 简单预测 | ✅ | E15 | ✅ `TimeSeriesTools.decompose_summary` / `adf_report` |
+| 缺期对齐 / 同比（零基数/未完月） | ✅ | **并入 E15** | ✅ `yoy_with_rules` / `complete_period_index` |
 | 生存 / 流失（KM） | ✅ | E16 | ❌ 无生存模块 |
 | 文本 EDA / 词袋特征 | ✅ | E17 | `extract_text_features`（浅） |
-| 异常检测（无标签） | ✅ | E18 | ❌ 无 IsolationForest 封装 |
+| 异常检测（无标签） | ✅ | E18 | ✅ `AnomalyDetector` |
 | 关联规则 / 购物篮 | ✅ | E19 | ❌ 宜放 extras |
 | 因果推断 / DiD 入门 | ✅ | E20 | ❌ 无因果模块（刻意） |
-| 多表关联膨胀 / 三表对账 | ✅ | **E21** | ❌ D02 深水区 S2 |
-| 推荐 / 排序指标（NDCG） | ✅ | **E22** | ❌ 无 RankingMetrics |
-| 校准曲线 / Brier / ECE | ✅ | **并入 E04** | ❌ 无校准 API |
-| 公平性系统化审计 | ✅ | **并入 E10** | ❌ 无 GroupMetricsReport |
+| 多表关联膨胀 / 三表对账 | ✅ | **E21** | ✅ `check_join_inflation` / `reconcile_to_source` |
+| 推荐 / 排序指标（NDCG） | ✅ | **E22** | ✅ `RankingMetrics` |
+| 校准曲线 / Brier / ECE | ✅ | **并入 E04** | ✅ `CalibrationReport` |
+| 公平性系统化审计 | ✅ | **并入 E10** | ✅ `GroupMetricsReport` |
 
 ## 2. 由案例反推的包优化优先级
 
 | 优先级 | 优化项 | 依据案例 | 建议 |
 | --- | --- | --- | --- |
-| P0 | `StatsToolkit` / `ExperimentDesign` | E14 / E13 | 含贝叶斯门槛概率可选 |
-| P0 | 业务 D02 多表关联 + 膨胀/对账日志 | **E21** | 路线图 S2 |
-| P0 | 业务 D04 缺期对齐 / 同比规则 | **E15 增补** | 路线图 S3 |
-| P1 | `TimeSeriesTools` / `SurvivalAnalyzer` / `AnomalyDetector` | E15 / E16 / E18 | |
-| P1 | `RankingMetrics.ndcg_at_k` | **E22** | |
-| P1 | 概率校准 + ECE 报表 | **E04 增补** | |
-| P1 | `GroupMetricsReport` 公平性 | **E10 增补** | |
+| P0 | `StatsToolkit` / `ExperimentDesign` | E14 / E13 | ✅ 已落地最小版 |
+| P0 | 业务 D02 多表关联 + 膨胀/对账日志 | **E21** | ✅ `reconciliation.py` |
+| P0 | 业务 D04 缺期对齐 / 同比规则 | **E15 增补** | ✅ `calendar.py` |
+| P1 | `TimeSeriesTools` / `AnomalyDetector` | E15 / E18 | ✅ 最小版；生存仍待 |
+| P1 | `RankingMetrics.ndcg_at_k` | **E22** | ✅ |
+| P1 | 概率校准 + ECE 报表 | **E04 增补** | ✅ `CalibrationReport` |
+| P1 | `GroupMetricsReport` 公平性 | **E10 增补** | ✅ |
 | P2 | 文本中文分词、关联规则 extras | E17 / E19 | |
 
 ## 3. 课号一览（E01–E22）

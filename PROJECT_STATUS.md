@@ -115,8 +115,8 @@
 | --- | --- | --- |
 | P0 | `StatsToolkit` / `ExperimentDesign` | E14 / E13 → ✅ |
 | P0 | 业务多表关联膨胀（S2） | E21 → ✅ |
-| P1 | `TimeSeriesTools` / `SurvivalAnalyzer` / `AnomalyDetector` | E15 / E16 / E18 |
-| P2 | 文本中文分词、关联规则 extras、校准与公平性报表 | E17 / E19 / E04·E10 |
+| P1 | `TimeSeriesTools` / `AnomalyDetector` / `RankingMetrics` / 校准 / 公平性 | → ✅ 最小版（生存仍待） |
+| P2 | 文本中文分词、关联规则 extras | E17 / E19 |
 
 ---
 
@@ -160,3 +160,4 @@
 | 2026-11-09 | wave3：E21–E22 + 六缺口收口；证据 22/22 |
 | 2026-11-09 | 课号统一为 E01–E22；配套勾选改称 EM01–EM05 |
 | 2026-11-10 | P0：`reconciliation` / `calendar` / `stats` 最小版 + 测试 |
+| 2026-11-10 | P1：`TimeSeriesTools` / `CalibrationReport` / `GroupMetricsReport` / `AnomalyDetector` / `RankingMetrics` |

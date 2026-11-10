@@ -646,6 +646,46 @@ print("stats OK", round(t["pvalue"], 4), n["n_per_arm"], round(bayes["prob_b_bea
 
 ---
 
+## 5.6 P1 分析工具箱
+
+| 名称 | 用途 |
+| --- | --- |
+| `TimeSeriesTools` | 分解摘要 / ADF / 安全滞后与滚动均值 |
+| `CalibrationReport` | Brier / ECE / 可靠性表 |
+| `GroupMetricsReport` | 分组 n / TPR / FPR |
+| `AnomalyDetector` | IsolationForest 薄封装 |
+| `RankingMetrics` | NDCG@K / Hit@K |
+
+```python
+# 【可运行】
+import numpy as np
+import pandas as pd
+from wanglaoshi import (
+    TimeSeriesTools,
+    CalibrationReport,
+    GroupMetricsReport,
+    AnomalyDetector,
+    RankingMetrics,
+)
+
+df = pd.DataFrame({"y": np.arange(20, dtype=float)})
+lagged = TimeSeriesTools.safe_lag(df, "y", lags=(1,))
+assert "y_lag1" in lagged.columns
+y = np.array([0, 1, 0, 1, 1, 0, 1, 0])
+p = np.array([0.1, 0.8, 0.2, 0.7, 0.6, 0.3, 0.9, 0.4])
+cal = CalibrationReport.summarize(y, p, n_bins=4)
+assert "ece" in cal
+audit = GroupMetricsReport.audit(y, (p >= 0.5).astype(int), {"g": ["a", "a", "b", "b", "a", "b", "a", "b"]})
+assert len(audit) >= 1
+X = np.vstack([np.random.default_rng(0).normal(0, 1, (40, 2)), np.random.default_rng(0).normal(4, 1, (5, 2))])
+summ = AnomalyDetector(contamination=0.1, random_state=0).fit_predict_summary(X)
+assert summ["n_flagged"] >= 1
+assert RankingMetrics.ndcg_at_k([1, 2, 3], {1}, k=3) == 1.0
+print("p1 toolkit OK", round(cal["ece"], 4), summ["n_flagged"])
+```
+
+---
+
 ## 6. `VERSIONS`
 
 | 函数 | 说明 |

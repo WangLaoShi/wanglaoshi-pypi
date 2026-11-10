@@ -77,6 +77,11 @@ from .business import (
 )
 from . import stats
 from .stats import StatsToolkit, ExperimentDesign
+from .timeseries import TimeSeriesTools
+from .calibration import CalibrationReport, expected_calibration_error
+from .fairness import GroupMetricsReport
+from .anomaly import AnomalyDetector
+from .ranking import RankingMetrics
 
 __all__ = [
     # 模块
@@ -116,4 +121,10 @@ __all__ = [
     "stats",
     "StatsToolkit",
     "ExperimentDesign",
+    "TimeSeriesTools",
+    "CalibrationReport",
+    "expected_calibration_error",
+    "GroupMetricsReport",
+    "AnomalyDetector",
+    "RankingMetrics",
 ]

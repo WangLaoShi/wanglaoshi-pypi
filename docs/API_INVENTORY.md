@@ -25,6 +25,11 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `check_join_inflation` / `reconcile_to_source` | 函数 | pandas | 连接膨胀 / 源表对账（P0） |
 | `complete_period_index` / `yoy_with_rules` | 函数 | pandas | 缺期骨架 / 同比规则（P0） |
 | `stats` / `StatsToolkit` / `ExperimentDesign` | 模块/类 | scipy/statsmodels | 假设检验与 A/B（P0） |
+| `TimeSeriesTools` | 类 | statsmodels/pandas | 分解 / ADF / 安全滞后（P1） |
+| `CalibrationReport` | 类 | sklearn | Brier / ECE（P1） |
+| `GroupMetricsReport` | 类 | sklearn | 分组公平性审计（P1） |
+| `AnomalyDetector` | 类 | sklearn | IsolationForest（P1） |
+| `RankingMetrics` | 类 | numpy | NDCG@K（P1） |
 
 ## CompetitionTools 关键契约
 
