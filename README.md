@@ -49,13 +49,11 @@ wanglaoshi-pypi
 ├── scripts/                      # 测试 / 证据 / 构建手册
 ├── tests/                        # pytest
 └── wanglaoshi/
-    ├── Analyzer.py / Analyzer_Plain.py
-    ├── CompetitionTools.py
-    ├── FeatureEngineering.py
-    ├── business/                 # 业务 Skill 流水线
-    ├── VERSIONS.py / JupyterEnv.py / JupyterFont.py / Useful.py / WebGetter.py
-    ├── MLDL.py                   # 可选（torch）
-    └── __init__.py
+    ├── compete/ analyze/ features/ analytics/ runtime/ _testing/  # 门面（实现所在）
+    ├── business/ stats/          # 业务流水线 / 统计工具
+    ├── Analyzer.py 等            # 兼容 shim（旧 import 仍可用）
+    ├── Analyzer_Plain.py / wqe.py / MLDL.py  # legacy / 可选
+    └── __init__.py               # 详见 docs/ARCHITECTURE.md
 ```
 
 ## 项目版本（摘要）

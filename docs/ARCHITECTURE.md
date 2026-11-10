@@ -65,10 +65,17 @@ wanglaoshi/
 ## 4. 兼容性验收
 
 ```bash
+python scripts/check_architecture.py   # 或 ./scripts/run_tests.sh arch
+./scripts/run_tests.sh quick
+./scripts/run_tests.sh coverage        # 行覆盖门槛 + 函数级 100%
+```
+
+手工等价检查：
+
+```bash
 python -c "from wanglaoshi import DataAnalyzer, CompetitionTools, ready"
 python -c "from wanglaoshi.compete import SubmissionGenerator"
 python -c "from wanglaoshi.analyze import DataAnalyzer"
 python -c "from wanglaoshi.analytics import StatsToolkit"
 python -c "from wanglaoshi._testing import assert_close"
-./scripts/run_tests.sh quick
 ```

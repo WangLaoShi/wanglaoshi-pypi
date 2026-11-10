@@ -167,3 +167,21 @@ def test_setup_extras_include_compete_business() -> None:
     assert re.search(r"['\"]compete['\"]\s*:", text)
     assert re.search(r"['\"]business['\"]\s*:", text)
     assert re.search(r"['\"]dev['\"]\s*:", text)
+
+
+@pytest.mark.quick
+def test_check_architecture_script_passes() -> None:
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    proc = subprocess.run(
+        [sys.executable, str(root / "scripts" / "check_architecture.py")],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert "PASSED" in proc.stdout
