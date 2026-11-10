@@ -33,3 +33,6 @@ book/reference/skill-mapping.md
 book/reference/dependencies.md
 book/reference/evidence.md
 .coverage
+artifacts/
+coverage.xml
+htmlcov/

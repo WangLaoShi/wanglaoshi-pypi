@@ -33,6 +33,12 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `SurvivalAnalyzer` | 类 | numpy | Kaplan–Meier（P1） |
 | `convert_units` | 函数 | pandas | 单位换算（S1） |
 | `assert_close` / `assert_metrics_close` / `assert_frame_contract` | 函数 | numpy/pandas | C04 测试断言 |
+| `DataRegistry` / `file_sha256` | 类/函数 | stdlib | C02 数据登记与哈希 |
+| `ExperimentContext` | 类 | sklearn | C03 划分/种子/环境 |
+| `SCORE_FLOORS` / `assert_above_floor` | 常量/函数 | — | C05 分数下限 |
+| `ChartMeta` / `assert_report_ok` / `write_chart_sidecar` | 类/函数 | — | C06 报告与图表元信息 |
+| `RegressionSummary` / `from_junit_xml` | 类/函数 | — | C10 回归汇总 |
+| `require_data_path` / `optional_data_available` | 函数 | pytest | C11 缺数据跳过 |
 | `validate_metric_dict` / `default_metric_registry` | 函数 | — | S5 指标口径版本登记 |
 
 ## CompetitionTools 关键契约

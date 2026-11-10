@@ -86,6 +86,12 @@ from .anomaly import AnomalyDetector
 from .ranking import RankingMetrics
 from .survival import SurvivalAnalyzer
 from .asserting import assert_close, assert_metrics_close, assert_frame_contract
+from .data_registry import DataRegistry, file_sha256
+from .experiment_context import ExperimentContext
+from .score_floors import SCORE_FLOORS, assert_above_floor
+from .report_meta import ChartMeta, assert_report_ok, write_chart_sidecar
+from .regression_summary import RegressionSummary, from_junit_xml
+from .testing_utils import require_data_path, optional_data_available
 
 __all__ = [
     # 模块
@@ -137,4 +143,16 @@ __all__ = [
     "assert_close",
     "assert_metrics_close",
     "assert_frame_contract",
+    "DataRegistry",
+    "file_sha256",
+    "ExperimentContext",
+    "SCORE_FLOORS",
+    "assert_above_floor",
+    "ChartMeta",
+    "assert_report_ok",
+    "write_chart_sidecar",
+    "RegressionSummary",
+    "from_junit_xml",
+    "require_data_path",
+    "optional_data_available",
 ]

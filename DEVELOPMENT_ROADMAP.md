@@ -114,17 +114,17 @@
 | 安装兼容 | 构建包、模板、可选依赖、环境矩阵 | 发布前 |
 
 - [x] C01 配置 pytest、分层标记和快速/完整/发布运行入口。（`pytest.ini` + `scripts/run_tests.sh`）
-- [ ] C02 数据登记来源、使用条件、版本、哈希和缓存；下载与测试分离。
-- [ ] C03 固定划分、种子、抽样和搜索预算；记录环境。
+- [x] C02 数据登记来源、使用条件、版本、哈希和缓存；下载与测试分离。（`wanglaoshi/data_registry.py`）
+- [x] C03 固定划分、种子、抽样和搜索预算；记录环境。（`wanglaoshi/experiment_context.py`）
 - [x] C04 数值公式用明确容差；字段、行数、顺序用精确断言。（`wanglaoshi/asserting.py` + `tests/test_c04_numeric_contracts.py`）
-- [ ] C05 模型采用预先说明的合理下限/容差，不要求改进方案必胜或跨版本分数完全相同。
-- [ ] C06 报告检查章节、数字引用、资源；图表检查数据与元信息，不默认逐字节比较。
+- [x] C05 模型采用预先说明的合理下限/容差，不要求改进方案必胜或跨版本分数完全相同。（`wanglaoshi/score_floors.py`）
+- [x] C06 报告检查章节、数字引用、资源；图表检查数据与元信息，不默认逐字节比较。（`wanglaoshi/report_meta.py`）
 - [x] C07 覆盖全空/常数列、单类别、小样本、高维、未见类别、中文、错误日期和重复键。（`tests/test_c07_edge_datasets.py`）
 - [x] C08 验证编码、选择、调参只在训练折拟合；泄露检测器不能代替流程隔离。（`tests/test_c08_fold_fit_discipline.py`）
 - [x] C09 业务样例含退款、取消、单位、缺期、零基期、关联膨胀、缺目标与隐私；关键结果手工预计算。（`tests/test_c09_business_dirty_cases.py`）
-- [ ] C10 汇总案例×模块状态、失败/跳过原因、指标、耗时与版本，保存回归产物。
-- [ ] C11 日常缺外部数据可明确跳过；发布必需案例缺数据视为验收未完成。
-- [ ] C12 变更代码行覆盖率以 80% 为初始参考，关键口径与已知 Bug 边界必须覆盖；先运行后校准资源门槛。
+- [x] C10 汇总案例×模块状态、失败/跳过原因、指标、耗时与版本，保存回归产物。（`wanglaoshi/regression_summary.py` + `scripts/run_tests.sh summary`）
+- [x] C11 日常缺外部数据可明确跳过；发布必需案例缺数据视为验收未完成。（`wanglaoshi/testing_utils.py`）
+- [x] C12 变更代码行覆盖率以 80% 为初始参考，关键口径与已知 Bug 边界必须覆盖；先运行后校准资源门槛。（`scripts/run_tests.sh coverage`，默认 fail-under=0 可调 `COV_FAIL_UNDER`）
 
 快速档限制数据和模型预算；完整档运行全案例；发布档增加安装兼容验证。环境矩阵先核对实际依赖与 `python_requires`，再声明最低支持版本和当前稳定版本；不虚假承诺未经验证的兼容性。初期流水线可先单环境运行，再扩展 Linux/Windows/macOS。耗时与内存阈值在固定环境建立基准后启用。
 
