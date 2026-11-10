@@ -1,13 +1,10 @@
-"""统计分析与试验设计最小工具（P0）。
+"""兼容 shim：实现已迁至 ``wanglaoshi.analytics.stats``。"""
 
-推荐用法::
+from __future__ import annotations
 
-    from wanglaoshi.stats import StatsToolkit, ExperimentDesign
-    StatsToolkit.ttest_ind(a, b)
-    ExperimentDesign.two_proportion_test(x1, n1, x2, n2)
-"""
+import sys
 
-from .toolkit import StatsToolkit
-from .experiment import ExperimentDesign
+from ..analytics import stats as _impl
 
-__all__ = ["StatsToolkit", "ExperimentDesign"]
+# 将本包命名空间换成真实实现包
+sys.modules[__name__] = _impl

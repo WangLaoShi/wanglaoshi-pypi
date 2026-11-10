@@ -34,8 +34,9 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `assert_close` / `DataRegistry` / `ExperimentContext` / … | 函数/类 | 视功能而定 | **稳定**捷径（等价 `_testing`） |
 | `JupyterEnv` / `VERSIONS` / `JupyterFont` / `Useful` / `WebGetter` | 模块 | 视功能而定 | **兼容**；推荐 `runtime` 门面 |
 | `Analyzer` / `CompetitionTools` / `FeatureEngineering` | 模块 | sklearn/pandas | **兼容**；推荐对应门面 |
-| `Analyzer_Plain` | 模块 | 同上 | **Legacy** soft deprecate；`WANGLAOSHI_SILENCE_LEGACY=1` 可关警告 |
-| `wqe`（非顶层 `__all__`） | 模块 | 同上 | **Legacy** soft deprecate；请优先 `wanglaoshi.analyze` |
+| `Analyzer_Plain` | 模块 | 同上 | **Legacy**→`analyze.plain`；soft deprecate；`WANGLAOSHI_SILENCE_LEGACY=1` 可关 |
+| `wqe`（非顶层 `__all__`） | 模块 | 同上 | **Legacy**→`analyze.wqe`；请优先 `wanglaoshi.analyze` |
+| `stats` | 子包 shim | scipy/statsmodels | 实现在 `analytics/stats`；`from wanglaoshi.stats import …` 仍可用 |
 | `MLDL` | 可选模块 | **torch** | **兼容**；未装 torch 时可能为 `None` |
 | `JupyterEnv.no_warning` | 函数 | warnings | 仅关警告；课堂请优先 `ready()` |
 | `validate_metric_dict` / `default_metric_registry` | 函数 | — | S5 指标口径版本登记 |

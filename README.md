@@ -50,9 +50,9 @@ wanglaoshi-pypi
 ├── tests/                        # pytest
 └── wanglaoshi/
     ├── compete/ analyze/ features/ analytics/ runtime/ _testing/  # 门面（实现所在）
-    ├── business/ stats/          # 业务流水线 / 统计工具
-    ├── Analyzer.py 等            # 兼容 shim（旧 import 仍可用）
-    ├── Analyzer_Plain.py / wqe.py / MLDL.py  # legacy / 可选
+    ├── business/                 # 业务 Skill 流水线
+    ├── Analyzer.py / stats/ 等   # 兼容 shim（旧 import 仍可用）
+    ├── Analyzer_Plain.py / wqe.py / MLDL.py  # legacy shim / 可选 torch
     └── __init__.py               # 详见 docs/ARCHITECTURE.md
 ```
 

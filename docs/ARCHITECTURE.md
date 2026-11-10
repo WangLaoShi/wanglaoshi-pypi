@@ -10,10 +10,10 @@
 ```text
 wanglaoshi/
   compete/      # 竞赛：submission / baseline / leakage / …
-  analyze/      # EDA / 报告（core.py = DataAnalyzer）
+  analyze/      # EDA（core.py）+ legacy（plain.py / wqe.py）
   features/     # 特征工程（engineering.py）
   business/     # 业务流水线
-  analytics/    # 时序 / 生存 / 排序 / 公平 / 校准 / 异常（stats/ 仍在包根）
+  analytics/    # 时序 / 生存 / 排序 / 公平 / 校准 / 异常 / stats/
   runtime/      # ready / jupyter_* / versions / web_getter / useful
   _testing/     # 断言 / 分数下限 / 回归汇总 / 数据台账 / 实验上下文
 ```
@@ -24,9 +24,10 @@ wanglaoshi/
 | `analyze` | `analyze/core.py` | `Analyzer.py`（shim） |
 | `features` | `features/engineering.py` | `FeatureEngineering.py`（shim） |
 | `business` | `business/*` | 同左 |
-| `analytics` | `analytics/*.py` + `stats/` | `timeseries.py` 等（shim） |
+| `analytics` | `analytics/*.py` + `analytics/stats/` | `timeseries.py` / `stats/`（shim） |
 | `runtime` | `runtime/*.py` | `ready.py` / `JupyterEnv.py` 等（shim） |
 | `_testing` | `_testing/*.py` | `asserting.py` 等（shim） |
+| legacy EDA | `analyze/plain.py` / `analyze/wqe.py` | `Analyzer_Plain.py` / `wqe.py`（shim + warning） |
 
 顶层 `from wanglaoshi import DataAnalyzer, ready, …` **继续支持**（兼容课堂旧代码）。
 
@@ -58,7 +59,8 @@ wanglaoshi/
 
 - 不改 Notebook 课号与 Book 目录（教材旧 import 仍可用）。
 - 不强制用户立刻改 import（仅 soft warning）。
-- `stats/` 暂留包根（已是子包）；`Analyzer_Plain` / `wqe` / `MLDL` 不在本轮物理迁入。
+- `MLDL` 仍留包根（可选 torch，单独演进）。
+- Phase 4 之后补迁：`stats/` → `analytics/stats/`；`Analyzer_Plain`/`wqe` → `analyze/{plain,wqe}.py`。
 
 ---
 

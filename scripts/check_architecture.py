@@ -40,15 +40,18 @@ def check_imports_and_identity() -> list[str]:
         from wanglaoshi.compete import SubmissionGenerator
         from wanglaoshi.features import AdvancedFeatureEngineer
         from wanglaoshi.runtime import JupyterEnv, VERSIONS, ready as ready_rt
+        from wanglaoshi.stats import StatsToolkit as ST_shim
 
         assert DA_facade is DataAnalyzer is DA_shim
         assert SubmissionGenerator is SG_ct is CompetitionTools.SubmissionGenerator
         assert AdvancedFeatureEngineer is FE_shim
         assert assert_close is ac_shim
+        assert StatsToolkit is ST_shim
         assert ready is ready_rt
         assert callable(ready) and StatsToolkit is not None
         assert hasattr(VERSIONS, "show_env_info")
         assert hasattr(JupyterEnv, "no_warning")
+        assert StatsToolkit.__module__.startswith("wanglaoshi.analytics.stats.")
         _ok("facade / shim / top-level imports + identity")
     except Exception as exc:  # noqa: BLE001
         errors.append(f"import/identity: {exc}")

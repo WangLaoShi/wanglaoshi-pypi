@@ -5,8 +5,8 @@
     from wanglaoshi.analyze import DataAnalyzer, analyze_data
 
 说明：
-- ``Analyzer_Plain`` / ``wqe`` 为历史并行路径；导入会发 DeprecationWarning
-  （``WANGLAOSHI_SILENCE_LEGACY=1`` 可关）。新代码请优先本门面。
+- legacy 实现：``analyze.plain`` / ``analyze.wqe``（根上 ``Analyzer_Plain`` / ``wqe`` 为 shim）；
+  导入会发 DeprecationWarning（``WANGLAOSHI_SILENCE_LEGACY=1`` 可关）。
 """
 
 from __future__ import annotations
