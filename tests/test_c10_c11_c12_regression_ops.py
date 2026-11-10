@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -57,6 +58,64 @@ def test_c10_from_junit_xml(tmp_path: Path) -> None:
 
 
 @pytest.mark.quick
+def test_c10_junit_error_and_nested_suites(tmp_path: Path) -> None:
+    junit = tmp_path / "junit.xml"
+    junit.write_text(
+        """<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+  <testsuite name="a" tests="2">
+    <testcase classname="pkg.a" name="err" time="0.01">
+      <error message="boom-err">trace</error>
+    </testcase>
+    <testcase classname="pkg.a" name="ok" time="0.02"/>
+  </testsuite>
+</testsuites>
+""",
+        encoding="utf-8",
+    )
+    summary = from_junit_xml(junit)
+    counts = summary.counts()
+    assert counts["error"] == 1
+    assert counts["passed"] == 1
+    assert counts["total"] == 2
+    err = next(c for c in summary.cases if c.outcome == "error")
+    assert "boom-err" in err.message
+
+
+@pytest.mark.quick
+def test_c10_unknown_outcome_counted_as_error() -> None:
+    summary = RegressionSummary(
+        cases=[CaseStatus(name="x", outcome="flaky"), CaseStatus(name="y", outcome="passed")]
+    )
+    counts = summary.counts()
+    assert counts["error"] == 1
+    assert counts["passed"] == 1
+    assert counts["total"] == 2
+
+
+@pytest.mark.quick
+def test_c10_summarize_junit_script(tmp_path: Path) -> None:
+    junit = tmp_path / "junit.xml"
+    junit.write_text(
+        """<?xml version="1.0"?>
+<testsuite tests="1"><testcase classname="t" name="ok" time="0.0"/></testsuite>
+""",
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.json"
+    proc = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "summarize_junit.py"), str(junit), str(out)],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["counts"]["passed"] == 1
+
+
+@pytest.mark.quick
 def test_c11_require_data_skips_when_missing(tmp_path: Path) -> None:
     missing = tmp_path / "external" / "kaggle.csv"
     assert optional_data_available(missing) is False
@@ -66,11 +125,20 @@ def test_c11_require_data_skips_when_missing(tmp_path: Path) -> None:
 
 
 @pytest.mark.quick
+def test_c11_default_skip_reason_mentions_download(tmp_path: Path) -> None:
+    missing = tmp_path / "absent.csv"
+    with pytest.raises(pytest.skip.Exception) as exc:
+        require_data_path(missing)
+    assert "download separately" in str(exc.value)
+
+
+@pytest.mark.quick
 def test_c11_require_data_returns_when_present(tmp_path: Path) -> None:
     f = tmp_path / "present.csv"
     f.write_text("a\n1\n", encoding="utf-8")
     got = require_data_path(f)
     assert got == f
+    assert optional_data_available(f) is True
 
 
 @pytest.mark.quick
@@ -89,6 +157,20 @@ def test_c12_coverage_entry_script_exists() -> None:
     text = script.read_text(encoding="utf-8")
     assert "coverage" in text
     assert "cov=wanglaoshi" in text or "--cov=wanglaoshi" in text
+    assert "summary" in text
+    assert "summarize_junit.py" in text
+
+
+@pytest.mark.quick
+def test_c12_public_exports_importable() -> None:
+    import wanglaoshi as wl
+
+    assert wl.DataRegistry is not None
+    assert wl.ExperimentContext is not None
+    assert callable(wl.assert_above_floor)
+    assert wl.ChartMeta is not None
+    assert wl.RegressionSummary is not None
+    assert callable(wl.require_data_path)
 
 
 @pytest.mark.full
