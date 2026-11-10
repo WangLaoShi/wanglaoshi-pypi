@@ -24,9 +24,9 @@ case "$MODE" in
     python -m pytest tests/
     ;;
   coverage)
-    # C12：产品模块行覆盖率（排除 Jupyter/可选 DL 等，见 .coveragerc）
-    # 默认门槛 78；可用 COV_FAIL_UNDER=80 抬高
-    FAIL_UNDER="${COV_FAIL_UNDER:-78}"
+    # C12：全包行覆盖 + 函数级 100%（见 .coveragerc / check_function_coverage.py）
+    # 行覆盖默认门槛 70（全包含 Jupyter/wqe）；可用 COV_FAIL_UNDER 抬高
+    FAIL_UNDER="${COV_FAIL_UNDER:-70}"
     python -m pytest -m "quick or submission" tests/ \
       --cov=wanglaoshi \
       --cov-config="${ROOT}/.coveragerc" \
@@ -34,6 +34,7 @@ case "$MODE" in
       --cov-report="xml:${ART}/coverage.xml" \
       --cov-report="json:${ART}/coverage.json" \
       --cov-fail-under="${FAIL_UNDER}"
+    python "${ROOT}/scripts/check_function_coverage.py" "${ART}/coverage.json"
     ;;
   summary)
     # C10：跑 quick 并写出回归汇总

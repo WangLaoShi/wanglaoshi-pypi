@@ -1,19 +1,10 @@
-# C12：产品覆盖率口径（排除可选/演示/环境装饰模块）
+# C12：全包覆盖率口径（函数级要求 100%；行覆盖另设门槛）
 # 跑：./scripts/run_tests.sh coverage
-# 覆盖「会改业务结果」的代码；Jupyter/可选深度学习等不拉低门槛。
 
 [run]
 source = wanglaoshi
 branch = False
 omit =
-    wanglaoshi/wqe.py
-    wanglaoshi/MLDL.py
-    wanglaoshi/Analyzer_Plain.py
-    wanglaoshi/Useful.py
-    wanglaoshi/JupyterFont.py
-    wanglaoshi/JupyterEnv.py
-    wanglaoshi/WebGetter.py
-    wanglaoshi/VERSIONS.py
 
 [report]
 precision = 1

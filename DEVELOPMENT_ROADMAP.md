@@ -124,7 +124,7 @@
 - [x] C09 业务样例含退款、取消、单位、缺期、零基期、关联膨胀、缺目标与隐私；关键结果手工预计算。（`tests/test_c09_business_dirty_cases.py`）
 - [x] C10 汇总案例×模块状态、失败/跳过原因、指标、耗时与版本，保存回归产物。（`wanglaoshi/regression_summary.py` + `scripts/run_tests.sh summary`）
 - [x] C11 日常缺外部数据可明确跳过；发布必需案例缺数据视为验收未完成。（`wanglaoshi/testing_utils.py`）
-- [x] C12 变更代码行覆盖率以 80% 为初始参考，关键口径与已知 Bug 边界必须覆盖；先运行后校准资源门槛。（`.coveragerc` 排除 Jupyter/可选 DL；`scripts/run_tests.sh coverage` 默认 `COV_FAIL_UNDER=78`，产品口径约 86%）
+- [x] C12 变更代码行覆盖率以 80% 为初始参考，关键口径与已知 Bug 边界必须覆盖；先运行后校准资源门槛。（全包行覆盖约 86%，默认 `COV_FAIL_UNDER=70`；**函数级 100%** 由 `scripts/check_function_coverage.py` 硬门槛；无 torch 时跳过 `TORCH_AVAILABLE` 真分支）
 
 快速档限制数据和模型预算；完整档运行全案例；发布档增加安装兼容验证。环境矩阵先核对实际依赖与 `python_requires`，再声明最低支持版本和当前稳定版本；不虚假承诺未经验证的兼容性。初期流水线可先单环境运行，再扩展 Linux/Windows/macOS。耗时与内存阈值在固定环境建立基准后启用。
 

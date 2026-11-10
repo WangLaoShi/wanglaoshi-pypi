@@ -65,11 +65,21 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor  # �
 from sklearn.svm import SVC, SVR  # 支持向量机
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor  # K近邻
 
-# PyTorch: 深度学习框架
-import torch  # PyTorch主模块
-import torch.nn as nn  # 神经网络模块
-import torch.optim as optim  # 优化器模块
-from torch.utils.data import Dataset, DataLoader  # 数据集和数据加载器
+# PyTorch: 可选依赖（未安装时 sklearn 部分仍可导入与测试）
+try:
+    import torch  # PyTorch主模块
+    import torch.nn as nn  # 神经网络模块
+    import torch.optim as optim  # 优化器模块
+    from torch.utils.data import Dataset, DataLoader  # 数据集和数据加载器
+
+    TORCH_AVAILABLE = True
+except ImportError:  # pragma: no cover - 环境无 torch 时走此分支
+    torch = None  # type: ignore
+    nn = None  # type: ignore
+    optim = None  # type: ignore
+    Dataset = object  # type: ignore
+    DataLoader = object  # type: ignore
+    TORCH_AVAILABLE = False
 
 class DataPreprocessor:
     """
@@ -322,91 +332,116 @@ class MLModel:
             
         return metrics
 
-class NeuralNetwork(nn.Module):
-    """神经网络模型类
-    
-    提供基础神经网络模型的实现
-    """
-    
-    def __init__(self, input_size: int, hidden_size: int, output_size: int):
-        """初始化神经网络
-        
-        参数:
-            input_size: 输入层大小
-            hidden_size: 隐藏层大小
-            output_size: 输出层大小
-        """
-        super(NeuralNetwork, self).__init__()
-        self.layer1 = nn.Linear(input_size, hidden_size)
-        self.relu = nn.ReLU()
-        self.layer2 = nn.Linear(hidden_size, output_size)
-        
-    def forward(self, x):
-        """前向传播
-        
-        参数:
-            x: 输入数据
-            
-        返回:
-            模型输出
-        """
-        x = self.layer1(x)
-        x = self.relu(x)
-        x = self.layer2(x)
-        return x
+if TORCH_AVAILABLE:
 
-class DLModel:
-    """深度学习模型类
-    
-    提供深度学习模型的训练、预测和评估功能
-    """
-    
-    def __init__(self, input_size: int, hidden_size: int, output_size: int):
-        """初始化深度学习模型
-        
-        参数:
-            input_size: 输入层大小
-            hidden_size: 隐藏层大小
-            output_size: 输出层大小
+    class NeuralNetwork(nn.Module):
+        """神经网络模型类
+
+        提供基础神经网络模型的实现
         """
-        self.model = NeuralNetwork(input_size, hidden_size, output_size)
-        self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = optim.Adam(self.model.parameters())
-        
-    def train(self, X: torch.Tensor, y: torch.Tensor, epochs: int = 100):
-        """训练模型
-        
-        参数:
-            X: 特征数据
-            y: 目标变量
-            epochs: 训练轮数
+
+        def __init__(self, input_size: int, hidden_size: int, output_size: int):
+            """初始化神经网络
+
+            参数:
+                input_size: 输入层大小
+                hidden_size: 隐藏层大小
+                output_size: 输出层大小
+            """
+            super(NeuralNetwork, self).__init__()
+            self.layer1 = nn.Linear(input_size, hidden_size)
+            self.relu = nn.ReLU()
+            self.layer2 = nn.Linear(hidden_size, output_size)
+
+        def forward(self, x):
+            """前向传播
+
+            参数:
+                x: 输入数据
+
+            返回:
+                模型输出
+            """
+            x = self.layer1(x)
+            x = self.relu(x)
+            x = self.layer2(x)
+            return x
+
+    class DLModel:
+        """深度学习模型类
+
+        提供深度学习模型的训练、预测和评估功能
         """
-        for epoch in range(epochs):
-            # 前向传播
-            outputs = self.model(X)
-            loss = self.criterion(outputs, y)
-            
-            # 反向传播和优化
-            self.optimizer.zero_grad()
-            loss.backward()
-            self.optimizer.step()
-            
-            if (epoch + 1) % 10 == 0:
-                print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
-                
-    def predict(self, X: torch.Tensor) -> torch.Tensor:
-        """预测
-        
-        参数:
-            X: 特征数据
-            
-        返回:
-            预测结果
-        """
-        with torch.no_grad():
-            outputs = self.model(X)
-            _, predicted = torch.max(outputs.data, 1)
-        return predicted
+
+        def __init__(self, input_size: int, hidden_size: int, output_size: int):
+            """初始化深度学习模型
+
+            参数:
+                input_size: 输入层大小
+                hidden_size: 隐藏层大小
+                output_size: 输出层大小
+            """
+            self.model = NeuralNetwork(input_size, hidden_size, output_size)
+            self.criterion = nn.CrossEntropyLoss()
+            self.optimizer = optim.Adam(self.model.parameters())
+
+        def train(self, X: torch.Tensor, y: torch.Tensor, epochs: int = 100):
+            """训练模型
+
+            参数:
+                X: 特征数据
+                y: 目标变量
+                epochs: 训练轮数
+            """
+            for epoch in range(epochs):
+                # 前向传播
+                outputs = self.model(X)
+                loss = self.criterion(outputs, y)
+
+                # 反向传播和优化
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+
+                if (epoch + 1) % 10 == 0:
+                    print(f"Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}")
+
+        def predict(self, X: torch.Tensor) -> torch.Tensor:
+            """预测
+
+            参数:
+                X: 特征数据
+
+            返回:
+                预测结果
+            """
+            with torch.no_grad():
+                outputs = self.model(X)
+                _, predicted = torch.max(outputs.data, 1)
+            return predicted
+
+else:
+
+    class NeuralNetwork:  # type: ignore[no-redef]
+        """无 torch 时的占位实现（保证模块可导入、函数可测试）。"""
+
+        def __init__(self, input_size: int, hidden_size: int, output_size: int):
+            raise ImportError("NeuralNetwork 需要安装 torch: pip install torch")
+
+        def forward(self, x):
+            raise ImportError("NeuralNetwork 需要安装 torch: pip install torch")
+
+    class DLModel:  # type: ignore[no-redef]
+        """无 torch 时的占位实现。"""
+
+        def __init__(self, input_size: int, hidden_size: int, output_size: int):
+            raise ImportError("DLModel 需要安装 torch: pip install torch")
+
+        def train(self, X, y, epochs: int = 100):
+            raise ImportError("DLModel 需要安装 torch: pip install torch")
+
+        def predict(self, X):
+            raise ImportError("DLModel 需要安装 torch: pip install torch")
 
 class ModelEvaluator:
     """模型评估类
@@ -457,16 +492,19 @@ def example_usage():
     # 1. 数据预处理
     preprocessor = DataPreprocessor()
     df = pd.DataFrame({
-        'A': [1, 2, np.nan, 4, 5],
+        'A': [1.0, 2.0, np.nan, 4.0, 5.0],
         'B': ['a', 'b', 'a', 'c', 'b']
     })
-    df_processed = preprocessor.handle_missing_values(df, method='mean')
+    # mean 仅用于数值列，避免 object 列触发 pandas 类型错误
+    df_num = preprocessor.handle_missing_values(df[['A']], method='mean')
+    df_processed = df.copy()
+    df_processed['A'] = df_num['A']
     df_encoded = preprocessor.encode_categorical(df_processed, ['B'])
-    
+
     # 2. 特征工程
     engineer = FeatureEngineer()
     df_features = engineer.create_polynomial_features(df_encoded, ['A'], degree=2)
-    
+
     # 3. 机器学习模型
     ml_model = MLModel('logistic')
     X = df_features[['A', 'A_power_2']]
@@ -474,13 +512,16 @@ def example_usage():
     ml_model.train(X, y)
     metrics = ml_model.evaluate()
     print("ML模型评估结果:", metrics)
-    
-    # 4. 深度学习模型
-    dl_model = DLModel(input_size=2, hidden_size=4, output_size=3)
-    X_tensor = torch.FloatTensor(X.values)
-    y_tensor = torch.LongTensor(y.values)
-    dl_model.train(X_tensor, y_tensor, epochs=100)
-    
+
+    # 4. 深度学习模型（可选）
+    if TORCH_AVAILABLE:
+        dl_model = DLModel(input_size=X.shape[1], hidden_size=4, output_size=int(y.nunique()))
+        X_tensor = torch.FloatTensor(X.values)
+        y_tensor = torch.LongTensor(y.values)
+        dl_model.train(X_tensor, y_tensor, epochs=2)
+    else:
+        print("跳过深度学习示例：未安装 torch")
+
     # 5. 模型评估
     evaluator = ModelEvaluator()
     y_pred = ml_model.predict(X)

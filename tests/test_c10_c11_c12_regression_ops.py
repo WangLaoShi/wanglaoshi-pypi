@@ -161,11 +161,10 @@ def test_c12_coverage_entry_script_exists() -> None:
     assert "summarize_junit.py" in text
     assert ".coveragerc" in text
     assert "COV_FAIL_UNDER" in text
+    assert "check_function_coverage.py" in text
     coveragerc = ROOT / ".coveragerc"
     assert coveragerc.exists()
-    rc = coveragerc.read_text(encoding="utf-8")
-    assert "wqe.py" in rc
-    assert "MLDL.py" in rc
+    assert (ROOT / "scripts" / "check_function_coverage.py").exists()
 
 
 @pytest.mark.quick

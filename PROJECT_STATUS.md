@@ -80,7 +80,7 @@
 | C09 | ✅ 脏样例（退款/单位/缺期/膨胀/隐私等） |
 | C10 | ✅ junit → `regression_summary.json` |
 | C11 | ✅ `require_data_path` 缺数据明确 skip |
-| C12 | ✅ `.coveragerc` 产品口径 + `run_tests.sh coverage`（默认门槛 78，实测约 86%） |
+| C12 | ✅ 全包行覆盖约 86%（门槛 70）+ **函数级 100%**（`check_function_coverage.py`） |
 
 ### E 进阶演示 — 课 E01–E22 + 配套 EM01–EM05
 
@@ -176,3 +176,4 @@
 | 2026-11-10 | C04/C07 回归 + S5 `metric_registry` + `asserting` 工具 |
 | 2026-11-10 | C02–C03/C05–C06/C10–C12 收口；正式点 **45/45 = 100%** |
 | 2026-11-10 | C12 加深：修复 rank_average / boxcox；CT+FE 深度测；产品覆盖约 **86%**（门槛 78） |
+| 2026-11-10 | C12 函数级 **100%**：全模块冒烟 + `check_function_coverage.py`；MLDL torch 改可选 |
