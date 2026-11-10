@@ -88,11 +88,14 @@ def _render_report_md(
     insights_data: Optional[Dict[str, Any]] = None,
     metrics_data: Optional[Dict[str, Any]] = None,
     analysis_data: Optional[Dict[str, Any]] = None,
+    redact_fields: Optional[Sequence[str]] = None,
 ) -> str:
     insights = insights_data or {}
     metrics = (metrics_data or {}).get("metrics") or {}
     findings = insights.get("findings") or []
     recs = insights.get("recommendations") or []
+    fields = list(redact_fields or [])
+    safe_config = _redact(record.config, fields) if fields else record.config
     lines = [
         f"# 业务分析报告（run `{record.run_id}`）",
         "",
@@ -106,7 +109,7 @@ def _render_report_md(
         "",
         "## 2. 数据说明",
         f"- 输入哈希: {json.dumps(record.input_hashes, ensure_ascii=False)}",
-        f"- 配置: `{json.dumps(record.config, ensure_ascii=False)}`",
+        f"- 配置: `{json.dumps(safe_config, ensure_ascii=False)}`",
         "",
         "## 3. 阶段状态",
     ]
@@ -179,6 +182,7 @@ def archive_delivery(
         insights_data=insights_data,
         metrics_data=metrics_data,
         analysis_data=analysis_data,
+        redact_fields=redact_fields,
     )
     report_path = out_dir / "report.md"
     report_path.write_text(report_md, encoding="utf-8")

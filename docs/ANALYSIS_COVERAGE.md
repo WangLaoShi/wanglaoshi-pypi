@@ -26,7 +26,7 @@
 | 贝叶斯 A/B / 先验敏感性 | ✅ | **并入 E13** | ✅ `bayes_prob_beat`（共轭；pymc 可选） |
 | 时序分解 / 平稳性 / 简单预测 | ✅ | E15 | ✅ `TimeSeriesTools.decompose_summary` / `adf_report` |
 | 缺期对齐 / 同比（零基数/未完月） | ✅ | **并入 E15** | ✅ `yoy_with_rules` / `complete_period_index` |
-| 生存 / 流失（KM） | ✅ | E16 | ❌ 无生存模块 |
+| 生存 / 流失（KM） | ✅ | E16 | ✅ `SurvivalAnalyzer` |
 | 文本 EDA / 词袋特征 | ✅ | E17 | `extract_text_features`（浅） |
 | 异常检测（无标签） | ✅ | E18 | ✅ `AnomalyDetector` |
 | 关联规则 / 购物篮 | ✅ | E19 | ❌ 宜放 extras |

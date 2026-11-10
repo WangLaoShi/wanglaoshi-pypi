@@ -28,6 +28,7 @@ from .insights import generate_insights
 from .archive import archive_delivery
 from .reconciliation import check_join_inflation, reconcile_to_source
 from .calendar import complete_period_index, yoy_with_rules, yoy_stage
+from .units import convert_units, DEFAULT_FACTORS
 
 __all__ = [
     "StageResult",
@@ -52,4 +53,6 @@ __all__ = [
     "complete_period_index",
     "yoy_with_rules",
     "yoy_stage",
+    "convert_units",
+    "DEFAULT_FACTORS",
 ]

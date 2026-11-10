@@ -655,6 +655,8 @@ print("stats OK", round(t["pvalue"], 4), n["n_per_arm"], round(bayes["prob_b_bea
 | `GroupMetricsReport` | 分组 n / TPR / FPR |
 | `AnomalyDetector` | IsolationForest 薄封装 |
 | `RankingMetrics` | NDCG@K / Hit@K |
+| `SurvivalAnalyzer` | Kaplan–Meier（无 lifelines 硬依赖） |
+| `convert_units` | 列级单位换算（yuan↔wan 等） |
 
 ```python
 # 【可运行】
@@ -681,7 +683,12 @@ X = np.vstack([np.random.default_rng(0).normal(0, 1, (40, 2)), np.random.default
 summ = AnomalyDetector(contamination=0.1, random_state=0).fit_predict_summary(X)
 assert summ["n_flagged"] >= 1
 assert RankingMetrics.ndcg_at_k([1, 2, 3], {1}, k=3) == 1.0
-print("p1 toolkit OK", round(cal["ece"], 4), summ["n_flagged"])
+from wanglaoshi import SurvivalAnalyzer, convert_units
+km = SurvivalAnalyzer.km([1, 2, 3], [1, 1, 1])
+assert km["n"] == 3
+u = convert_units(pd.DataFrame({"amount": [10000.0]}), "amount", from_unit="yuan", to_unit="wan")
+assert u.data["frame"][u.data["out_col"]].iloc[0] == 1.0
+print("p1 toolkit OK", round(cal["ece"], 4), summ["n_flagged"], km["median_survival"])
 ```
 
 ---

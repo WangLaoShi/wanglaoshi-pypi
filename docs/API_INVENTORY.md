@@ -30,6 +30,8 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `GroupMetricsReport` | 类 | sklearn | 分组公平性审计（P1） |
 | `AnomalyDetector` | 类 | sklearn | IsolationForest（P1） |
 | `RankingMetrics` | 类 | numpy | NDCG@K（P1） |
+| `SurvivalAnalyzer` | 类 | numpy | Kaplan–Meier（P1） |
+| `convert_units` | 函数 | pandas | 单位换算（S1） |
 
 ## CompetitionTools 关键契约
 

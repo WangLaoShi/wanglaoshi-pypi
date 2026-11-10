@@ -74,6 +74,7 @@ from .business import (
     reconcile_to_source,
     complete_period_index,
     yoy_with_rules,
+    convert_units,
 )
 from . import stats
 from .stats import StatsToolkit, ExperimentDesign
@@ -82,6 +83,7 @@ from .calibration import CalibrationReport, expected_calibration_error
 from .fairness import GroupMetricsReport
 from .anomaly import AnomalyDetector
 from .ranking import RankingMetrics
+from .survival import SurvivalAnalyzer
 
 __all__ = [
     # 模块
@@ -118,6 +120,7 @@ __all__ = [
     "reconcile_to_source",
     "complete_period_index",
     "yoy_with_rules",
+    "convert_units",
     "stats",
     "StatsToolkit",
     "ExperimentDesign",
@@ -127,4 +130,5 @@ __all__ = [
     "GroupMetricsReport",
     "AnomalyDetector",
     "RankingMetrics",
+    "SurvivalAnalyzer",
 ]
