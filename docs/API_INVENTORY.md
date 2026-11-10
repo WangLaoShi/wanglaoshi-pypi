@@ -39,6 +39,7 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `ChartMeta` / `assert_report_ok` / `write_chart_sidecar` | 类/函数 | — | C06 报告与图表元信息 |
 | `RegressionSummary` / `from_junit_xml` | 类/函数 | — | C10 回归汇总 |
 | `require_data_path` / `optional_data_available` | 函数 | pytest（懒加载） | C11；`import wanglaoshi` 不强制 pytest |
+| `compete` / `analyze` / `features` / `analytics` / `runtime` / `_testing` | 子包门面 | — | 架构 Phase 1；见 `docs/ARCHITECTURE.md` |
 | `validate_metric_dict` / `default_metric_registry` | 函数 | — | S5 指标口径版本登记 |
 
 ## CompetitionTools 关键契约

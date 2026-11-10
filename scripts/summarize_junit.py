@@ -13,8 +13,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+# 强制置顶：避免 site-packages 里旧版 wanglaoshi 抢先（egg-link 可能靠后）
+root_s = str(ROOT)
+while root_s in sys.path:
+    sys.path.remove(root_s)
+sys.path.insert(0, root_s)
 
 from wanglaoshi.regression_summary import from_junit_xml
 

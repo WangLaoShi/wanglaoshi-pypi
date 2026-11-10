@@ -30,6 +30,9 @@ wanglaoshi 顶层导出 (API)
 - analyze_data
 - analyze_multiple_files
 - analyze_notebook
+
+架构门面（推荐新代码使用，详见 docs/ARCHITECTURE.md）：
+- wanglaoshi.compete / analyze / features / business / analytics / runtime / _testing
 """
 
 # 模块导出（用于 from wanglaoshi import VERSIONS as V 这类用法）
@@ -92,6 +95,10 @@ from .score_floors import SCORE_FLOORS, assert_above_floor
 from .report_meta import ChartMeta, assert_report_ok, write_chart_sidecar
 from .regression_summary import RegressionSummary, from_junit_xml
 
+# 架构门面（Phase 1：re-export；旧路径仍可用）
+from . import compete, analyze, features, analytics, runtime
+from . import _testing  # noqa: F401
+
 # testing_utils 依赖 pytest，仅开发/测试需要；勿在 import wanglaoshi 时强拉
 # 仍支持：from wanglaoshi import require_data_path（首次访问时再加载）
 
@@ -108,6 +115,13 @@ __all__ = [
     "JupyterFont",
     "Useful",
     "WebGetter",
+    # 架构门面
+    "compete",
+    "analyze",
+    "features",
+    "analytics",
+    "runtime",
+    "_testing",
     # 类 / 函数
     "ready",
     "DataAnalyzer",

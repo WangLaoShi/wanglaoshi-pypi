@@ -177,3 +177,4 @@
 | 2026-11-10 | C02–C03/C05–C06/C10–C12 收口；正式点 **45/45 = 100%** |
 | 2026-11-10 | C12 加深：修复 rank_average / boxcox；CT+FE 深度测；产品覆盖约 **86%**（门槛 78） |
 | 2026-11-10 | C12 函数级 **100%**：全模块冒烟 + `check_function_coverage.py`；MLDL torch 改可选 |
+| 2026-11-10 | 架构 Phase 1：`compete/analyze/features/analytics/runtime/_testing` 门面 + `docs/ARCHITECTURE.md` |
