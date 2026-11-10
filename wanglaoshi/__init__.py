@@ -70,7 +70,13 @@ from .business import (
     archive_delivery,
     archive_charts,
     run_eda_profile,
+    check_join_inflation,
+    reconcile_to_source,
+    complete_period_index,
+    yoy_with_rules,
 )
+from . import stats
+from .stats import StatsToolkit, ExperimentDesign
 
 __all__ = [
     # 模块
@@ -103,4 +109,11 @@ __all__ = [
     "archive_delivery",
     "archive_charts",
     "run_eda_profile",
+    "check_join_inflation",
+    "reconcile_to_source",
+    "complete_period_index",
+    "yoy_with_rules",
+    "stats",
+    "StatsToolkit",
+    "ExperimentDesign",
 ]

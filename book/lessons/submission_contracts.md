@@ -77,7 +77,7 @@ B 阶段修复过的坑：模板目标列名未推断、字符串标签写出后
 
 - Iris / Digits：标签提交 — {doc}`../cases/01_iris`、{doc}`../cases/12_digit_recognizer`  
 - House Prices：数值目标 — {doc}`../cases/11_house_prices`  
-- 无标签测试集：**只生成，不本地「刷测试分」**（E15）
+- 无标签测试集：**只生成，不本地「刷测试分」**（配套 EM03）
 
 ## 6. 自测
 

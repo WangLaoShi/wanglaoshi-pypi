@@ -64,20 +64,20 @@ qb = QuickBaseline(random_state=42)
 
 1. 概率矩阵不要静默 `argmax`（除非显式 `class_labels`）  
 2. 目标编码、选特征、标准化必须在 **训练折内** 拟合  
-3. 无标签测试集只用于生成提交，不用于本地刷分（E15）  
-4. 时间滞后特征不得引用「未来」目标（E16）  
+3. 无标签测试集只用于生成提交，不用于本地刷分（配套 EM03）  
+4. 时间滞后特征不得引用「未来」目标（配套 EM04 / 课 E08）  
 5. 校验失败禁止「手动改 CSV 对付平台」而不修生成逻辑  
 
 ## 5. 推荐学习顺序（路径 B 摘要）
 
-| 顺序 | 课 | 你必须能讲清的一句话 |
+| 课号 | 课 | 你必须能讲清的一句话 |
 | --- | --- | --- |
-| 1 | {doc}`../cases/01_iris` | 分层 + 标签提交 |
-| 2 | {doc}`../cases/02_titanic` | 缺失处理与隔离 |
-| 3 | {doc}`../cases/04_breast_cancer` | 缩放与阈值权衡 |
-| 4 | {doc}`../cases/12_digit_recognizer` | 高维与错分 |
-| 5 | {doc}`../cases/06_california_housing` | 分组 vs 随机 |
-| … | 其余按 {doc}`../start/learning-path` | — |
+| E01 | {doc}`../cases/01_iris` | 分层 + 标签提交 |
+| E02 | {doc}`../cases/02_titanic` | 缺失处理与隔离 |
+| E04 | {doc}`../cases/04_breast_cancer` | 缩放与阈值权衡 |
+| E12 | {doc}`../cases/12_digit_recognizer` | 高维与错分 |
+| E06 | {doc}`../cases/06_california_housing` | 分组 vs 随机 |
+| … | 其余按 {doc}`../start/learning-path`（E01–E22） | — |
 
 精讲建议先于案例：{doc}`../lessons/overview`。
 

@@ -1,4 +1,4 @@
-"""E17：执行 examples/advanced 下 Notebook，产出跑通证据。
+"""执行 examples/advanced 下 Notebook（E01–E22），产出跑通证据。
 
 默认在当前解释器进程内执行 code cell（避免 Jupyter kernel 环境不一致）。
 可选 --kernel 走 nbclient。

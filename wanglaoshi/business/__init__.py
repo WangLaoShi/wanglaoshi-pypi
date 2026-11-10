@@ -26,6 +26,8 @@ from .analysis import run_multidimensional_analysis
 from .visualization import archive_charts
 from .insights import generate_insights
 from .archive import archive_delivery
+from .reconciliation import check_join_inflation, reconcile_to_source
+from .calendar import complete_period_index, yoy_with_rules, yoy_stage
 
 __all__ = [
     "StageResult",
@@ -45,4 +47,9 @@ __all__ = [
     "archive_charts",
     "generate_insights",
     "archive_delivery",
+    "check_join_inflation",
+    "reconcile_to_source",
+    "complete_period_index",
+    "yoy_with_rules",
+    "yoy_stage",
 ]

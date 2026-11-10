@@ -24,7 +24,7 @@
 | **[docs/RELEASE.md](docs/RELEASE.md)** | **发布只记三句**（`./scripts/release_check.sh`） |
 | [PROJECT_STATUS.md](PROJECT_STATUS.md) | 功能点数量与完成率 |
 | [examples/README.md](examples/README.md) | 示例总览（Analyzer / 业务 / 12 进阶案例） |
-| [examples/advanced/README.md](examples/advanced/README.md) | 22 个进阶 Notebook 学习顺序 |
+| [examples/advanced/README.md](examples/advanced/README.md) | 进阶 Notebook **E01–E22** 学习顺序 |
 | [docs/ANALYSIS_COVERAGE.md](docs/ANALYSIS_COVERAGE.md) | 常见分析方法覆盖矩阵与包优化缺口 |
 | [docs/README.md](docs/README.md) | 开发文档索引（API、Skill 映射、依赖、证据） |
 | [docs/evidence/ADVANCED_EVIDENCE.md](docs/evidence/ADVANCED_EVIDENCE.md) | 12 案例跑通证据 |
@@ -44,7 +44,7 @@ wanglaoshi-pypi
 ├── examples/                     # 可运行示例
 │   ├── analyzer_demo.py
 │   ├── business_intake_demo.ipynb
-│   └── advanced/                 # 22 个进阶 Jupyter 案例（手册内容源）
+│   └── advanced/                 # 进阶 Jupyter 案例 E01–E22（手册内容源）
 ├── scripts/                      # 测试 / 证据 / 构建手册
 ├── tests/                        # pytest
 └── wanglaoshi/
@@ -96,7 +96,7 @@ pip install wanglaoshi
 
 ### 基线工坊（Jupyter Book / GitHub Pages）
 
-把 22 个进阶 Notebook、**每课练习**、**中文术语表**、**分析覆盖矩阵**、**业务流水线专章**做成可浏览教材（**基线工坊 · 从 EDA 到提交**）：
+把 **E01–E22** 进阶 Notebook、**每课练习**、**中文术语表**、**分析覆盖矩阵**、**业务流水线专章**做成可浏览教材（**基线工坊 · 从 EDA 到提交**）：
 
 ```bash
 python -m pip install -e ".[book]"

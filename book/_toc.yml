@@ -24,7 +24,7 @@ parts:
       - file: tracks/competition
       - file: tracks/business
 
-  - caption: 进阶案例（22 课）
+  - caption: 进阶案例（E01–E22）
     chapters:
       - file: cases/overview
       - file: cases/01_iris

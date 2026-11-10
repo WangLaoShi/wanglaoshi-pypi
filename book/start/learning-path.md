@@ -20,37 +20,37 @@
 2. {doc}`../lessons/submission_contracts` + {doc}`../lessons/feature_fit_discipline`  
 3. 按顺序啃案例（与仓库 `examples/advanced/README` 一致）：
 
-| 顺序 | 课 | 必绑 API / 纪律 |
+| 课号 | 课 | 必绑 API / 纪律 |
 | --- | --- | --- |
-| 1 | {doc}`../cases/01_iris` | 提交契约 + 分层 |
-| 2 | {doc}`../cases/02_titanic` | 折内填充 |
-| 3 | {doc}`../cases/04_breast_cancer` | 重要性 / 召回 |
-| 4 | {doc}`../cases/12_digit_recognizer` | 高维 EDA |
-| 5 | {doc}`../cases/06_california_housing` | 分组划分 |
-| 6 | {doc}`../cases/03_wine_quality` | 回归指标 |
-| 7 | {doc}`../cases/07_abalone` | 混合编码 |
-| 8 | {doc}`../cases/08_bike_sharing` | 时间 / 滞后 |
-| 9 | {doc}`../cases/09_mall_customers` | 聚类稳定性 |
-| 10 | {doc}`../cases/10_adult_census` | 折内目标编码 |
-| 11 | {doc}`../cases/05_credit_card_fraud` | 不均衡指标 |
-| 12 | {doc}`../cases/11_house_prices` | 集成 + 提交 |
+| E01 | {doc}`../cases/01_iris` | 提交契约 + 分层 |
+| E02 | {doc}`../cases/02_titanic` | 折内填充 |
+| E04 | {doc}`../cases/04_breast_cancer` | 重要性 / 召回 / 校准 |
+| E12 | {doc}`../cases/12_digit_recognizer` | 高维 EDA |
+| E06 | {doc}`../cases/06_california_housing` | 分组划分 |
+| E03 | {doc}`../cases/03_wine_quality` | 回归指标 |
+| E07 | {doc}`../cases/07_abalone` | 混合编码 |
+| E08 | {doc}`../cases/08_bike_sharing` | 时间 / 滞后 |
+| E09 | {doc}`../cases/09_mall_customers` | 聚类稳定性 |
+| E10 | {doc}`../cases/10_adult_census` | 折内目标编码 / 公平性 |
+| E05 | {doc}`../cases/05_credit_card_fraud` | 不均衡指标 |
+| E11 | {doc}`../cases/11_house_prices` | 集成 + 提交 |
 
-## 路径 D：统计 / 试验 / 时序 / 文本 / 对账 / 推荐（13–22）
+## 路径 D：统计 / 试验 / 时序 / 文本 / 对账 / 推荐（E13–E22）
 
-补齐常见分析方法；见 {doc}`../reference/analysis-coverage`。
+补齐常见分析方法；见 {doc}`../reference/analysis-coverage`。课号一律 **Exx**。
 
-| 顺序 | 课 | 焦点 |
+| 课号 | 课 | 焦点 |
 | --- | --- | --- |
-| 13 | {doc}`../cases/13_ab_testing` | A/B、功效、贝叶斯门槛概率 |
-| 14 | {doc}`../cases/14_hypothesis_testing` | t / χ² / ANOVA |
-| 15 | {doc}`../cases/15_timeseries_forecast` | 分解 + 同比缺月/零基数 |
-| 16 | {doc}`../cases/16_survival_churn` | KM 与删失 |
-| 17 | {doc}`../cases/17_text_eda` | 文本特征 |
-| 18 | {doc}`../cases/18_anomaly_detection` | 无标签异常 |
-| 19 | {doc}`../cases/19_association_rules` | 购物篮规则 |
-| 20 | {doc}`../cases/20_causal_did` | DiD 入门 |
-| 21 | {doc}`../cases/21_order_refund_reconciliation` | 三表对账防翻倍 |
-| 22 | {doc}`../cases/22_movielens_ndcg` | NDCG@10 |
+| E13 | {doc}`../cases/13_ab_testing` | A/B、功效、贝叶斯门槛概率 |
+| E14 | {doc}`../cases/14_hypothesis_testing` | t / χ² / ANOVA |
+| E15 | {doc}`../cases/15_timeseries_forecast` | 分解 + 同比缺月/零基数 |
+| E16 | {doc}`../cases/16_survival_churn` | KM 与删失 |
+| E17 | {doc}`../cases/17_text_eda` | 文本特征 |
+| E18 | {doc}`../cases/18_anomaly_detection` | 无标签异常 |
+| E19 | {doc}`../cases/19_association_rules` | 购物篮规则 |
+| E20 | {doc}`../cases/20_causal_did` | DiD 入门 |
+| E21 | {doc}`../cases/21_order_refund_reconciliation` | 三表对账防翻倍 |
+| E22 | {doc}`../cases/22_movielens_ndcg` | NDCG@10 |
 
 ## 路径 C：业务分析流水线
 

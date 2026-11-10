@@ -22,6 +22,9 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `JupyterEnv.no_warning` | 函数 | warnings | 仅关警告；与 `warnings.filterwarnings` 同义，课堂请优先 `ready()` |
 | `business` | 模块 | pandas/matplotlib | Skill 固化流水线 |
 | `BusinessPipeline` / `intake_file` / `generate_insights` / `archive_delivery` / `archive_charts` / `run_eda_profile` … | 函数/类 | pandas | 见 `wanglaoshi.business` |
+| `check_join_inflation` / `reconcile_to_source` | 函数 | pandas | 连接膨胀 / 源表对账（P0） |
+| `complete_period_index` / `yoy_with_rules` | 函数 | pandas | 缺期骨架 / 同比规则（P0） |
+| `stats` / `StatsToolkit` / `ExperimentDesign` | 模块/类 | scipy/statsmodels | 假设检验与 A/B（P0） |
 
 ## CompetitionTools 关键契约
 
@@ -39,10 +42,10 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | 阶段 | 模块 | 状态 |
 | --- | --- | --- |
 | D01 | `intake.py` | 已实现 |
-| D02 | `structuring.py` | MVP |
+| D02 | `structuring.py` + `reconciliation.py` | MVP；**P0 对账/膨胀已加** |
 | D03 | `cleaning.py` | MVP |
 | D12 | `eda.py` | MVP（复用 DataAnalyzer） |
-| D04 | `derived.py` | MVP |
+| D04 | `derived.py` + `calendar.py` | MVP；**P0 同比规则已加** |
 | D05 | `planning.py` | MVP |
 | D06 | `metrics.py` | MVP |
 | D07 | `analysis.py` | MVP |

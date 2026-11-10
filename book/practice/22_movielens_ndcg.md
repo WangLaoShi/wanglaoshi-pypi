@@ -1,4 +1,4 @@
-# 练习：MovieLens NDCG
+# 练习：E22 MovieLens NDCG
 
 对应课：{doc}`../cases/22_movielens_ndcg` · 覆盖矩阵：{doc}`../reference/analysis-coverage`
 
@@ -11,7 +11,7 @@
 
 ## 自测
 
-1. 本课补上了覆盖矩阵里的哪一格？
+1. 本课补上了覆盖矩阵（E01–E22）里的哪一格？
 2. 若跳过「对账 / 同一候选集」约束，结论会怎样被高估？
 
 ## 动手

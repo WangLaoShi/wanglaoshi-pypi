@@ -77,7 +77,7 @@ def e21() -> None:
     slug = "21_order_refund_reconciliation"
     cells = [
         new_markdown_cell(
-            """# 案例 21｜订单、明细与退款三表对账：防止连接后金额翻倍
+            """# E21 订单、明细与退款三表对账：防止连接后金额翻倍
 
 > 公开范例对照：[Looker Symmetric Aggregates](https://docs.cloud.google.com/looker/docs/best-practices/understanding-symmetric-aggregates)  
 > 覆盖矩阵：多表关联膨胀 · `docs/ANALYSIS_COVERAGE.md`
@@ -194,7 +194,7 @@ def e22() -> None:
     slug = "22_movielens_ndcg"
     cells = [
         new_markdown_cell(
-            """# 案例 22｜MovieLens 电影推荐：用 NDCG@10 评估 Top‑K 排序
+            """# E22 MovieLens 电影推荐：用 NDCG@10 评估 Top‑K 排序
 
 > 公开范例对照：[Recommenders Quick Start](https://github.com/recommenders-team/recommenders/blob/main/examples/00_quick_start/README.md)  
 > 覆盖矩阵：推荐 / 排序指标（NDCG）

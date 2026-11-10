@@ -552,6 +552,30 @@ run_to_dict(source_path, **kwargs) -> dict
 | `generate_insights` | D09 |
 | `archive_delivery` | D10 |
 | `STAT_METHOD_CATALOG` / `DEFAULT_METRIC_DICT` | 目录常量 |
+| `check_join_inflation` / `reconcile_to_source` | 连接膨胀检查 / 源表对账（P0） |
+| `complete_period_index` / `yoy_with_rules` | 缺期骨架 / 同比规则（P0） |
+
+### 5.4 对账与同比（P0）
+
+```python
+# 【可运行】
+import pandas as pd
+from wanglaoshi import check_join_inflation, reconcile_to_source, yoy_with_rules
+
+orders = pd.DataFrame({"order_id": [1, 2], "order_amount": [100.0, 200.0]})
+items = pd.DataFrame({"order_id": [1, 1, 2], "sku": ["a", "b", "c"]})
+inf = check_join_inflation(orders, items, on="order_id", measure_col="order_amount")
+assert inf.data["inflated"] is True
+rec = reconcile_to_source(orders.rename(columns={"order_amount": "amount"}), orders.rename(columns={"order_amount": "amount"}), key="order_id", value_col="amount")
+assert rec.data["all_balanced"] is True
+sales = pd.DataFrame({
+    "month": pd.to_datetime(["2023-01-01", "2023-03-01", "2024-01-01", "2024-03-01"]),
+    "sales": [100.0, 0.0, 110.0, 20.0],
+})
+yoy = yoy_with_rules(sales, "month", "sales", as_of="2024-03-15")
+assert "reason" in yoy.columns
+print("reconciliation/yoy OK", inf.data["inflation_ratio"], set(yoy["reason"]))
+```
 
 ```python
 # 【可运行】
@@ -586,6 +610,38 @@ summary = record.summary()
 assert "stages" in summary
 assert summary.get("blocked") is False
 print("BusinessPipeline OK", summary["run_id"], len(summary["stages"]))
+```
+
+---
+
+## 5.5 `wanglaoshi.stats`（P0）
+
+| 名称 | 用途 |
+| --- | --- |
+| `StatsToolkit.ttest_ind` | Welch/独立 t + Cohen's d + 适用性提示 |
+| `StatsToolkit.chi2_independence` | 列联表 χ² + 期望频数警告 |
+| `StatsToolkit.anova_oneway` | 单因素 ANOVA + η² |
+| `ExperimentDesign.two_proportion_test` | 两比例 z / χ²、提升 pp、CI |
+| `ExperimentDesign.sample_size_two_proportion` | 每臂样本量 |
+| `ExperimentDesign.bayes_prob_beat` / `prior_sensitivity` | Beta-Binomial 门槛概率 |
+
+```python
+# 【可运行】
+from wanglaoshi import StatsToolkit, ExperimentDesign
+
+a = [1, 2, 3, 4, 5, 6]
+b = [2, 3, 4, 5, 6, 8]
+t = StatsToolkit.ttest_ind(a, b)
+assert "cohens_d" in t
+c = StatsToolkit.chi2_independence([[10, 2], [3, 9]])
+assert "min_expected" in c
+ab = ExperimentDesign.two_proportion_test(10, 100, 18, 100)
+assert "lift_pp" in ab
+n = ExperimentDesign.sample_size_two_proportion(0.1, 0.02)
+assert n["n_per_arm"] > 100
+bayes = ExperimentDesign.bayes_prob_beat(10, 100, 18, 100, delta=0.01)
+assert 0 <= bayes["prob_b_beats_a"] <= 1
+print("stats OK", round(t["pvalue"], 4), n["n_per_arm"], round(bayes["prob_b_beats_a"], 3))
 ```
 
 ---
