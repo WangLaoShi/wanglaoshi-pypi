@@ -6,40 +6,38 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 > **详尽签名 + 已校验可运行示例** 见 **[API_REFERENCE.md](API_REFERENCE.md)**（`python scripts/verify_api_reference.py`）。  
 > 本文件只做短盘点；有冲突以 `API_REFERENCE.md` 与源码为准。
 
+## 推荐门面（稳定公开）
+
+见 [`ARCHITECTURE.md`](ARCHITECTURE.md)。新代码优先：
+
+| 门面 | 示例 |
+| --- | --- |
+| `wanglaoshi.compete` | `SubmissionGenerator`, `QuickBaseline` |
+| `wanglaoshi.analyze` | `DataAnalyzer`, `analyze_data` |
+| `wanglaoshi.features` | `AdvancedFeatureEngineer` |
+| `wanglaoshi.analytics` | `StatsToolkit`, `TimeSeriesTools` |
+| `wanglaoshi.runtime` | `ready`, `VERSIONS`, `JupyterEnv` |
+| `wanglaoshi._testing` | `assert_close`, `ExperimentContext` |
+| `wanglaoshi.business` | `BusinessPipeline` |
+
 ## 顶层导出（`from wanglaoshi import ...`）
+
+`__all__` 分两层：`_STABLE_PUBLIC`（门面 + 捷径）与 `_COMPAT_EXPORTS`（课堂兼容）。
 
 | 名称 | 类型 | 依赖 | 备注 |
 | --- | --- | --- | --- |
-| `JupyterEnv` | 模块 | 标准库/Jupyter | `no_warning` 等 |
-| `VERSIONS` | 模块 | rich / requests | `show_env_info` / `check_all_versions` |
-| `ready` | 函数 | 标准库 (+ 可选 numpy) | **推荐** Notebook 一键就绪；合并关警告+环境信息，避免与 `JE.no_warning` 重复 |
-| `Analyzer` / `DataAnalyzer` | 模块/类 | pandas/sklearn/matplotlib | EDA 主入口 |
-| `Analyzer_Plain` | 模块 | 同上 | 精简版 |
-| `CompetitionTools` | 模块 | sklearn | 基线、提交、泄漏检查等 |
-| `FeatureEngineering` | 模块 | pandas/sklearn | 编码/变换 |
-| `MLDL` | 可选模块 | **torch** | 未装 torch 时顶层导入不失败；`MLDL` 可能为 `None` |
-| `JupyterFont` / `Useful` / `WebGetter` | 模块 | 视功能而定 | 辅助 |
-| `JupyterEnv.no_warning` | 函数 | warnings | 仅关警告；与 `warnings.filterwarnings` 同义，课堂请优先 `ready()` |
-| `business` | 模块 | pandas/matplotlib | Skill 固化流水线 |
-| `BusinessPipeline` / `intake_file` / `generate_insights` / `archive_delivery` / `archive_charts` / `run_eda_profile` … | 函数/类 | pandas | 见 `wanglaoshi.business` |
-| `check_join_inflation` / `reconcile_to_source` | 函数 | pandas | 连接膨胀 / 源表对账（P0） |
-| `complete_period_index` / `yoy_with_rules` | 函数 | pandas | 缺期骨架 / 同比规则（P0） |
-| `stats` / `StatsToolkit` / `ExperimentDesign` | 模块/类 | scipy/statsmodels | 假设检验与 A/B（P0） |
-| `TimeSeriesTools` | 类 | statsmodels/pandas | 分解 / ADF / 安全滞后（P1） |
-| `CalibrationReport` | 类 | sklearn | Brier / ECE（P1） |
-| `GroupMetricsReport` | 类 | sklearn | 分组公平性审计（P1） |
-| `AnomalyDetector` | 类 | sklearn | IsolationForest（P1） |
-| `RankingMetrics` | 类 | numpy | NDCG@K（P1） |
-| `SurvivalAnalyzer` | 类 | numpy | Kaplan–Meier（P1） |
-| `convert_units` | 函数 | pandas | 单位换算（S1） |
-| `assert_close` / `assert_metrics_close` / `assert_frame_contract` | 函数 | numpy/pandas | C04 测试断言 |
-| `DataRegistry` / `file_sha256` | 类/函数 | stdlib | C02 数据登记与哈希 |
-| `ExperimentContext` | 类 | sklearn | C03 划分/种子/环境 |
-| `SCORE_FLOORS` / `assert_above_floor` | 常量/函数 | — | C05 分数下限 |
-| `ChartMeta` / `assert_report_ok` / `write_chart_sidecar` | 类/函数 | — | C06 报告与图表元信息 |
-| `RegressionSummary` / `from_junit_xml` | 类/函数 | — | C10 回归汇总 |
-| `require_data_path` / `optional_data_available` | 函数 | pytest（懒加载） | C11；`import wanglaoshi` 不强制 pytest |
-| `compete` / `analyze` / `features` / `analytics` / `runtime` / `_testing` | 子包门面 | — | 架构 Phase 1；见 `docs/ARCHITECTURE.md` |
+| `compete` / `analyze` / `features` / `analytics` / `runtime` / `_testing` | 子包门面 | — | **稳定**；见 `docs/ARCHITECTURE.md` |
+| `ready` | 函数 | 标准库 (+ 可选 numpy) | **稳定** Notebook 一键就绪 |
+| `DataAnalyzer` / `analyze_*` | 类/函数 | pandas/sklearn/matplotlib | **稳定**捷径（等价 `analyze` 门面） |
+| `business` / `BusinessPipeline` / … | 模块/类/函数 | pandas | **稳定**；见 `wanglaoshi.business` |
+| `stats` / `StatsToolkit` / `TimeSeriesTools` / … | 模块/类 | 视功能而定 | **稳定**捷径（等价 `analytics`） |
+| `assert_close` / `DataRegistry` / `ExperimentContext` / … | 函数/类 | 视功能而定 | **稳定**捷径（等价 `_testing`） |
+| `JupyterEnv` / `VERSIONS` / `JupyterFont` / `Useful` / `WebGetter` | 模块 | 视功能而定 | **兼容**；推荐 `runtime` 门面 |
+| `Analyzer` / `CompetitionTools` / `FeatureEngineering` | 模块 | sklearn/pandas | **兼容**；推荐对应门面 |
+| `Analyzer_Plain` | 模块 | 同上 | **Legacy**；请优先 `wanglaoshi.analyze` |
+| `wqe`（非顶层 `__all__`） | 模块 | 同上 | **Legacy**；`import wanglaoshi.wqe` |
+| `MLDL` | 可选模块 | **torch** | **兼容**；未装 torch 时可能为 `None` |
+| `JupyterEnv.no_warning` | 函数 | warnings | 仅关警告；课堂请优先 `ready()` |
 | `validate_metric_dict` / `default_metric_registry` | 函数 | — | S5 指标口径版本登记 |
 
 ## CompetitionTools 关键契约

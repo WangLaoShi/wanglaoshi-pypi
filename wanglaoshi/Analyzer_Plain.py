@@ -1,6 +1,9 @@
 """
 简化版数据分析模块 (Analyzer_Plain.py)
 
+**Legacy（历史路径）**：新代码请优先 ``from wanglaoshi.analyze import DataAnalyzer`` /
+``analyze_data``。本模块仍可导入，后续 Phase 可能发出 DeprecationWarning。
+
 这个模块提供了一个简化版的数据分析函数，功能包括：
 1. 数据基本信息统计
 2. 缺失值分析

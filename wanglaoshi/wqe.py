@@ -1,3 +1,12 @@
+"""Legacy EDA 并行实现（wqe）。
+
+历史路径，仍可 ``import wanglaoshi.wqe``。新代码请优先::
+
+    from wanglaoshi.analyze import DataAnalyzer, analyze_data
+
+后续 Phase 可能发出 DeprecationWarning；详见 docs/ARCHITECTURE.md。
+"""
+
 # 导入各种必需的库
 import os  # 用于操作系统相关的功能，如文件路径处理
 import base64  # 用于图像编码

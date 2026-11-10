@@ -40,11 +40,11 @@ wanglaoshi/
 - 写本文档；加架构烟测。
 - **不发** DeprecationWarning（避免刷屏）。
 
-### Phase 2 — 收缩公开面（下一批）
+### Phase 2 — 收缩公开面 ✅
 
-- 文档/教材改用门面导入。
-- `__all__` 区分「稳定公开」与「兼容导出」；README 示例切到门面。
-- 给 `Analyzer_Plain` / `wqe` 文档标注 *legacy*。
+- 文档/README 主示例改用门面导入；课堂旧导入仍可用。
+- `__all__` 区分 `_STABLE_PUBLIC` 与 `_COMPAT_EXPORTS`。
+- `Analyzer_Plain` / `wqe` 源码与 API 盘点标注 *legacy*。
 
 ### Phase 3 — soft deprecate
 

@@ -6,12 +6,13 @@
 
 **基线工坊** 是面向 **数据分析入门学生** 与 **数据科学竞赛选手（如 Kaggle）** 的学习与实战工具包（`pip install wanglaoshi`），主要特点：
 
-- **一键 EDA**：`Analyzer` / `DataAnalyzer` 做缺失、异常、相关、PCA 与 HTML 报告
-- **比赛工具链**：`CompetitionTools` 提供提交生成与校验、快速基线、集成、调参、实验追踪
-- **特征工程**：`FeatureEngineering` 支持时间/文本/编码/变换/特征选择
+- **一键 EDA**：`wanglaoshi.analyze`（`DataAnalyzer`）做缺失、异常、相关、PCA 与 HTML 报告
+- **比赛工具链**：`wanglaoshi.compete` 提供提交生成与校验、快速基线、集成、调参、实验追踪
+- **特征工程**：`wanglaoshi.features` 支持时间/文本/编码/变换/特征选择
 - **业务流水线**：`business` / `BusinessPipeline` 固化接收→清洗→指标→六视角→结论→归档（无需 AI Key）
-- **环境辅助**：`VERSIONS`、`JupyterEnv`、`JupyterFont`、`Useful` 等
+- **环境辅助**：`wanglaoshi.runtime`（`ready` / `VERSIONS` / `JupyterEnv` 等）
 - **可选深度学习**：`MLDL`（需自行安装 `torch`；未安装不影响其他功能）
+- **架构说明**：门面分层与迁移见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 适用人群：数据分析初学者、Kaggle 选手、需要可追溯业务分析模板的同学。
 
@@ -142,8 +143,9 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from wanglaoshi import ready, DataAnalyzer
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import ready
+from wanglaoshi.analyze import DataAnalyzer
+from wanglaoshi.compete import QuickBaseline, SubmissionGenerator
 
 # 1) 一键就绪：关警告 + 打印环境（替代 filterwarnings + JE.no_warning + V.show_env_info）
 ready()
@@ -162,7 +164,7 @@ X_train, X_valid, y_train, y_valid = train_test_split(
 )
 
 # 4) 一键多模型基线；compare_models 按验证集表现排序
-baseline = CT.QuickBaseline()
+baseline = QuickBaseline()
 results = baseline.run_all_models(X_train, y_train, X_valid, y_valid, task_type='classification')
 comparison = baseline.compare_models(results, top_n=5)
 print(comparison)
@@ -173,10 +175,12 @@ best = comparison.iloc[0]['Model']
 pred = results[best]['predictions']
 sample = pd.DataFrame({'Id': np.arange(len(pred)), 'target': y_valid.to_numpy()})
 sample.to_csv('sample_submission.csv', index=False)
-gen = CT.SubmissionGenerator()
+gen = SubmissionGenerator()
 gen.create_submission(pred, 'sample_submission.csv', 'submission.csv', prediction_type='label')
 print(gen.validate_submission('submission.csv', 'sample_submission.csv'))
 ```
+
+> 课堂旧写法 `from wanglaoshi import CompetitionTools as CT` 仍然可用；新代码优先门面导入。
 
 完整竞赛流程（读 `train.csv` / 特征工程 / 提交）见下文各章节与 `examples/advanced/`。
 
@@ -1217,51 +1221,50 @@ selected_features = engineer.select_features_by_mutual_info(
 
 这一节汇总了常用的对外 API，方便你快速找到「应该从哪里导入什么」。
 
-### 顶层导入（推荐）
+### 门面导入（推荐）
 
-这些是你在大多数脚本 / Notebook 里最常用的入口：
+新代码优先走子包门面（详见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)）：
 
 | 类型         | 说明                         | 导入方式 / 示例 |
 |--------------|------------------------------|-----------------|
-| 环境与版本   | 检查 Python / 库版本         | `from wanglaoshi import VERSIONS as V` |
-| EDA 分析器   | 高级 EDA 与报告生成          | `from wanglaoshi import Analyzer, DataAnalyzer` |
-| 比赛工具     | 提交文件、基线模型、集成等   | `from wanglaoshi import CompetitionTools as CT` |
+| 环境就绪     | 关警告 + 环境信息            | `from wanglaoshi import ready` / `from wanglaoshi.runtime import ready` |
+| EDA 分析器   | 高级 EDA 与报告生成          | `from wanglaoshi.analyze import DataAnalyzer` |
+| 比赛工具     | 提交文件、基线模型、集成等   | `from wanglaoshi.compete import SubmissionGenerator, QuickBaseline` |
 | 业务流水线   | 接收→清洗→指标→结论→归档     | `from wanglaoshi import BusinessPipeline` |
-| 特征工程     | 时间 / 文本 / 编码 / 选择等  | `from wanglaoshi import FeatureEngineering as FE` |
-| ML/DL 基础   | 预处理、特征工程、ML/DL 模型 | `from wanglaoshi import MLDL` |
-| Jupyter 环境 | 管理内核、查看环境信息       | `from wanglaoshi import JupyterEnv as JE` |
-| 字体配置     | Matplotlib 中文字体支持      | `from wanglaoshi import JupyterFont as JF` |
-| 常用工具     | pip 源、样式等               | `from wanglaoshi import Useful` |
-| 下载工具     | 带进度条的文件下载           | `from wanglaoshi import WebGetter` |
+| 特征工程     | 时间 / 文本 / 编码 / 选择等  | `from wanglaoshi.features import AdvancedFeatureEngineer` |
+| 通用分析     | 时序 / 统计 / 校准 / 公平等  | `from wanglaoshi.analytics import StatsToolkit, TimeSeriesTools` |
+| 运行时辅助   | Jupyter / 字体 / 下载        | `from wanglaoshi.runtime import JupyterEnv, VERSIONS, WebGetter` |
+| 测试治理     | 断言 / 分数下限 / 实验上下文 | `from wanglaoshi._testing import assert_close, ExperimentContext` |
+| ML/DL 基础   | 预处理、特征工程、ML/DL 模型 | `from wanglaoshi import MLDL`（可选 torch） |
 
-常用函数 / 类可以直接从包顶层导入（少打一层模块前缀）：
+顶层捷径仍可用（兼容课堂旧代码）：
 
-| 名称                    | 来自模块   | 作用                            | 导入示例 |
-|-------------------------|------------|---------------------------------|----------|
-| `DataAnalyzer`          | `Analyzer` | 高级 EDA 主类                   | `from wanglaoshi import DataAnalyzer` |
-| `analyze_data`          | `Analyzer` | 对单个数据文件做 EDA 并生成报告 | `from wanglaoshi import analyze_data` |
-| `analyze_multiple_files`| `Analyzer` | 批量分析文件夹下的多个数据文件  | `from wanglaoshi import analyze_multiple_files` |
-| `analyze_notebook`      | `Analyzer` | 在 Jupyter Notebook 中展示分析  | `from wanglaoshi import analyze_notebook` |
-
-> 说明：上面这些函数 / 类都已经在 `wanglaoshi/__init__.py` 中导出，可以直接从 `wanglaoshi` 顶层导入，不需要经过子模块。
+| 名称                    | 推荐门面           | 兼容导入 |
+|-------------------------|--------------------|----------|
+| `DataAnalyzer`          | `wanglaoshi.analyze` | `from wanglaoshi import DataAnalyzer` |
+| `analyze_data`          | `wanglaoshi.analyze` | `from wanglaoshi import analyze_data` |
+| `CompetitionTools`      | `wanglaoshi.compete` | `from wanglaoshi import CompetitionTools as CT` |
+| `FeatureEngineering`    | `wanglaoshi.features` | `from wanglaoshi import FeatureEngineering as FE` |
 
 ### 模块级 API 一览
 
 | 模块名              | 主要内容 / 用途                                             | 常见入口 / 示例 |
 |---------------------|--------------------------------------------------------------|-----------------|
-| `VERSIONS`          | 环境与库版本检查，支持简单 / 完整库表、PyPI 最新版本对比     | `V.show_env_info()`、`V.check_all_versions(...)` |
-| `Analyzer`          | 高级 EDA：缺失值、异常值、相关性、PCA、HTML 报告            | `analyzer = DataAnalyzer(df)`、`analyzer.generate_report()` |
-| `Analyzer_Plain`    | 简化版文本 EDA：统计 + 文本报告 + 基本图表                  | `from wanglaoshi import Analyzer_Plain` |
-| `CompetitionTools`  | 比赛工具：提交文件、快速基线、模型集成、调参、实验追踪      | `CT.SubmissionGenerator`、`CT.QuickBaseline`、`CT.ModelEnsemble` 等 |
+| `analyze`           | EDA 门面：缺失值、异常值、相关性、PCA、HTML 报告            | `from wanglaoshi.analyze import DataAnalyzer` |
+| `compete`           | 比赛门面：提交、基线、集成、调参、实验追踪                  | `from wanglaoshi.compete import QuickBaseline` |
+| `features`          | 特征工程门面                                                | `from wanglaoshi.features import AdvancedFeatureEngineer` |
+| `analytics`         | 时序 / 统计 / 校准 / 公平 / 异常 / 排序 / 生存              | `from wanglaoshi.analytics import StatsToolkit` |
+| `runtime`           | 环境 / 字体 / 下载                                          | `from wanglaoshi.runtime import ready, VERSIONS` |
 | `business`          | 业务 Skill 流水线：intake/清洗/指标/六视角/结论/交付归档   | `BusinessPipeline`、`intake_file`、`generate_insights` |
-| `FeatureEngineering`| 增强特征工程：时间特征、文本特征、编码、变换、特征选择      | `engineer = FE.AdvancedFeatureEngineer()` |
+| `Analyzer`          | （兼容）高级 EDA 实现模块                                   | `from wanglaoshi import Analyzer` |
+| `Analyzer_Plain`    | **Legacy**：简化版文本 EDA；请优先 `wanglaoshi.analyze`     | `from wanglaoshi import Analyzer_Plain` |
+| `wqe`               | **Legacy**：历史并行 EDA；请优先 `wanglaoshi.analyze`       | `import wanglaoshi.wqe` |
+| `CompetitionTools`  | （兼容）比赛工具实现模块                                    | `from wanglaoshi import CompetitionTools as CT` |
+| `FeatureEngineering`| （兼容）特征工程实现模块                                    | `from wanglaoshi import FeatureEngineering as FE` |
 | `MLDL`              | ML/DL 封装：预处理、特征工程、传统 ML 模型、PyTorch DL 模型  | `from wanglaoshi import MLDL` |
-| `JupyterEnv`        | Jupyter 内核管理、环境信息                                   | `JE.jupyter_kernel_list()`、`JE.install_kernel()` |
-| `JupyterFont`       | Matplotlib 中文字体自动下载与配置                            | `JF.matplotlib_font_init()` |
-| `Useful`            | 常用小工具：pip 镜像源、Jupyter Markdown 样式示例等          | `from wanglaoshi import Useful` |
-| `WebGetter`         | 通用文件下载工具（支持进度条）                               | `from wanglaoshi import WebGetter` |
+| `JupyterEnv` / `VERSIONS` / `JupyterFont` / `Useful` / `WebGetter` | （兼容）运行时辅助 | 推荐 `wanglaoshi.runtime` |
 
-> 建议：做比赛 / 项目时，可以把这一小节当成「速查表」，需要某个功能时先看对应模块，再点进具体示例。
+> 建议：新项目先查门面；旧 Notebook 无需立刻改 import。
 
 ## 建议的版本对照关系
 

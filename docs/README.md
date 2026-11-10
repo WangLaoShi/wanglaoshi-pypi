@@ -7,6 +7,7 @@
 | **[RELEASE.md](RELEASE.md)** | **发布只记三句命令**（`release_check.sh`） |
 | **[API_REFERENCE.md](API_REFERENCE.md)** | **详尽 API 说明书**（签名 + 已校验【可运行】示例） |
 | [API_INVENTORY.md](API_INVENTORY.md) | 公开 API / 可选依赖短盘点（A01） |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | 包分层门面与零破坏迁移（Phase 1–4） |
 | [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md) | Skill → API / 配置 / 测试映射（A02–A03） |
 | [DEPENDENCIES.md](DEPENDENCIES.md) | 依赖分层：默认核 / extras / requirements 文件 / torch（F02） |
 | [evidence/ADVANCED_EVIDENCE.md](evidence/ADVANCED_EVIDENCE.md) | 进阶 Notebook 跑通证据 |

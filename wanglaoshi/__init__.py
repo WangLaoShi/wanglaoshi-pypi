@@ -1,38 +1,21 @@
 """
 wanglaoshi 顶层导出 (API)
 
-为了让 README 中的用法与实际安装后的体验一致，这里整理了推荐的对外 API。
-
-常见用法示例：
+推荐新代码走架构门面（见 docs/ARCHITECTURE.md）::
 
     from wanglaoshi import ready
-    ready()  # 一键：关警告 + 打印环境（推荐，替代 JE.no_warning + V.show_env_info 拼盘）
+    from wanglaoshi.analyze import DataAnalyzer
+    from wanglaoshi.compete import QuickBaseline, SubmissionGenerator
+    from wanglaoshi.features import AdvancedFeatureEngineer
+    from wanglaoshi.analytics import StatsToolkit, TimeSeriesTools
+    from wanglaoshi.runtime import JupyterEnv, VERSIONS
+    from wanglaoshi._testing import assert_close
 
-    from wanglaoshi import Analyzer
+课堂兼容仍可用::
+
     from wanglaoshi import CompetitionTools as CT
     from wanglaoshi import FeatureEngineering as FE
-    from wanglaoshi import DataAnalyzer, analyze_data, analyze_multiple_files, analyze_notebook
-
-模块级别导出：
-- JupyterEnv
-- VERSIONS
-- Analyzer
-- Analyzer_Plain
-- CompetitionTools
-- FeatureEngineering
-- MLDL
-- JupyterFont
-- Useful
-- WebGetter
-
-函数 / 类级别导出：
-- DataAnalyzer
-- analyze_data
-- analyze_multiple_files
-- analyze_notebook
-
-架构门面（推荐新代码使用，详见 docs/ARCHITECTURE.md）：
-- wanglaoshi.compete / analyze / features / business / analytics / runtime / _testing
+    from wanglaoshi import DataAnalyzer, analyze_data
 """
 
 # 模块导出（用于 from wanglaoshi import VERSIONS as V 这类用法）
@@ -102,19 +85,12 @@ from . import _testing  # noqa: F401
 # testing_utils 依赖 pytest，仅开发/测试需要；勿在 import wanglaoshi 时强拉
 # 仍支持：from wanglaoshi import require_data_path（首次访问时再加载）
 
-__all__ = [
-    # 模块
-    "JupyterEnv",
-    "VERSIONS",
-    "Analyzer",
-    "Analyzer_Plain",
-    "CompetitionTools",
-    "FeatureEngineering",
-    # MLDL 是可选模块，这里继续导出名称，但需要用户自己确保安装了 torch
-    "MLDL",
-    "JupyterFont",
-    "Useful",
-    "WebGetter",
+# ---------------------------------------------------------------------------
+# Phase 2：公开面分层
+# - _STABLE_PUBLIC：推荐对外稳定入口（门面 + 常用捷径）
+# - _COMPAT_EXPORTS：课堂/历史兼容，仍可 import，新代码请优先门面
+# ---------------------------------------------------------------------------
+_STABLE_PUBLIC = [
     # 架构门面
     "compete",
     "analyze",
@@ -122,14 +98,14 @@ __all__ = [
     "analytics",
     "runtime",
     "_testing",
-    # 类 / 函数
+    "business",
+    # Notebook / EDA 捷径
     "ready",
     "DataAnalyzer",
     "analyze_data",
     "analyze_multiple_files",
     "analyze_notebook",
-    # business
-    "business",
+    # business 捷径
     "BusinessPipeline",
     "StageResult",
     "RunRecord",
@@ -146,6 +122,7 @@ __all__ = [
     "yoy_with_rules",
     "convert_units",
     "add_value_tiers",
+    # analytics 捷径
     "stats",
     "StatsToolkit",
     "ExperimentDesign",
@@ -156,6 +133,7 @@ __all__ = [
     "AnomalyDetector",
     "RankingMetrics",
     "SurvivalAnalyzer",
+    # 测试 / 实验治理捷径
     "assert_close",
     "assert_metrics_close",
     "assert_frame_contract",
@@ -172,6 +150,22 @@ __all__ = [
     "require_data_path",
     "optional_data_available",
 ]
+
+_COMPAT_EXPORTS = [
+    # 历史模块级导入（等价于门面 / 子模块）
+    "JupyterEnv",
+    "VERSIONS",
+    "Analyzer",
+    "Analyzer_Plain",  # legacy：请优先 wanglaoshi.analyze
+    "CompetitionTools",
+    "FeatureEngineering",
+    "MLDL",  # 可选；未装 torch 时为 None
+    "JupyterFont",
+    "Useful",
+    "WebGetter",
+]
+
+__all__ = _STABLE_PUBLIC + _COMPAT_EXPORTS
 
 
 def __getattr__(name: str):
