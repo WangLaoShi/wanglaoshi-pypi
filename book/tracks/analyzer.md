@@ -11,7 +11,7 @@
 | `ready()` | 统一环境横幅与警告策略 |
 
 ```python
-from wanglaoshi import ready, DataAnalyzer
+from wanglaoshi.runtime import ready, DataAnalyzer
 import pandas as pd
 
 ready()
@@ -35,7 +35,7 @@ analyzer.generate_report("report.html")
 
 ```python
 from sklearn.datasets import load_iris
-from wanglaoshi import ready, DataAnalyzer
+from wanglaoshi.runtime import ready, DataAnalyzer
 
 ready()
 iris = load_iris(as_frame=True)

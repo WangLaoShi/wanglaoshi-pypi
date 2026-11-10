@@ -1,6 +1,6 @@
 # 基线工坊 · 从 EDA 到提交
 
-当前版本：**0.14.0** · Python 包名：`wanglaoshi`（作者 WangLaoShi）
+当前版本：**1.15.1** · Python 包名：`wanglaoshi`（作者 WangLaoShi）
 
 ## 项目介绍
 
@@ -51,9 +51,9 @@ wanglaoshi-pypi
 └── wanglaoshi/
     ├── compete/ analyze/ features/ analytics/ runtime/ _testing/  # 门面（实现所在）
     ├── business/                 # 业务 Skill 流水线
-    ├── Analyzer.py / stats/ 等   # 兼容 shim（旧 import 仍可用）
+    ├── Analyzer.py / stats/ 等   # 旧路径 shim（1.15+ 不再推荐）
     ├── ml/                       # ML/DL 门面（torch 可选）
-    ├── Analyzer_Plain.py / wqe.py / MLDL.py  # legacy / 兼容 shim
+    ├── Analyzer_Plain.py / wqe.py / MLDL.py  # legacy shim
     └── __init__.py               # 详见 docs/ARCHITECTURE.md
 ```
 
@@ -61,7 +61,8 @@ wanglaoshi-pypi
 
 完整历史见下方「版本历史」；近期：
 
-- **0.14.0** 业务流水线 `wanglaoshi.business`（D01–D12 主链）、进阶 12 案例与跑通证据、提交生成加固、文档与 CI 更新
+- **1.15.1** 架构门面优先（`compete` / `analyze` / `features` / `analytics` / `ml` / `runtime`）；文档、examples、book 案例全面切换；旧顶层导入不再作为推荐写法
+- 0.14.0 业务流水线 `wanglaoshi.business`（D01–D12 主链）、进阶 12 案例与跑通证据、提交生成加固、文档与 CI 更新
 - 0.13.1 `MLDL`/torch 改为可选导入，避免未装 torch 时整包失败
 - 0.13.0 FeatureEngineering + CompetitionTools 增强
 - 0.12.0 CompetitionTools 初版（提交 / 基线 / 泄漏检测）
@@ -142,7 +143,7 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 from wanglaoshi.analyze import DataAnalyzer
 from wanglaoshi.compete import QuickBaseline, SubmissionGenerator
 
@@ -179,7 +180,7 @@ gen.create_submission(pred, 'sample_submission.csv', 'submission.csv', predictio
 print(gen.validate_submission('submission.csv', 'sample_submission.csv'))
 ```
 
-> 课堂旧写法 `from wanglaoshi import CompetitionTools as CT` 仍然可用；新代码优先门面导入。
+> 课堂旧写法 `from wanglaoshi import compete as CT` 仍然可用；新代码优先门面导入。
 
 完整竞赛流程（读 `train.csv` / 特征工程 / 提交）见下文各章节与 `examples/advanced/`。
 
@@ -249,7 +250,7 @@ VERSIONS 模块提供了两个版本的库列表：**简单版本**（9个核心
 简单版本只包含最核心、最常用的库，适合快速检查基础环境：
 
 ```python
-from wanglaoshi import VERSIONS as V
+from wanglaoshi.runtime import VERSIONS as V
 
 # 显示简单版本（只包含9个核心库）
 V.check_all_versions(version='simple')
@@ -269,7 +270,7 @@ V.check_all_versions(version='simple')
 复杂版本包含所有重要的机器学习和深度学习库，适合完整环境检查：
 
 ```python
-from wanglaoshi import VERSIONS as V
+from wanglaoshi.runtime import VERSIONS as V
 
 # 显示复杂版本（包含60+个库，默认）
 V.check_all_versions()
@@ -296,7 +297,7 @@ V.check_all_versions(version='full')
 #### 2.3 显示所有列（包括网站和分类）
 
 ```python
-from wanglaoshi import VERSIONS as V
+from wanglaoshi.runtime import VERSIONS as V
 
 # 显示所有列（包括网站链接和分类信息）
 V.check_all_versions(all_columns=True, version='full')
@@ -305,7 +306,7 @@ V.check_all_versions(all_columns=True, version='full')
 #### 2.4 其他版本检查功能
 
 ```python
-from wanglaoshi import VERSIONS as V
+from wanglaoshi.runtime import VERSIONS as V
 
 # 获取所有已安装的库（不限于ML/DL库）
 V.check_all_installed()
@@ -581,13 +582,13 @@ if __name__ == "__main__":
 旧写法里 `warnings.filterwarnings('ignore')` 与 `JE.no_warning()` **重复**，请改用：
 
 ```python
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready()                 # quiet=True, show_env=True, seed=42
 # ready(quiet=False)    # 调试时保留警告
 # ready(check_core=True)  # 顺带检查 numpy/pandas/sklearn
 ```
 
-仅需关警告时仍可用：`from wanglaoshi import JupyterEnv as JE; JE.no_warning()`。
+仅需关警告时：`from wanglaoshi.runtime import JupyterEnv as JE; JE.no_warning()`。
 
 ### 7. Wget 功能
 
@@ -669,11 +670,11 @@ A.analyze_multiple_files('test_data', output_dir='reports')
 - `tips_report.html`：餐厅小费数据集的分析报告
 - `iris_report.html`：鸢尾花数据集的分析报告
 
-## 10. MLDL (单独安装 torch，pip install torch)
+## 10. ML（`wanglaoshi.ml`；单独安装 torch）
 
 ```python
 """使用示例"""
-from MLDL import *
+from wanglaoshi.ml import DataPreprocessor, FeatureEngineer, MLModel
 # 1. 数据预处理
 preprocessor = DataPreprocessor()
 df = pd.DataFrame({
@@ -1226,26 +1227,17 @@ selected_features = engineer.select_features_by_mutual_info(
 
 | 类型         | 说明                         | 导入方式 / 示例 |
 |--------------|------------------------------|-----------------|
-| 环境就绪     | 关警告 + 环境信息            | `from wanglaoshi import ready` / `from wanglaoshi.runtime import ready` |
+| 环境就绪     | 关警告 + 环境信息            | `from wanglaoshi.runtime import ready` |
 | EDA 分析器   | 高级 EDA 与报告生成          | `from wanglaoshi.analyze import DataAnalyzer` |
 | 比赛工具     | 提交文件、基线模型、集成等   | `from wanglaoshi.compete import SubmissionGenerator, QuickBaseline` |
-| 业务流水线   | 接收→清洗→指标→结论→归档     | `from wanglaoshi import BusinessPipeline` |
+| 业务流水线   | 接收→清洗→指标→结论→归档     | `from wanglaoshi.business import BusinessPipeline` |
 | 特征工程     | 时间 / 文本 / 编码 / 选择等  | `from wanglaoshi.features import AdvancedFeatureEngineer` |
 | 通用分析     | 时序 / 统计 / 校准 / 公平等  | `from wanglaoshi.analytics import StatsToolkit, TimeSeriesTools` |
 | 运行时辅助   | Jupyter / 字体 / 下载        | `from wanglaoshi.runtime import JupyterEnv, VERSIONS, WebGetter` |
 | 测试治理     | 断言 / 分数下限 / 实验上下文 | `from wanglaoshi._testing import assert_close, ExperimentContext` |
 | ML/DL 基础   | 预处理、特征工程、ML/DL 模型 | `from wanglaoshi.ml import MLModel`（可选 torch） |
 
-顶层捷径仍可用（兼容课堂旧代码）：
-
-| 名称                    | 推荐门面           | 兼容导入 |
-|-------------------------|--------------------|----------|
-| `DataAnalyzer`          | `wanglaoshi.analyze` | `from wanglaoshi import DataAnalyzer` |
-| `analyze_data`          | `wanglaoshi.analyze` | `from wanglaoshi import analyze_data` |
-| `CompetitionTools`      | `wanglaoshi.compete` | `from wanglaoshi import compete as CT` |
-| `FeatureEngineering`    | `wanglaoshi.features` | `from wanglaoshi import features as FE` |
-
-### 模块级 API 一览
+### 模块级 API 一览（1.15.1+）
 
 | 模块名              | 主要内容 / 用途                                             | 常见入口 / 示例 |
 |---------------------|--------------------------------------------------------------|-----------------|
@@ -1254,16 +1246,11 @@ selected_features = engineer.select_features_by_mutual_info(
 | `features`          | 特征工程门面                                                | `from wanglaoshi.features import AdvancedFeatureEngineer` |
 | `analytics`         | 时序 / 统计 / 校准 / 公平 / 异常 / 排序 / 生存              | `from wanglaoshi.analytics import StatsToolkit` |
 | `runtime`           | 环境 / 字体 / 下载                                          | `from wanglaoshi.runtime import ready, VERSIONS` |
-| `business`          | 业务 Skill 流水线：intake/清洗/指标/六视角/结论/交付归档   | `BusinessPipeline`、`intake_file`、`generate_insights` |
-| `Analyzer`          | （兼容）高级 EDA 实现模块                                   | `from wanglaoshi import Analyzer` |
-| `Analyzer_Plain`    | **Legacy**（导入会警告；`WANGLAOSHI_SILENCE_LEGACY=1` 可关） | `from wanglaoshi import Analyzer_Plain` |
-| `wqe`               | **Legacy**（同上）；请优先 `wanglaoshi.analyze`             | `import wanglaoshi.wqe` |
-| `CompetitionTools`  | （兼容）比赛工具实现模块                                    | `from wanglaoshi import CompetitionTools as CT` |
-| `FeatureEngineering`| （兼容）特征工程实现模块                                    | `from wanglaoshi import features as FE` |
-| `ml` / `MLDL`       | ML/DL 门面（实现 `ml.core`）；`MLDL` 为兼容 shim                 | `from wanglaoshi.ml import DataPreprocessor` |
-| `JupyterEnv` / `VERSIONS` / `JupyterFont` / `Useful` / `WebGetter` | （兼容）运行时辅助 | 推荐 `wanglaoshi.runtime` |
+| `business`          | 业务 Skill 流水线：intake/清洗/指标/六视角/结论/交付归档   | `from wanglaoshi.business import BusinessPipeline` |
+| `ml`                | ML/DL 门面（实现 `ml.core`；torch 可选）                    | `from wanglaoshi.ml import DataPreprocessor, MLModel` |
+| `Analyzer_Plain` / `wqe` | **Legacy**（导入警告；`WANGLAOSHI_SILENCE_LEGACY=1` 可关） | 请用 `wanglaoshi.analyze` |
 
-> 建议：新项目先查门面；旧 Notebook 无需立刻改 import。
+> 1.15.1 起教材与示例只教门面；根上旧模块名为过渡 shim，勿再写入新代码。
 
 ## 建议的版本对照关系
 

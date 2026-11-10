@@ -1,7 +1,7 @@
-# wanglaoshi 架构与迁移（零破坏）
+# wanglaoshi 架构与迁移
 
-**更新日期：** 2026-11-10  
-**原则：** 先加门面 → 文档引导 → 再 deprecate → 最后搬实现。旧导入路径在过渡期内保持可用。
+**更新日期：** 2026-11-10 · **当前版本：1.15.1**  
+**原则：** 公开写法以门面为准；根上旧路径仅作过渡 shim，**不再作为文档 / 示例 / 教材推荐**。
 
 ---
 
@@ -31,7 +31,17 @@ wanglaoshi/
 | `_testing` | `_testing/*.py` | `asserting.py` 等（shim） |
 | legacy EDA | `analyze/plain.py` / `analyze/wqe.py` | `Analyzer_Plain.py` / `wqe.py`（shim + warning） |
 
-顶层 `from wanglaoshi import DataAnalyzer, ready, …` **继续支持**（兼容课堂旧代码）。
+自 **1.15.1** 起，请统一：
+
+```python
+from wanglaoshi.runtime import ready
+from wanglaoshi.analyze import DataAnalyzer
+from wanglaoshi.compete import QuickBaseline, SubmissionGenerator
+from wanglaoshi.features import AdvancedFeatureEngineer
+from wanglaoshi.ml import DataPreprocessor, MLModel
+```
+
+旧写法（`from wanglaoshi import CompetitionTools as CT` / 顶层 `DataAnalyzer` 等）已放弃为推荐路径。
 
 ---
 
@@ -57,10 +67,10 @@ wanglaoshi/
 
 ---
 
-## 3. 明确不做什么
+## 3. 1.15.1 起的公开约定
 
-- 不强制改 `examples/advanced/*.ipynb` 与 `book/` 课号目录中的旧 import（兼容路径仍可用）。
-- 不强制用户立刻改 import（仅 soft warning）；**新文档 / API 说明书 / 脚本示例**优先门面。
+- `examples/`、`book/`、`docs/`、`README` **全部改为门面导入**；旧顶层捷径不再写入新示例。
+- 根 shim 暂留，便于未升级课堂环境；**新代码勿再依赖**。
 - Phase 4 之后补迁已完成：`stats/` → `analytics/stats/`；`Analyzer_Plain`/`wqe` → `analyze/{plain,wqe}.py`；`MLDL` → `ml/core.py`。
 
 ---
@@ -76,9 +86,10 @@ python scripts/check_architecture.py   # 或 ./scripts/run_tests.sh arch
 手工等价检查：
 
 ```bash
-python -c "from wanglaoshi import DataAnalyzer, CompetitionTools, ready"
-python -c "from wanglaoshi.compete import SubmissionGenerator"
-python -c "from wanglaoshi.analyze import DataAnalyzer"
+python -c "from wanglaoshi.runtime import ready; from wanglaoshi.analyze import DataAnalyzer"
+python -c "from wanglaoshi.compete import SubmissionGenerator, QuickBaseline"
+python -c "from wanglaoshi.features import AdvancedFeatureEngineer"
 python -c "from wanglaoshi.analytics import StatsToolkit"
+python -c "from wanglaoshi.ml import DataPreprocessor, MLModel"
 python -c "from wanglaoshi._testing import assert_close"
 ```

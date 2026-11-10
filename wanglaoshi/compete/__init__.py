@@ -3,11 +3,6 @@
 推荐::
 
     from wanglaoshi.compete import SubmissionGenerator, QuickBaseline
-
-过渡期仍可用::
-
-    from wanglaoshi import CompetitionTools as CT
-    from wanglaoshi.CompetitionTools import SubmissionGenerator
 """
 
 from __future__ import annotations

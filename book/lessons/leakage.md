@@ -17,7 +17,7 @@
 ```python
 import pandas as pd
 import numpy as np
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 from wanglaoshi.CompetitionTools import LeakageDetector
 
 ready()

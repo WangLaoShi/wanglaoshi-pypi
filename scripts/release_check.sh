@@ -65,11 +65,14 @@ step "文档/示例烟测" python scripts/smoke_docs_examples.py
 
 # 4) 发版档：导入确认
 if [[ "$MODE" != "quick" ]]; then
-  step "顶层导入烟测" python -c "
+  step "门面导入烟测" python -c "
 import wanglaoshi
-from wanglaoshi import ready, DataAnalyzer, BusinessPipeline, CompetitionTools
+from wanglaoshi.runtime import ready, WebGetter
+from wanglaoshi.analyze import DataAnalyzer
+from wanglaoshi.compete import SubmissionGenerator
+from wanglaoshi.business import BusinessPipeline
 from wanglaoshi.WebGetter import Wget
-print('ok', wanglaoshi.__file__)
+print('ok', wanglaoshi.__file__, ready, DataAnalyzer, SubmissionGenerator, BusinessPipeline, Wget)
 "
 fi
 

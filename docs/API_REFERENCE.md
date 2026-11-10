@@ -34,17 +34,17 @@ print(sorted(wanglaoshi.__all__))
 
 | 写法 | 用途 |
 | --- | --- |
-| `from wanglaoshi import ready` | Notebook 一键就绪 |
+| `from wanglaoshi.runtime import ready` | Notebook 一键就绪 |
 | `from wanglaoshi.analyze import DataAnalyzer, analyze_data` | EDA |
 | `from wanglaoshi.compete import SubmissionGenerator, QuickBaseline` | 竞赛工具 |
 | `from wanglaoshi.features import AdvancedFeatureEngineer` | 特征工程 |
-| `from wanglaoshi import BusinessPipeline` | 业务流水线 |
+| `from wanglaoshi.business import BusinessPipeline` | 业务流水线 |
 | `from wanglaoshi.runtime import VERSIONS, JupyterEnv, WebGetter` | 环境 / 下载 |
 | `from wanglaoshi.ml import DataPreprocessor, MLModel, TORCH_AVAILABLE` | ML/DL（torch 可选） |
 | `from wanglaoshi.analytics import StatsToolkit, TimeSeriesTools` | 统计 / 时序等 |
 | `from wanglaoshi._testing import assert_close` | 测试断言 |
 
-兼容旧写法（仍可用）：`from wanglaoshi import CompetitionTools as CT` / `FeatureEngineering as FE` / `MLDL`。
+自 **1.15.1** 起以上为唯一推荐写法；根上旧模块名仅为过渡 shim。
 
 ---
 
@@ -61,7 +61,7 @@ print(sorted(wanglaoshi.__all__))
 
 ```python
 # 【可运行】
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 
 info = ready(show_env=False, quiet=True, seed=42)
 assert isinstance(info, dict)
@@ -795,7 +795,6 @@ print("Useful OK")
 ## 8. `wanglaoshi.ml` 【torch 可选】
 
 - 推荐：`from wanglaoshi.ml import DataPreprocessor, MLModel, TORCH_AVAILABLE`
-- 兼容：`from wanglaoshi import MLDL`（shim → `ml.core`）
 - 未装 torch 时模块仍可导入；`TORCH_AVAILABLE is False`，DL 类实例化会提示安装 torch。
 - 安装请按 [PyTorch 官网](https://pytorch.org/)。
 

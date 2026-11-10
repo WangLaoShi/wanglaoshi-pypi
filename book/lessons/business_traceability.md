@@ -20,7 +20,7 @@
 ```python
 from pathlib import Path
 import pandas as pd
-from wanglaoshi import ready, BusinessPipeline
+from wanglaoshi.runtime import ready, BusinessPipeline
 
 ready()
 

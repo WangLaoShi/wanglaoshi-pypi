@@ -31,8 +31,8 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from wanglaoshi import ready, DataAnalyzer
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi.runtime import ready, DataAnalyzer
+from wanglaoshi import compete as CT
 
 ready(show_env=False)
 df = load_iris(as_frame=True).frame

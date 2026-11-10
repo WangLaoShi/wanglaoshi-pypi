@@ -17,7 +17,7 @@
 | `AdvancedFeatureEngineer` | 时间/文本/编码等 | {doc}`../lessons/feature_fit_discipline` |
 
 ```python
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 from wanglaoshi.CompetitionTools import (
     SubmissionGenerator,
     QuickBaseline,

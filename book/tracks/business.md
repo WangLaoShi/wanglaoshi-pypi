@@ -29,7 +29,7 @@ Skill 来源与 API 映射：{doc}`../reference/skill-mapping`。
 ## 3. 最小可运行用法
 
 ```python
-from wanglaoshi import ready, BusinessPipeline
+from wanglaoshi.runtime import ready, BusinessPipeline
 
 ready()
 pipe = BusinessPipeline(

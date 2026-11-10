@@ -1,9 +1,9 @@
 """
 wanglaoshi 顶层导出 (API)
 
-推荐新代码走架构门面（见 docs/ARCHITECTURE.md）::
+自 1.15.1 起，公开写法以架构门面为准（见 docs/ARCHITECTURE.md）::
 
-    from wanglaoshi import ready
+    from wanglaoshi.runtime import ready
     from wanglaoshi.analyze import DataAnalyzer
     from wanglaoshi.compete import QuickBaseline, SubmissionGenerator
     from wanglaoshi.features import AdvancedFeatureEngineer
@@ -12,11 +12,8 @@ wanglaoshi 顶层导出 (API)
     from wanglaoshi.runtime import JupyterEnv, VERSIONS
     from wanglaoshi._testing import assert_close
 
-课堂兼容仍可用::
-
-    from wanglaoshi import CompetitionTools as CT
-    from wanglaoshi import FeatureEngineering as FE
-    from wanglaoshi import DataAnalyzer, analyze_data
+旧顶层捷径（``CompetitionTools`` / ``FeatureEngineering`` / 顶层 ``DataAnalyzer`` 等）
+已放弃为推荐路径；根上 shim 仅过渡保留，新代码请勿再依赖。
 """
 
 # 模块导出（用于 from wanglaoshi import VERSIONS as V 这类用法）
@@ -75,7 +72,7 @@ from .score_floors import SCORE_FLOORS, assert_above_floor
 from .report_meta import ChartMeta, assert_report_ok, write_chart_sidecar
 from .regression_summary import RegressionSummary, from_junit_xml
 
-# 架构门面（Phase 1：re-export；旧路径仍可用）
+# 架构门面（实现所在；根上旧模块为过渡 shim）
 from . import compete, analyze, features, analytics, runtime, ml
 from . import _testing  # noqa: F401
 

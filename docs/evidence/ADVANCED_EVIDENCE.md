@@ -1,6 +1,6 @@
 # Advanced Notebook 跑通证据
 
-- 生成时间(UTC): `2026-11-09T07:12:01.511827+00:00`
+- 生成时间(UTC): `2026-11-10T08:19:17.404550+00:00`
 - Python: `/opt/anaconda3/bin/python`
 - 汇总: passed=22, failed=0, total=22
 

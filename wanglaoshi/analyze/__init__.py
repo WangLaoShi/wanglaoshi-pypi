@@ -4,9 +4,7 @@
 
     from wanglaoshi.analyze import DataAnalyzer, analyze_data
 
-说明：
-- legacy 实现：``analyze.plain`` / ``analyze.wqe``（根上 ``Analyzer_Plain`` / ``wqe`` 为 shim）；
-  导入会发 DeprecationWarning（``WANGLAOSHI_SILENCE_LEGACY=1`` 可关）。
+说明：legacy ``analyze.plain`` / ``analyze.wqe`` 仅过渡保留（导入有 DeprecationWarning）。
 """
 
 from __future__ import annotations

@@ -61,7 +61,7 @@ def e13() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -82,7 +82,7 @@ ready(seed=RANDOM_STATE)
             """from pathlib import Path
 import numpy as np
 import pandas as pd
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 rng = np.random.default_rng(RANDOM_STATE)
 n_a, n_b = 8000, 8000
@@ -209,7 +209,7 @@ def e14() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -217,7 +217,7 @@ ready(seed=RANDOM_STATE)
         new_code_cell(
             """import numpy as np
 import pandas as pd
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 from scipy import stats
 
 rng = np.random.default_rng(RANDOM_STATE)
@@ -312,7 +312,7 @@ def e15() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -364,8 +364,8 @@ adf_report(s.diff(), 'diff1')
         ),
         new_markdown_cell("## 4. wanglaoshi 时间特征 + 泄漏意识"),
         new_code_cell(
-            """from wanglaoshi import FeatureEngineering as FE
-from wanglaoshi import CompetitionTools as CT
+            """from wanglaoshi import features as FE
+from wanglaoshi import compete as CT
 
 fe_df = df.rename(columns={'ds': 'datetime'}).copy()
 eng = FE.AdvancedFeatureEngineer()
@@ -437,7 +437,7 @@ def e16() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -445,7 +445,7 @@ ready(seed=RANDOM_STATE)
         new_code_cell(
             """import numpy as np
 import pandas as pd
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 rng = np.random.default_rng(RANDOM_STATE)
 n = 600
@@ -546,7 +546,7 @@ def e17() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -554,7 +554,7 @@ ready(seed=RANDOM_STATE)
         new_code_cell(
             """import numpy as np
 import pandas as pd
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 rng = np.random.default_rng(RANDOM_STATE)
 pos = [
@@ -579,7 +579,7 @@ print(DataAnalyzer(df).get_basic_info().get('dtypes'))
         ),
         new_markdown_cell("## 2. extract_text_features(basic)"),
         new_code_cell(
-            """from wanglaoshi import FeatureEngineering as FE
+            """from wanglaoshi import features as FE
 eng = FE.AdvancedFeatureEngineer()
 feat = eng.extract_text_features(df, 'text', method='basic')
 print([c for c in feat.columns if c.startswith('text_')])
@@ -631,7 +631,7 @@ def e18() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -639,7 +639,7 @@ ready(seed=RANDOM_STATE)
         new_code_cell(
             """import numpy as np
 import pandas as pd
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 rng = np.random.default_rng(RANDOM_STATE)
 n_norm, n_out = 500, 25
@@ -700,7 +700,7 @@ def e19() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -709,7 +709,7 @@ ready(seed=RANDOM_STATE)
             """import numpy as np
 import pandas as pd
 from itertools import combinations
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 rng = np.random.default_rng(RANDOM_STATE)
 items = ['bread', 'milk', 'eggs', 'butter', 'diaper', 'beer']
@@ -787,7 +787,7 @@ def e20() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -795,7 +795,7 @@ ready(seed=RANDOM_STATE)
         new_code_cell(
             """import numpy as np
 import pandas as pd
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 rng = np.random.default_rng(RANDOM_STATE)
 rows = []

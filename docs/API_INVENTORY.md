@@ -21,26 +21,21 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `wanglaoshi._testing` | `assert_close`, `ExperimentContext` |
 | `wanglaoshi.business` | `BusinessPipeline` |
 
-## 顶层导出（`from wanglaoshi import ...`）
+## 顶层导出说明（1.15.1+）
 
-`__all__` 分两层：`_STABLE_PUBLIC`（门面 + 捷径）与 `_COMPAT_EXPORTS`（课堂兼容）。
+`__all__` 仍分 `_STABLE_PUBLIC` / `_COMPAT_EXPORTS`，但 **文档与示例只教门面**。  
+`_COMPAT_EXPORTS` 与根 shim 为过渡保留，**新代码请勿依赖**。
 
 | 名称 | 类型 | 依赖 | 备注 |
 | --- | --- | --- | --- |
-| `compete` / `analyze` / `features` / `analytics` / `runtime` / `_testing` | 子包（实现已迁入） | — | **稳定**；根上旧模块为 shim；见 `docs/ARCHITECTURE.md` |
-| `ready` | 函数 | 标准库 (+ 可选 numpy) | **稳定** Notebook 一键就绪 |
-| `DataAnalyzer` / `analyze_*` | 类/函数 | pandas/sklearn/matplotlib | **稳定**捷径（等价 `analyze` 门面） |
-| `business` / `BusinessPipeline` / … | 模块/类/函数 | pandas | **稳定**；见 `wanglaoshi.business` |
-| `stats` / `StatsToolkit` / `TimeSeriesTools` / … | 模块/类 | 视功能而定 | **稳定**捷径（等价 `analytics`） |
-| `assert_close` / `DataRegistry` / `ExperimentContext` / … | 函数/类 | 视功能而定 | **稳定**捷径（等价 `_testing`） |
-| `JupyterEnv` / `VERSIONS` / `JupyterFont` / `Useful` / `WebGetter` | 模块 | 视功能而定 | **兼容**；推荐 `runtime` 门面 |
-| `Analyzer` / `CompetitionTools` / `FeatureEngineering` | 模块 | sklearn/pandas | **兼容**；推荐对应门面 |
-| `Analyzer_Plain` | 模块 | 同上 | **Legacy**→`analyze.plain`；soft deprecate；`WANGLAOSHI_SILENCE_LEGACY=1` 可关 |
-| `wqe`（非顶层 `__all__`） | 模块 | 同上 | **Legacy**→`analyze.wqe`；请优先 `wanglaoshi.analyze` |
-| `stats` | 子包 shim | scipy/statsmodels | 实现在 `analytics/stats`；`from wanglaoshi.stats import …` 仍可用 |
-| `ml` | 子包门面 | sklearn；**torch 可选** | **稳定**；`DataPreprocessor` / `MLModel` / `TORCH_AVAILABLE` |
-| `MLDL` | 模块 shim | 同上 | **兼容**→`ml.core`；`from wanglaoshi import MLDL` 仍可用 |
-| `JupyterEnv.no_warning` | 函数 | warnings | 仅关警告；课堂请优先 `ready()` |
+| `compete` / `analyze` / `features` / `analytics` / `ml` / `runtime` / `_testing` | 子包门面 | — | **稳定公开**；见 `docs/ARCHITECTURE.md` |
+| `business` / `BusinessPipeline` / … | 模块/类/函数 | pandas | **稳定**；`from wanglaoshi.business import …` |
+| `ready`（捷径） | 函数 | 标准库 (+ 可选 numpy) | 等价 `runtime.ready`；示例请写 `runtime` |
+| `DataAnalyzer` / `analyze_*`（捷径） | 类/函数 | pandas/sklearn/matplotlib | 等价 `analyze`；示例请写门面 |
+| `StatsToolkit` / `TimeSeriesTools` 等（捷径） | 类 | 视功能而定 | 等价 `analytics` |
+| `assert_close` / `DataRegistry` / …（捷径） | 函数/类 | 视功能而定 | 等价 `_testing` |
+| `Analyzer` / `CompetitionTools` / `FeatureEngineering` / `MLDL` / runtime 旧模块 | shim | — | **已放弃推荐**；仅过渡 |
+| `Analyzer_Plain` / `wqe` | legacy | 同上 | soft deprecate；`WANGLAOSHI_SILENCE_LEGACY=1` 可关 |
 | `validate_metric_dict` / `default_metric_registry` | 函数 | — | S5 指标口径版本登记 |
 
 ## CompetitionTools 关键契约

@@ -29,7 +29,7 @@
 | 上面非深度学习的可选一次装齐 | `pip install "wanglaoshi[all]"` |
 | 本地开发 / 跑 pytest | `pip install -e ".[dev]"` |
 | 构建基线工坊教材站（Jupyter Book） | `pip install -e ".[book]"` 后执行 `python scripts/build_book.py` |
-| 深度学习 `MLDL` | **不要**指望 extras；请按 [PyTorch 官网](https://pytorch.org/) 安装匹配的 `torch` |
+| 深度学习 `wanglaoshi.ml` | **不要**指望 extras；请按 [PyTorch 官网](https://pytorch.org/) 安装匹配的 `torch` |
 
 组合写法：
 

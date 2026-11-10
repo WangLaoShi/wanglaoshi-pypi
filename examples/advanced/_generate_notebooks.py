@@ -323,8 +323,8 @@ def build_notebook(case: dict) -> dict:
 QUICK = True
 RANDOM_STATE = 42
 
-from wanglaoshi import ready
-from wanglaoshi import VERSIONS as V
+from wanglaoshi.runtime import ready
+from wanglaoshi.runtime import VERSIONS as V
 
 ready(seed=RANDOM_STATE)  # 关警告 + 环境信息；勿再叠 filterwarnings / JE.no_warning
 V.check_all_versions(version='simple', show_latest=False)
@@ -339,7 +339,7 @@ V.check_all_versions(version='simple', show_latest=False)
         ),
         code(
             """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 # 若上面成功得到 df，则继续；否则请先解决数据路径问题
 try:
@@ -412,7 +412,7 @@ print(X_train.shape, X_valid.shape)
         md("## 4. 快速基线（wanglaoshi.CompetitionTools.QuickBaseline）"),
         code(
             """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 # 仅数值特征的快速基线；含类别特征的案例请先做编码（见 FeatureEngineering）
 baseline = CT.QuickBaseline()
@@ -438,7 +438,7 @@ comparison
         ),
         code(
             """
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 engineer = FE.AdvancedFeatureEngineer()
 print('FeatureEngineering 已加载。请按本案例难点选择：')
@@ -459,7 +459,7 @@ print('- select_features_by_importance')
 from pathlib import Path
 import pandas as pd
 import numpy as np
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 # 用验证集预测模拟“测试提交”
 best_name = comparison.iloc[0]['Model']

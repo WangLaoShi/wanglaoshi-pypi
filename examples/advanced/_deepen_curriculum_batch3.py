@@ -186,7 +186,7 @@ df.head(3)
             ),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda_df = df.sample(min(len(df), 5000), random_state=RANDOM_STATE) if QUICK else df
 analyzer = DataAnalyzer(eda_df)
@@ -261,7 +261,7 @@ Xtr_s.head(2)
             ),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import average_precision_score, roc_auc_score, classification_report
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -448,7 +448,7 @@ else:
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/05_credit_card_fraud')
 out.mkdir(parents=True, exist_ok=True)
@@ -583,7 +583,7 @@ df.head()
             md("## 2. EDA"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 analyzer = DataAnalyzer(df)
 display(analyzer.get_basic_info())
@@ -884,7 +884,7 @@ df.head(3)
             md("## 2. EDA"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda_df = df.sample(min(len(df), 5000), random_state=RANDOM_STATE) if QUICK else df
 analyzer = DataAnalyzer(eda_df)
@@ -1002,7 +1002,7 @@ print('holdout shape', Xtr_f.shape)
             ),
             code(
                 """
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 engineer = FE.AdvancedFeatureEngineer()
 demo_col = te_cols[0]
@@ -1017,7 +1017,7 @@ print(encoded[[demo_col, enc_col]].head(4))
             md("## 7. 建模：缩放 + QuickBaseline（QUICK 跳 SVM）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 from sklearn.linear_model import LogisticRegression
@@ -1083,7 +1083,7 @@ print('若 leaky 明显更高，说明全量统计不可用于上线')
             ),
             code(
                 """
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 eng = FE.AdvancedFeatureEngineer()
 te_demo = Xtr[[te_cols[1]]].copy()
@@ -1131,7 +1131,7 @@ if group_col:
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/10_adult_census')
 out.mkdir(parents=True, exist_ok=True)
@@ -1304,7 +1304,7 @@ train.head(3)
             md("## 2. EDA：缺失可能有含义"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda_df = train.sample(min(len(train), 3000), random_state=RANDOM_STATE) if QUICK else train
 analyzer = DataAnalyzer(eda_df)
@@ -1337,7 +1337,7 @@ print('log-target mean', ytr.mean())
             ),
             code(
                 """
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 num_cols = Xtr.select_dtypes(include=[np.number]).columns.tolist()
 cat_cols = [c for c in Xtr.columns if c not in num_cols]
@@ -1365,7 +1365,7 @@ print('design matrix', Xtr_n.shape)
             md("## 5. 单模型 QuickBaseline（log 空间）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 baseline = CT.QuickBaseline()
@@ -1449,7 +1449,7 @@ print('集成输出维度', np.asarray(blend_pred).shape)
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 price_pred = np.expm1(blend_pred)
 price_true = np.expm1(yte.to_numpy())

@@ -92,7 +92,7 @@ def e21() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -101,7 +101,7 @@ ready(seed=RANDOM_STATE)
             """import numpy as np
 import pandas as pd
 from pathlib import Path
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 rng = np.random.default_rng(RANDOM_STATE)
 orders = pd.DataFrame({
@@ -209,7 +209,7 @@ def e22() -> None:
         new_code_cell(
             """QUICK = True
 RANDOM_STATE = 42
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         ),
@@ -218,7 +218,7 @@ ready(seed=RANDOM_STATE)
             """import numpy as np
 import pandas as pd
 from pathlib import Path
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 rng = np.random.default_rng(RANDOM_STATE)
 DEMO = True

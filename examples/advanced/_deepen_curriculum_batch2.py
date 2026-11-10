@@ -370,7 +370,7 @@ if df is not None:
             ),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 assert df is not None, '请先成功加载 df'
 eda_df = df.sample(min(len(df), 5000), random_state=RANDOM_STATE) if QUICK else df
@@ -426,7 +426,7 @@ print('train quality counts', ytr.value_counts().sort_index().to_dict())
             ),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 baseline = CT.QuickBaseline()
@@ -587,7 +587,7 @@ display(df.head())
             md("## 2. EDA：分布、收入关系与 top-coding 线索"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda_df = df.sample(min(5000, len(df)), random_state=RANDOM_STATE) if QUICK else df
 analyzer = DataAnalyzer(eda_df)
@@ -665,7 +665,7 @@ print('spatial test groups', len(hold), 'test n', mask_te.sum())
                 """
 from sklearn.model_selection import KFold, GroupKFold, cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 cv_splits = 3 if QUICK else 5
 rf = RandomForestRegressor(n_estimators=n_est, random_state=RANDOM_STATE, n_jobs=-1, max_depth=10)
@@ -702,7 +702,7 @@ print('KNN(loc only) R2 spatial', round(r2_knn_grp.mean(), 4), '+/-', round(r2_k
             md("## 7. QuickBaseline（随机划分，对比模型族）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 if QUICK:
     sample_idx = Xtr_r.sample(min(4000, len(Xtr_r)), random_state=RANDOM_STATE).index
@@ -856,7 +856,7 @@ print(df['Sex'].value_counts() if 'Sex' in df.columns else df.columns)
             md("## 2. EDA 与 Age = Rings + 1.5"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 work_raw = df.dropna(subset=['Rings']).copy()
 work_raw['Age_years'] = work_raw['Rings'] + 1.5
@@ -871,7 +871,7 @@ print('Sex counts:\\n', work_raw['Sex'].value_counts())
             code(
                 """
 from sklearn.model_selection import train_test_split
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 work = work_raw.copy()
 tr, te = train_test_split(work, test_size=0.25, random_state=RANDOM_STATE)
@@ -894,7 +894,7 @@ print('features', len(feat), 'train', Xtr.shape)
             md("## 4. 原尺度 vs log1p 目标（QuickBaseline）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 baseline = CT.QuickBaseline()
@@ -934,7 +934,7 @@ print('implied age MAE (years) ~', round(mean_absolute_error(yte + 1.5, pred_b +
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/07_abalone'); out.mkdir(parents=True, exist_ok=True)
 sample = pd.DataFrame({'Id': np.arange(len(pred_b)), 'Rings': yte.to_numpy()})
@@ -1092,7 +1092,7 @@ print('DEMO', DEMO)
             md("## 2. 时间排序与 wanglaoshi 时间特征"),
             code(
                 """
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 work = df.copy()
 time_col = None
@@ -1117,7 +1117,7 @@ print('time_col', time_col, 'shape', work.shape)
             md("## 3. 天气 / 节假日与 demand 的 EDA"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda = work.select_dtypes(include=[np.number]).iloc[: min(3000, len(work))]
 analyzer = DataAnalyzer(eda)
@@ -1152,7 +1152,7 @@ print('train', Xtr.shape, 'valid', Xva.shape, 'features n', len(Xtr.columns))
             md("## 5. 泄漏检测：安全滞后 vs 故意未来列"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 det = CT.LeakageDetector()
 chk = work[[time_col, 'cnt', 'cnt_lag1', 'cnt_lag24']].dropna().copy()
@@ -1172,7 +1172,7 @@ print('with future shift(-1) col warnings sample:', bad_leak.get('warnings', [])
             md("## 6. 基线 + RMSLE；可选 TimeSeriesSplit CV"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import mean_squared_log_error, mean_absolute_error
 from sklearn.ensemble import RandomForestRegressor
 

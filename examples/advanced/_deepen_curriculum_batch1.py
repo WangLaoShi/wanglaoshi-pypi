@@ -66,7 +66,7 @@ df.head()
             md("## 2. EDA：描述统计与缺失"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 analyzer = DataAnalyzer(df)
 print(analyzer.get_basic_info())
@@ -208,7 +208,7 @@ print(f'accuracy with Pipeline scaling: {acc_pipe:.3f}')
             md("## 5. QuickBaseline：多模型对比（训练集上 fit，验证集评估）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 baseline = CT.QuickBaseline()
 results = baseline.run_all_models(Xtr, ytr, Xte, yte, task_type='classification')
@@ -253,7 +253,7 @@ print('累计解释方差:', pca_vis.explained_variance_ratio_.sum())
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/01_iris')
 out.mkdir(parents=True, exist_ok=True)
@@ -460,7 +460,7 @@ print('remaining cols:', list(df.columns))
             md("## 3. EDA：目标分布与缺失"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 analyzer = DataAnalyzer(df)
 display(analyzer.missing_value_analysis())
@@ -615,7 +615,7 @@ print('全表填充可能略乐观 —— 竞赛要用 train-only 统计')
             md("## 7. LeakageDetector：可疑高相关特征"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 detector = CT.LeakageDetector()
 leaks = detector.detect_target_leakage(Xtr, ytr, threshold=0.85, method='correlation')
@@ -635,7 +635,7 @@ comparison
             md("### 7.1 FeatureEngineering 模块（可选辅助）"),
             code(
                 """
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 eng = FE.AdvancedFeatureEngineer()
 # 演示：对训练集数值列做安全预览（不在此替换主流程）
@@ -771,7 +771,7 @@ df.head(2)
             md("## 2. EDA：量纲跨度与缺失"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 analyzer = DataAnalyzer(df)
 display(analyzer.basic_statistics().head(10))
@@ -889,7 +889,7 @@ print('FN = 恶性被判良性 —— 医学场景最危险')
             md("## 7. QuickBaseline（缩放后全特征）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 scaler = StandardScaler()
 Xtr_s = pd.DataFrame(scaler.fit_transform(Xtr), columns=Xtr.columns, index=Xtr.index)
@@ -1150,7 +1150,7 @@ plt.show()
             md("## 5. QuickBaseline"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 Xtr_df = pd.DataFrame(Xtr)
 Xte_df = pd.DataFrame(Xte)

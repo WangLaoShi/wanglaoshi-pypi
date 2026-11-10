@@ -36,7 +36,7 @@ python -m pip install -e .
 ## 验证
 
 ```bash
-python -c "import wanglaoshi; from wanglaoshi import DataAnalyzer, BusinessPipeline, CompetitionTools; print('ok')"
+python -c "import wanglaoshi; from wanglaoshi.analyze import DataAnalyzer, BusinessPipeline, CompetitionTools; print('ok')"
 python scripts/smoke_docs_examples.py
 ```
 

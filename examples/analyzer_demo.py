@@ -166,7 +166,7 @@ def file_analysis_demo():
     # 分析单个文件
     print("\n分析单个文件示例:")
     print("分析 sample_data1.csv...")
-    from wanglaoshi import analyze_data
+    from wanglaoshi.analyze import analyze_data
     analyze_data(
         os.path.join(data_dir, "sample_data1.csv"),
         "analysis_report_single.html"
@@ -176,7 +176,7 @@ def file_analysis_demo():
     # 分析多个文件
     print("\n分析多个文件示例:")
     print("分析目录下的所有数据文件...")
-    from wanglaoshi import analyze_multiple_files
+    from wanglaoshi.analyze import analyze_multiple_files
     analyze_multiple_files(data_dir, "reports")
     print("多个文件的分析报告已生成在 reports 目录下")
     

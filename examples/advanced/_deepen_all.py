@@ -57,7 +57,7 @@ QUICK = True
 RANDOM_STATE = 42
 
 # 一键就绪：关警告 + 打印环境 + 设种子（勿再叠 JE.no_warning / filterwarnings）
-from wanglaoshi import ready
+from wanglaoshi.runtime import ready
 ready(seed=RANDOM_STATE)
 """
         )
@@ -127,7 +127,7 @@ df.head()
             md("## 2. EDA：小样本下先看分布与相关"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 analyzer = DataAnalyzer(df)
 print(analyzer.get_basic_info())
@@ -173,7 +173,7 @@ print(f'CV accuracy mean±std = {scores.mean():.3f} ± {scores.std():.3f}')
             md("## 4. QuickBaseline 对比"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 baseline = CT.QuickBaseline()
 results = baseline.run_all_models(Xtr, ytr, Xte, yte, task_type='classification')
@@ -185,7 +185,7 @@ comparison
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 best = comparison.iloc[0]['Model']
 pred_int = results[best]['predictions']
@@ -278,7 +278,7 @@ df.head()
             md("## 2. EDA：缺失与目标关系"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda = DataAnalyzer(df)
 display(eda.missing_value_analysis())
@@ -333,7 +333,7 @@ print('numeric features after encoding:', len(num2))
             md("## 5. QuickBaseline"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 baseline = CT.QuickBaseline()
 results = baseline.run_all_models(Xtr_f, ytr, Xva_f, yva, task_type='classification')
@@ -345,7 +345,7 @@ comparison
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 best = comparison.iloc[0]['Model']
 pred = results[best]['predictions']
@@ -429,7 +429,7 @@ if df is not None:
             md("## 2. EDA：目标不均衡与特征相关"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 assert df is not None, '请先成功加载 df'
 eda_df = df.sample(min(len(df), 5000), random_state=RANDOM_STATE) if QUICK else df
@@ -461,7 +461,7 @@ print(Xtr_f.shape, 'train quality counts', ytr.value_counts().sort_index().to_di
             md("## 4. 回归基线（把 quality 当连续）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 baseline = CT.QuickBaseline()
@@ -496,7 +496,7 @@ print('macro-F1', f1_score(yte, pred_clf, average='macro', zero_division=0))
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/03_wine_quality'); out.mkdir(parents=True, exist_ok=True)
 sample = pd.DataFrame({'Id': np.arange(len(pred_reg)), 'quality': yte.to_numpy()})
@@ -564,7 +564,7 @@ df.head()
             md("## 2. EDA：量纲差异"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 analyzer = DataAnalyzer(df)
 display(analyzer.basic_statistics().head(12))
@@ -630,7 +630,7 @@ plt.show()
             md("## 5. QuickBaseline 对比（无 PCA）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.preprocessing import StandardScaler
 
 scaler = StandardScaler()
@@ -647,7 +647,7 @@ comparison
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 best = comparison.iloc[0]['Model']
 pred_best = results[best]['predictions']
@@ -735,7 +735,7 @@ df.head()
             md("## 2. EDA：类别比例与 Amount"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda_df = df.sample(min(len(df), 5000), random_state=RANDOM_STATE) if QUICK else df
 analyzer = DataAnalyzer(eda_df)
@@ -762,7 +762,7 @@ print('time range valid', valid['Time'].min(), '->', valid['Time'].max())
             md("## 4. 基线 + PR-AUC（忽略 Accuracy）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import average_precision_score, roc_auc_score, classification_report
 from sklearn.preprocessing import StandardScaler
 
@@ -814,7 +814,7 @@ else:
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/05_credit_card_fraud'); out.mkdir(parents=True, exist_ok=True)
 pred_label = results[best]['predictions']
@@ -879,7 +879,7 @@ df.head()
             md("## 2. EDA"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda_df = df.sample(5000, random_state=RANDOM_STATE) if QUICK else df
 analyzer = DataAnalyzer(eda_df)
@@ -929,7 +929,7 @@ print('holdout groups', len(hold), 'test size', mask.sum())
             md("## 4. QuickBaseline（随机划分，便于对比模型）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 # 为速度可抽样
 if QUICK:
@@ -959,7 +959,7 @@ display(err.groupby('bin', observed=True)['abs_err'].agg(['mean', 'median', 'cou
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/06_california_housing'); out.mkdir(parents=True, exist_ok=True)
 sample = pd.DataFrame({'Id': np.arange(len(pred)), 'MedHouseVal': yte_r.to_numpy()})
@@ -1040,7 +1040,7 @@ print(df['Sex'].value_counts() if 'Sex' in df.columns else df.columns)
             md("## 2. EDA"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 analyzer = DataAnalyzer(df.dropna())
 display(analyzer.basic_statistics())
@@ -1064,7 +1064,7 @@ print(Xtr.shape)
             md("## 4. 原尺度 vs log1p 目标"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 baseline = CT.QuickBaseline()
@@ -1106,7 +1106,7 @@ print('residual mean', resid.mean(), 'std', resid.std())
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/07_abalone'); out.mkdir(parents=True, exist_ok=True)
 sample = pd.DataFrame({'Id': np.arange(len(pred_b)), 'Rings': yte.to_numpy()})
@@ -1249,7 +1249,7 @@ print('train', Xtr.shape, 'valid', Xva.shape)
             md("## 4. 基线 + RMSLE"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import mean_squared_log_error, mean_absolute_error
 
 baseline = CT.QuickBaseline()
@@ -1266,7 +1266,7 @@ print('RMSLE', mean_squared_log_error(yva, pred, squared=False))
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/08_bike_sharing'); out.mkdir(parents=True, exist_ok=True)
 sample = pd.DataFrame({'Id': np.arange(len(pred)), 'cnt': yva.to_numpy()})
@@ -1344,7 +1344,7 @@ df.head()
             md("## 2. EDA"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 analyzer = DataAnalyzer(df)
 display(analyzer.basic_statistics())
@@ -1485,7 +1485,7 @@ df.head()
             md("## 2. EDA"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda_df = df.sample(min(len(df), 5000), random_state=RANDOM_STATE) if QUICK else df
 analyzer = DataAnalyzer(eda_df)
@@ -1537,7 +1537,7 @@ print(Xtr_f.shape)
             md("## 4. QuickBaseline（先缩放；QUICK 跳过慢速 SVM）"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 from sklearn.linear_model import LogisticRegression
@@ -1591,7 +1591,7 @@ else:
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/10_adult_census'); out.mkdir(parents=True, exist_ok=True)
 sample = pd.DataFrame({'Id': np.arange(len(pred)), 'income': np.asarray(yte)})
@@ -1686,7 +1686,7 @@ print('DEMO', DEMO)
             md("## 2. EDA：缺失可能有含义"),
             code(
                 """
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 
 eda_df = train.sample(min(len(train), 3000), random_state=RANDOM_STATE) if QUICK else train
 analyzer = DataAnalyzer(eda_df)
@@ -1724,7 +1724,7 @@ print(Xtr_n.shape)
             md("## 4. QuickBaseline + 简单集成"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 baseline = CT.QuickBaseline()
@@ -1745,7 +1745,7 @@ print('blend MAE(price)', mean_absolute_error(np.expm1(yte), np.expm1(blend)))
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 price_pred = np.expm1(blend)
 price_true = np.expm1(yte.to_numpy())
@@ -1848,7 +1848,7 @@ print('components for 95% variance:', pca.n_components_)
             md("## 4. QuickBaseline"),
             code(
                 """
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 Xtr_df = pd.DataFrame(Xtr)
 Xte_df = pd.DataFrame(Xte)
@@ -1899,7 +1899,7 @@ else:
             code(
                 """
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path('outputs/12_digit_recognizer'); out.mkdir(parents=True, exist_ok=True)
 sample = pd.DataFrame({'ImageId': np.arange(1, len(pred) + 1), 'Label': yte})

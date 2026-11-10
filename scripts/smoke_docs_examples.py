@@ -62,7 +62,7 @@ def check_imports() -> None:
 def check_competition_min() -> None:
     import numpy as np
     import pandas as pd
-    from wanglaoshi import CompetitionTools as CT
+    from wanglaoshi import compete as CT
     from sklearn.datasets import load_iris
     from sklearn.model_selection import train_test_split
 
@@ -96,7 +96,7 @@ def check_analyzer_demo_core() -> None:
     import analyzer_demo as demo  # type: ignore
 
     df = demo.create_sample_data()
-    from wanglaoshi import DataAnalyzer
+    from wanglaoshi.analyze import DataAnalyzer
 
     analyzer = DataAnalyzer(df)
     info = analyzer.get_basic_info()
