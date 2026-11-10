@@ -29,6 +29,7 @@ from .archive import archive_delivery
 from .reconciliation import check_join_inflation, reconcile_to_source
 from .calendar import complete_period_index, yoy_with_rules, yoy_stage
 from .units import convert_units, DEFAULT_FACTORS
+from .metric_registry import validate_metric_dict, default_metric_registry
 
 __all__ = [
     "StageResult",
@@ -56,4 +57,6 @@ __all__ = [
     "yoy_stage",
     "convert_units",
     "DEFAULT_FACTORS",
+    "validate_metric_dict",
+    "default_metric_registry",
 ]

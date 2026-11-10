@@ -91,7 +91,7 @@
 - [x] D03 可配置清洗、新文件输出、逐规则影响日志；统计异常默认 clip 不删行。（`business/cleaning.py`）
 - [x] D04 时间部件、占比、简单环比、头腰尾分层（MVP；缺期/跨年已由 calendar 补）。（`business/derived.py` + `add_value_tiers`）
 - [x] D05 四方向分析计划及不适用原因。（`business/planning.py`）
-- [x] D06 指标字典与底稿；明细汇总、占比一致性校验。（`business/metrics.py`）
+- [x] D06 指标字典与底稿；明细汇总、占比一致性校验；口径版本登记最小版。（`business/metrics.py` + `metric_registry.py`）
 - [x] D07 六视角分析；贡献分解与因果假设分开。（`business/analysis.py`；pareto 注明非因果）
 - [x] D08 图表独立归档，标题/单位/周期/来源齐全。（`business/visualization.py`）
 - [x] D09 带证据的规则结论和行动建议。（`business/insights.py`）
@@ -116,10 +116,10 @@
 - [x] C01 配置 pytest、分层标记和快速/完整/发布运行入口。（`pytest.ini` + `scripts/run_tests.sh`）
 - [ ] C02 数据登记来源、使用条件、版本、哈希和缓存；下载与测试分离。
 - [ ] C03 固定划分、种子、抽样和搜索预算；记录环境。
-- [ ] C04 数值公式用明确容差；字段、行数、顺序用精确断言。
+- [x] C04 数值公式用明确容差；字段、行数、顺序用精确断言。（`wanglaoshi/asserting.py` + `tests/test_c04_numeric_contracts.py`）
 - [ ] C05 模型采用预先说明的合理下限/容差，不要求改进方案必胜或跨版本分数完全相同。
 - [ ] C06 报告检查章节、数字引用、资源；图表检查数据与元信息，不默认逐字节比较。
-- [ ] C07 覆盖全空/常数列、单类别、小样本、高维、未见类别、中文、错误日期和重复键。
+- [x] C07 覆盖全空/常数列、单类别、小样本、高维、未见类别、中文、错误日期和重复键。（`tests/test_c07_edge_datasets.py`）
 - [x] C08 验证编码、选择、调参只在训练折拟合；泄露检测器不能代替流程隔离。（`tests/test_c08_fold_fit_discipline.py`）
 - [x] C09 业务样例含退款、取消、单位、缺期、零基期、关联膨胀、缺目标与隐私；关键结果手工预计算。（`tests/test_c09_business_dirty_cases.py`）
 - [ ] C10 汇总案例×模块状态、失败/跳过原因、指标、耗时与版本，保存回归产物。

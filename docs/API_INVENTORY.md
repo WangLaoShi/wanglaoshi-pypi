@@ -32,6 +32,8 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `RankingMetrics` | 类 | numpy | NDCG@K（P1） |
 | `SurvivalAnalyzer` | 类 | numpy | Kaplan–Meier（P1） |
 | `convert_units` | 函数 | pandas | 单位换算（S1） |
+| `assert_close` / `assert_metrics_close` / `assert_frame_contract` | 函数 | numpy/pandas | C04 测试断言 |
+| `validate_metric_dict` / `default_metric_registry` | 函数 | — | S5 指标口径版本登记 |
 
 ## CompetitionTools 关键契约
 

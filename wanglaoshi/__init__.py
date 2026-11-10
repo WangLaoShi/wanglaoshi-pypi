@@ -85,6 +85,7 @@ from .fairness import GroupMetricsReport
 from .anomaly import AnomalyDetector
 from .ranking import RankingMetrics
 from .survival import SurvivalAnalyzer
+from .asserting import assert_close, assert_metrics_close, assert_frame_contract
 
 __all__ = [
     # 模块
@@ -133,4 +134,7 @@ __all__ = [
     "AnomalyDetector",
     "RankingMetrics",
     "SurvivalAnalyzer",
+    "assert_close",
+    "assert_metrics_close",
+    "assert_frame_contract",
 ]
