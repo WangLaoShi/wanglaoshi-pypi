@@ -46,10 +46,13 @@ wanglaoshi/
 - `__all__` 区分 `_STABLE_PUBLIC` 与 `_COMPAT_EXPORTS`。
 - `Analyzer_Plain` / `wqe` 源码与 API 盘点标注 *legacy*。
 
-### Phase 3 — soft deprecate
+### Phase 3 — soft deprecate ✅
 
-- 对 `from wanglaoshi.wqe import …`、`Analyzer_Plain` 等发 `DeprecationWarning`（可 env 关闭）。
-- `CompetitionTools` 大类按职责拆文件，仍由 `compete` 与旧模块路径 re-export。
+- 导入 `wanglaoshi.wqe` / `Analyzer_Plain` 发出 `DeprecationWarning`。
+  - 关闭：`export WANGLAOSHI_SILENCE_LEGACY=1`
+  - `import wanglaoshi` 本身不触发（`Analyzer_Plain` 已懒加载）。
+- `CompetitionTools` 大类拆到 `compete/{submission,baseline,leakage,ensemble,importance,cv,hyperopt,tracker}.py`；
+  `CompetitionTools.py` 与 `compete` 门面均为 re-export，旧导入路径符号不变。
 
 ### Phase 4 — 搬实现
 
@@ -58,11 +61,11 @@ wanglaoshi/
 
 ---
 
-## 3. 明确不做什么（Phase 1）
+## 3. 明确不做什么
 
-- 不改 Notebook 课号与 Book 目录。
-- 不强制用户改 import。
-- 不在本轮拆 `CompetitionTools.py` / `Analyzer.py` 实体文件（体积大，单独 PR）。
+- 不改 Notebook 课号与 Book 目录（教材旧 import 仍可用）。
+- 不强制用户立刻改 import（仅 soft warning）。
+- Phase 3 已拆 `CompetitionTools`；`Analyzer.py` 实体搬迁留待 Phase 4。
 
 ---
 

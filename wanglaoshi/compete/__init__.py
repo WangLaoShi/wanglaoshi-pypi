@@ -1,4 +1,4 @@
-"""竞赛工具门面（零破坏：实现仍在 ``CompetitionTools``）。
+"""竞赛工具门面。
 
 推荐::
 
@@ -12,16 +12,14 @@
 
 from __future__ import annotations
 
-from ..CompetitionTools import (
-    CrossValidator,
-    ExperimentTracker,
-    FeatureImportanceAnalyzer,
-    HyperparameterOptimizer,
-    LeakageDetector,
-    ModelEnsemble,
-    QuickBaseline,
-    SubmissionGenerator,
-)
+from .baseline import QuickBaseline
+from .cv import CrossValidator
+from .ensemble import ModelEnsemble
+from .hyperopt import HyperparameterOptimizer
+from .importance import FeatureImportanceAnalyzer
+from .leakage import LeakageDetector
+from .submission import SubmissionGenerator
+from .tracker import ExperimentTracker
 
 __all__ = [
     "SubmissionGenerator",

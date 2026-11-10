@@ -4,8 +4,17 @@
 
     from wanglaoshi.analyze import DataAnalyzer, analyze_data
 
-后续 Phase 可能发出 DeprecationWarning；详见 docs/ARCHITECTURE.md。
+导入本模块会发出 DeprecationWarning（可用 ``WANGLAOSHI_SILENCE_LEGACY=1`` 关闭）。
+详见 docs/ARCHITECTURE.md。
 """
+
+from ._legacy import warn_legacy
+
+warn_legacy(
+    "wanglaoshi.wqe",
+    replacement="wanglaoshi.analyze（DataAnalyzer / analyze_data）",
+    stacklevel=2,
+)
 
 # 导入各种必需的库
 import os  # 用于操作系统相关的功能，如文件路径处理

@@ -179,3 +179,4 @@
 | 2026-11-10 | C12 函数级 **100%**：全模块冒烟 + `check_function_coverage.py`；MLDL torch 改可选 |
 | 2026-11-10 | 架构 Phase 1：`compete/analyze/features/analytics/runtime/_testing` 门面 + `docs/ARCHITECTURE.md` |
 | 2026-11-10 | 架构 Phase 2：`__all__` 分层；README/API 改门面示例；`Analyzer_Plain`/`wqe` 标 legacy |
+| 2026-11-10 | 架构 Phase 3：Plain/wqe soft deprecate（可 env 关）；`CompetitionTools` 拆入 `compete/*` |

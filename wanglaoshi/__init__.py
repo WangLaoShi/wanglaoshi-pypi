@@ -22,12 +22,12 @@ wanglaoshi 顶层导出 (API)
 from . import JupyterEnv
 from . import VERSIONS
 from . import Analyzer
-from . import Analyzer_Plain
 from . import CompetitionTools
 from . import FeatureEngineering
 from . import JupyterFont
 from . import Useful
 from . import WebGetter
+# Analyzer_Plain 为 legacy：改懒加载，避免 import wanglaoshi 就刷 DeprecationWarning
 
 # MLDL 依赖 torch，为了不影响普通用户导入，本模块中将其视为「可选模块」。
 # - 如果用户未安装 torch，则 from wanglaoshi import MLDL 不会自动失败；
@@ -169,9 +169,13 @@ __all__ = _STABLE_PUBLIC + _COMPAT_EXPORTS
 
 
 def __getattr__(name: str):
-    """懒加载仅测试用途的符号，避免生产环境强依赖 pytest。"""
+    """懒加载：测试工具（避免强依赖 pytest）与 legacy 模块（触发 soft deprecate）。"""
     if name in {"require_data_path", "optional_data_available"}:
         from . import testing_utils
 
         return getattr(testing_utils, name)
+    if name == "Analyzer_Plain":
+        import importlib
+
+        return importlib.import_module(".Analyzer_Plain", __name__)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

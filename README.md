@@ -1257,8 +1257,8 @@ selected_features = engineer.select_features_by_mutual_info(
 | `runtime`           | 环境 / 字体 / 下载                                          | `from wanglaoshi.runtime import ready, VERSIONS` |
 | `business`          | 业务 Skill 流水线：intake/清洗/指标/六视角/结论/交付归档   | `BusinessPipeline`、`intake_file`、`generate_insights` |
 | `Analyzer`          | （兼容）高级 EDA 实现模块                                   | `from wanglaoshi import Analyzer` |
-| `Analyzer_Plain`    | **Legacy**：简化版文本 EDA；请优先 `wanglaoshi.analyze`     | `from wanglaoshi import Analyzer_Plain` |
-| `wqe`               | **Legacy**：历史并行 EDA；请优先 `wanglaoshi.analyze`       | `import wanglaoshi.wqe` |
+| `Analyzer_Plain`    | **Legacy**（导入会警告；`WANGLAOSHI_SILENCE_LEGACY=1` 可关） | `from wanglaoshi import Analyzer_Plain` |
+| `wqe`               | **Legacy**（同上）；请优先 `wanglaoshi.analyze`             | `import wanglaoshi.wqe` |
 | `CompetitionTools`  | （兼容）比赛工具实现模块                                    | `from wanglaoshi import CompetitionTools as CT` |
 | `FeatureEngineering`| （兼容）特征工程实现模块                                    | `from wanglaoshi import FeatureEngineering as FE` |
 | `MLDL`              | ML/DL 封装：预处理、特征工程、传统 ML 模型、PyTorch DL 模型  | `from wanglaoshi import MLDL` |

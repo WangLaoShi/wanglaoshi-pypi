@@ -73,3 +73,62 @@ def test_legacy_modules_document_status() -> None:
 
     assert "Legacy" in (plain.__doc__ or "")
     assert "Legacy" in (wqe.__doc__ or "")
+
+
+@pytest.mark.quick
+def test_legacy_import_emits_deprecation(monkeypatch: pytest.MonkeyPatch) -> None:
+    import importlib
+    import warnings
+
+    import wanglaoshi.Analyzer_Plain as plain_mod
+    import wanglaoshi.wqe as wqe_mod
+
+    monkeypatch.delenv("WANGLAOSHI_SILENCE_LEGACY", raising=False)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always", DeprecationWarning)
+        importlib.reload(plain_mod)
+        importlib.reload(wqe_mod)
+    msgs = [str(w.message) for w in caught if issubclass(w.category, DeprecationWarning)]
+    assert any("Analyzer_Plain" in m for m in msgs)
+    assert any("wqe" in m for m in msgs)
+
+
+@pytest.mark.quick
+def test_legacy_warning_can_be_silenced(monkeypatch: pytest.MonkeyPatch) -> None:
+    import importlib
+    import warnings
+
+    import wanglaoshi.Analyzer_Plain as plain_mod
+
+    monkeypatch.setenv("WANGLAOSHI_SILENCE_LEGACY", "1")
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always", DeprecationWarning)
+        importlib.reload(plain_mod)
+    assert not [
+        w for w in caught if issubclass(w.category, DeprecationWarning) and "Analyzer_Plain" in str(w.message)
+    ]
+
+
+@pytest.mark.quick
+def test_competition_tools_split_reexports_same_objects() -> None:
+    import wanglaoshi.CompetitionTools as CT
+    from wanglaoshi.compete import (
+        CrossValidator,
+        ExperimentTracker,
+        FeatureImportanceAnalyzer,
+        HyperparameterOptimizer,
+        LeakageDetector,
+        ModelEnsemble,
+        QuickBaseline,
+        SubmissionGenerator,
+    )
+    from wanglaoshi.compete.submission import SubmissionGenerator as SG_mod
+
+    assert CT.SubmissionGenerator is SubmissionGenerator is SG_mod
+    assert CT.QuickBaseline is QuickBaseline
+    assert CT.LeakageDetector is LeakageDetector
+    assert CT.ModelEnsemble is ModelEnsemble
+    assert CT.FeatureImportanceAnalyzer is FeatureImportanceAnalyzer
+    assert CT.CrossValidator is CrossValidator
+    assert CT.HyperparameterOptimizer is HyperparameterOptimizer
+    assert CT.ExperimentTracker is ExperimentTracker
