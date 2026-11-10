@@ -565,14 +565,18 @@ class DataAnalyzer:
         # 处理空值，将其转换为更易读的格式
         stats_df = stats_df.apply(lambda x: x.apply(lambda v: '空值' if pd.isna(v) else v))
         
-        # 对数值列的统计量进行格式化
+        # 对数值列的统计量进行格式化（先转 object，避免 pandas 拒绝对 float64 写入 str）
         numeric_cols = self.df.select_dtypes(include=['number']).columns
+        fmt_stats = [s for s in ['mean', 'std', '25%', '50%', '75%', 'min', 'max'] if s in stats_df.columns]
+        if fmt_stats:
+            stats_df[fmt_stats] = stats_df[fmt_stats].astype(object)
         for col in stats_df.index:
             if col in numeric_cols:
-                for stat in ['mean', 'std', '25%', '50%', '75%', 'min', 'max']:
-                    if stat in stats_df.columns and not isinstance(stats_df.at[col, stat], str):
-                        stats_df.at[col, stat] = f"{stats_df.at[col, stat]:.2f}"
-        
+                for stat in fmt_stats:
+                    val = stats_df.at[col, stat]
+                    if not isinstance(val, str) and pd.notna(val):
+                        stats_df.at[col, stat] = f"{float(val):.2f}"
+
         return stats_df.reset_index().rename(columns={'index': '列名'})
 
     def normality_test(self) -> pd.DataFrame:
