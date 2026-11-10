@@ -19,7 +19,7 @@ from .pipeline import BusinessPipeline
 from .structuring import structure_dataframe, structure_file
 from .cleaning import clean_dataframe
 from .eda import run_eda_profile, STAT_METHOD_CATALOG
-from .derived import derive_metrics
+from .derived import derive_metrics, add_value_tiers
 from .planning import build_analysis_plan
 from .metrics import calculate_metrics, DEFAULT_METRIC_DICT
 from .analysis import run_multidimensional_analysis
@@ -41,6 +41,7 @@ __all__ = [
     "run_eda_profile",
     "STAT_METHOD_CATALOG",
     "derive_metrics",
+    "add_value_tiers",
     "build_analysis_plan",
     "calculate_metrics",
     "DEFAULT_METRIC_DICT",

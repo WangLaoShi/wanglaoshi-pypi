@@ -52,7 +52,7 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | D02 | `structuring.py` + `reconciliation.py` | MVP；**P0 对账/膨胀已加** |
 | D03 | `cleaning.py` | MVP |
 | D12 | `eda.py` | MVP（复用 DataAnalyzer） |
-| D04 | `derived.py` + `calendar.py` | MVP；**P0 同比规则已加** |
+| D04 | `derived.py` + `calendar.py` | MVP；同比 + **头腰尾 `add_value_tiers`** |
 | D05 | `planning.py` | MVP |
 | D06 | `metrics.py` | MVP |
 | D07 | `analysis.py` | MVP |

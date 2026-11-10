@@ -257,7 +257,8 @@ class AdvancedFeatureEngineer:
         )
         
         # 填充缺失值（新类别）
-        df_result[f'{categorical_col}_target_encoded'].fillna(global_mean, inplace=True)
+        col_te = f'{categorical_col}_target_encoded'
+        df_result[col_te] = df_result[col_te].fillna(global_mean)
         
         logger.info(f"对 {categorical_col} 进行了目标编码")
         

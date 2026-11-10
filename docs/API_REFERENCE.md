@@ -544,7 +544,7 @@ run_to_dict(source_path, **kwargs) -> dict
 | `structure_dataframe` / `structure_file` | D02 |
 | `clean_dataframe` | D03 |
 | `run_eda_profile` | D12 |
-| `derive_metrics` | D04 |
+| `derive_metrics` / `add_value_tiers` | D04（含头腰尾分层） |
 | `build_analysis_plan` | D05 |
 | `calculate_metrics` | D06 |
 | `run_multidimensional_analysis` | D07 |

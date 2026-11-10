@@ -75,6 +75,7 @@ from .business import (
     complete_period_index,
     yoy_with_rules,
     convert_units,
+    add_value_tiers,
 )
 from . import stats
 from .stats import StatsToolkit, ExperimentDesign
@@ -121,6 +122,7 @@ __all__ = [
     "complete_period_index",
     "yoy_with_rules",
     "convert_units",
+    "add_value_tiers",
     "stats",
     "StatsToolkit",
     "ExperimentDesign",

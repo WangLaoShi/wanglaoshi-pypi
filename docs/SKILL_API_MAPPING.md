@@ -7,7 +7,7 @@
 | data-intake | `intake_file` | `required_columns`, `period` | 缺文件 `blocked`；缺列 `warning` | `test_intake_*` |
 | data-structuring | `structure_dataframe` / `structure_file`；P0：`check_join_inflation` / `reconcile_to_source` | `column_map`, `dtype_map`；对账 `on`/`measure_col` | 缺文件 `blocked`；类型失败 `warning`；膨胀 → `warning` | `test_structure_*` / `test_p0_*` |
 | data-cleaning | `clean_dataframe` | `fillna`, `clip_bounds`, `drop_duplicates` | 默认不因异常删行；写影响日志 | `test_clean_*` |
-| derived-metrics | `derive_metrics`；P0：`complete_period_index` / `yoy_with_rules` / `yoy_stage` | `date_col`, `value_col`；同比 `as_of`/`freq` | 缺关键列 `blocked`；零基数/未完月 → reason | `test_derive_*` / `test_p0_*` |
+| derived-metrics | `derive_metrics`；`complete_period_index` / `yoy_with_rules`；`add_value_tiers` | `date_col`, `value_col`, `add_tiers`；同比 `as_of` | 缺关键列 `blocked`；零基数/未完月 → reason | `test_derive_*` / `test_p0_*` / `test_s4_*` |
 | analysis-decomposition | `build_analysis_plan` | `field_roles.*` | 无可用方向 `warning` | `test_planning_*` |
 | metrics-calculation | `calculate_metrics` | `metrics`, `group_cols`, `share_of` | 零分母/缺列 `warning`；占比不一致 `warning` | `test_metrics_*` |
 | multidimensional-analysis | `run_multidimensional_analysis` | `date_col`, `dim_col`, `segment_col` | 视角不足 `warning`；pareto 非因果 | `test_analysis_*` |

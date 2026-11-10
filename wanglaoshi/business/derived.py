@@ -53,6 +53,62 @@ def add_period_change(
     return work
 
 
+def add_value_tiers(
+    df: pd.DataFrame,
+    value_col: str,
+    *,
+    method: str = "pareto",
+    head: float = 0.8,
+    waist: float = 0.95,
+    out_col: str = "value_tier",
+    abs_value: bool = True,
+) -> pd.DataFrame:
+    """价值分层：头 / 腰 / 尾。
+
+    - ``pareto``：按金额从大到小累计占比，前 ``head`` 为头，到 ``waist`` 为腰，其余为尾
+    - ``quantile``：三分位（高/中/低），忽略 head/waist
+    """
+    if value_col not in df.columns:
+        raise KeyError(f"value_col not found: {value_col}")
+    if method not in {"pareto", "quantile"}:
+        raise ValueError("method must be 'pareto' or 'quantile'")
+    if not (0 < head < waist <= 1):
+        raise ValueError("require 0 < head < waist <= 1")
+
+    work = df.copy()
+    vals = pd.to_numeric(work[value_col], errors="coerce")
+    if abs_value:
+        vals = vals.abs()
+    work["_tier_val"] = vals.fillna(0.0)
+
+    if method == "quantile":
+        # 高→头，中→腰，低→尾
+        try:
+            cats = pd.qcut(work["_tier_val"], q=3, labels=["尾", "腰", "头"], duplicates="drop")
+        except ValueError:
+            # 取值过少时退化为常数尾
+            cats = pd.Series(["尾"] * len(work), index=work.index)
+        work[out_col] = cats.astype(str)
+    else:
+        order = work["_tier_val"].sort_values(ascending=False)
+        total = float(order.sum())
+        if total <= 0:
+            work[out_col] = "尾"
+        else:
+            cum = order.cumsum() / total
+            tier = pd.Series(index=order.index, dtype=object)
+            tier[cum <= head] = "头"
+            tier[(cum > head) & (cum <= waist)] = "腰"
+            tier[cum > waist] = "尾"
+            # 边界：第一笔必为头
+            if len(tier):
+                tier.iloc[0] = "头"
+            work[out_col] = tier.reindex(work.index)
+
+    work = work.drop(columns=["_tier_val"])
+    return work
+
+
 def derive_metrics(
     df: pd.DataFrame,
     *,
@@ -60,6 +116,8 @@ def derive_metrics(
     value_col: Optional[str] = None,
     share_group_cols: Optional[Sequence[str]] = None,
     add_wow: bool = False,
+    add_tiers: bool = False,
+    tier_method: str = "pareto",
 ) -> StageResult:
     warnings: List[str] = []
     rules: List[str] = []
@@ -98,14 +156,33 @@ def derive_metrics(
         work = add_period_change(work, value_col, date_col=date_col, periods=1, out_col="wow")
         created.append("wow")
 
+    if add_tiers and value_col:
+        if value_col not in work.columns:
+            return StageResult(
+                stage_id="D04_derived",
+                status="blocked",
+                block_reasons=[f"value_col not found: {value_col}"],
+            )
+        rules.append("D04.value_tiers")
+        work = add_value_tiers(work, value_col, method=tier_method)
+        created.append("value_tier")
+        tier_counts = work["value_tier"].value_counts(dropna=False).to_dict()
+    else:
+        tier_counts = {}
+
     if not rules:
-        warnings.append("no derive rules applied; pass date_col/value_col/share_group_cols")
+        warnings.append("no derive rules applied; pass date_col/value_col/share_group_cols/add_tiers")
 
     status = "warning" if warnings else "passed"
     result = StageResult(
         stage_id="D04_derived",
         status=status,
-        data={"created_columns": created, "n_rows": int(len(work)), "columns": list(work.columns)},
+        data={
+            "created_columns": created,
+            "n_rows": int(len(work)),
+            "columns": list(work.columns),
+            "tier_counts": {str(k): int(v) for k, v in tier_counts.items()},
+        },
         rules=rules,
         warnings=warnings,
     )
