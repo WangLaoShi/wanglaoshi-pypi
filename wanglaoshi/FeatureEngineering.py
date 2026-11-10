@@ -20,7 +20,7 @@ import numpy as np
 from typing import List, Dict, Any, Optional, Union
 import logging
 from scipy import stats
-from scipy.special import boxcox
+from scipy.stats import boxcox
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)

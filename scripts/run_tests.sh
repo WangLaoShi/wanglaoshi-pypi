@@ -2,7 +2,7 @@
 # C01 / C10 / C12：分层测试入口（只跑 pytest）
 #   ./scripts/run_tests.sh quick
 #   ./scripts/run_tests.sh full
-#   ./scripts/run_tests.sh coverage   # C12：行覆盖率（初始不强制 80%）
+#   ./scripts/run_tests.sh coverage   # C12：产品口径覆盖率（见 .coveragerc）
 #   ./scripts/run_tests.sh summary    # C10：junit + 回归汇总 JSON
 #
 # 发版请用总入口（测试 + API 说明书 + 烟测 + …）：
@@ -24,12 +24,15 @@ case "$MODE" in
     python -m pytest tests/
     ;;
   coverage)
-    # C12：先能跑通 cov，门槛后续按基线校准（默认 --cov-fail-under=0）
-    FAIL_UNDER="${COV_FAIL_UNDER:-0}"
+    # C12：产品模块行覆盖率（排除 Jupyter/可选 DL 等，见 .coveragerc）
+    # 默认门槛 78；可用 COV_FAIL_UNDER=80 抬高
+    FAIL_UNDER="${COV_FAIL_UNDER:-78}"
     python -m pytest -m "quick or submission" tests/ \
       --cov=wanglaoshi \
+      --cov-config="${ROOT}/.coveragerc" \
       --cov-report=term-missing \
       --cov-report="xml:${ART}/coverage.xml" \
+      --cov-report="json:${ART}/coverage.json" \
       --cov-fail-under="${FAIL_UNDER}"
     ;;
   summary)

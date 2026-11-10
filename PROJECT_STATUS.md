@@ -80,7 +80,7 @@
 | C09 | ✅ 脏样例（退款/单位/缺期/膨胀/隐私等） |
 | C10 | ✅ junit → `regression_summary.json` |
 | C11 | ✅ `require_data_path` 缺数据明确 skip |
-| C12 | ✅ `run_tests.sh coverage`（`COV_FAIL_UNDER` 可调） |
+| C12 | ✅ `.coveragerc` 产品口径 + `run_tests.sh coverage`（默认门槛 78，实测约 86%） |
 
 ### E 进阶演示 — 课 E01–E22 + 配套 EM01–EM05
 
@@ -155,7 +155,7 @@
 
 1. **P0 教材：** G02/G03/G05；构建 Pages 使课上线  
 2. **P1 深水区：** S6 图表扩展 / S7 uplift / S8 recommendations  
-3. **工程校准：** 将 `COV_FAIL_UNDER` 逐步抬到约 80%；补外部竞赛数据登记样例 
+3. **工程校准：** 可将 `COV_FAIL_UNDER` 从 78 抬到 80；继续啃 `CompetitionTools` 未覆盖分支（泄露/调参/追踪） 
 
 ---
 
@@ -175,3 +175,4 @@
 | 2026-11-10 | C08 折内拟合回归 + S4 `add_value_tiers`；修复 target_encode fillna 警告 |
 | 2026-11-10 | C04/C07 回归 + S5 `metric_registry` + `asserting` 工具 |
 | 2026-11-10 | C02–C03/C05–C06/C10–C12 收口；正式点 **45/45 = 100%** |
+| 2026-11-10 | C12 加深：修复 rank_average / boxcox；CT+FE 深度测；产品覆盖约 **86%**（门槛 78） |

@@ -159,6 +159,13 @@ def test_c12_coverage_entry_script_exists() -> None:
     assert "cov=wanglaoshi" in text or "--cov=wanglaoshi" in text
     assert "summary" in text
     assert "summarize_junit.py" in text
+    assert ".coveragerc" in text
+    assert "COV_FAIL_UNDER" in text
+    coveragerc = ROOT / ".coveragerc"
+    assert coveragerc.exists()
+    rc = coveragerc.read_text(encoding="utf-8")
+    assert "wqe.py" in rc
+    assert "MLDL.py" in rc
 
 
 @pytest.mark.quick

@@ -363,7 +363,8 @@ class SubmissionGenerator:
                     # 将平均排名转换回预测值范围
                     min_val = np.min([np.min(pred) for pred in predictions])
                     max_val = np.max([np.max(pred) for pred in predictions])
-                    ensemble_pred = min_val + (avg_ranks / len(ensemble_pred)) * (max_val - min_val)
+                    denom = max(len(avg_ranks) - 1, 1)
+                    ensemble_pred = min_val + (avg_ranks / denom) * (max_val - min_val)
                     logger.info(f"使用排名平均融合 {target_col}")
                     
                 elif method == 'median':
