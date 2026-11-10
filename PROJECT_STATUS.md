@@ -146,7 +146,7 @@
 | G08 | 教材完成度纳入发布检查 | ✅ `release_check.sh full` 含 build_book |
 | G09 | 详尽 API 说明书 + 自动校验 | ✅ `docs/API_REFERENCE.md` |
 | G10 | 发布步骤收成一条命令 | ✅ `scripts/release_check.sh` + `docs/RELEASE.md` |
-| G11 | 中文术语表扩到统计/时序/生存/因果 | ✅ `book/reference/glossary.md` |
+| G11 | 中文术语表扩到统计/时序/生存/因果；1.15.1 补门面/shim/业务治理词条 | ✅ `book/reference/glossary.md` |
 | G12 | 分析覆盖矩阵 + E01–E22（六缺口收口） | ✅ `docs/ANALYSIS_COVERAGE.md` |
 
 ---
