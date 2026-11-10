@@ -12,224 +12,152 @@ Jupyter环境管理模块 (JupyterEnv.py)
 - 获取Python环境信息
 """
 
-import sys  # 系统相关参数和函数
-import os   # 操作系统接口
+from __future__ import annotations
 
-def run_cmd(cmd):
+import os
+import re
+import subprocess
+import sys
+from typing import List, Sequence, Union
+
+# 内核名/显示名：禁止 shell 元字符，避免经 popen/拼接注入
+_KERNEL_NAME_RE = re.compile(r"^[\w.-]+$")
+_KERNEL_DISPLAY_RE = re.compile(r"^[\w.\- ]+$")
+
+
+def run_cmd(cmd: Union[str, Sequence[str]]) -> None:
     """
-    在系统中执行命令
-    
-    这个函数用于执行系统命令（如pip、jupyter等），
-    并将命令的输出显示在控制台。
-    
-    参数:
-        cmd: 要执行的命令字符串
-            例如: "pip install numpy" 或 "jupyter kernelspec list"
-            
-    返回:
-        None（无返回值，直接打印输出）
-        
-    示例:
-        run_cmd("pip list")  # 列出已安装的包
+    在系统中执行命令并打印输出。
+
+    优先传入参数列表（无 shell）；若传入字符串则仍走 shell（兼容旧用法，勿拼接用户输入）。
     """
-    # 打印要执行的命令
-    print('Running command:', cmd)
-    # os.popen() 打开一个管道，执行命令并返回文件对象
-    # 这样可以读取命令的输出
-    p = os.popen(cmd)
-    # 使用read()获取命令的完整输出（一个字符串）
-    results = p.read()
-    # 将输出按行分割成列表
-    # split('\n') 按换行符分割字符串
-    results_lst = results.split('\n')
-    # 逐行打印输出
-    for line in results_lst:
+    print("Running command:", cmd)
+    if isinstance(cmd, (list, tuple)):
+        completed = subprocess.run(
+            list(cmd),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        out = (completed.stdout or "") + (completed.stderr or "")
+    else:
+        # 兼容旧字符串调用；调用方不得把未校验用户输入拼进字符串
+        completed = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        out = (completed.stdout or "") + (completed.stderr or "")
+    for line in out.split("\n"):
         print(line)
 
-def running_os():
-    """
-    检测当前运行的操作系统
-    
-    通过sys.platform获取系统平台标识符，并转换为易读的操作系统名称。
-    
-    返回:
-        操作系统名称字符串：
-        - 'Windows': Windows系统
-        - 'Linux': Linux系统
-        - 'MacOS': macOS系统（苹果系统）
-        - 'Unknown': 未知系统
-        
-    示例:
-        os_name = running_os()  # 返回 'Windows' 或 'Linux' 或 'MacOS'
-    """
-    # sys.platform 返回系统平台标识符
-    # 'win32' 表示Windows（包括64位）
-    # 'linux' 表示Linux
-    # 'darwin' 表示macOS
-    env = sys.platform
-    if env == 'win32':
-        return 'Windows'
-    elif env == 'linux':
-        return 'Linux'
-    elif env == 'darwin':
-        return 'MacOS'
-    else:
-        return 'Unknown'
 
-def running_python_version():
-    """
-    获取当前运行的Python版本
-    
-    返回:
-        Python版本字符串，例如: "3.9.7 (default, Sep 3 2021, 06:20:32)"
-        
-    示例:
-        version = running_python_version()
-        print(version)  # 输出: "3.9.7 (default, Sep 3 2021, 06:20:32)"
-    """
-    # sys.version 返回Python解释器的版本信息字符串
+def running_os() -> str:
+    """检测当前运行的操作系统。"""
+    env = sys.platform
+    if env == "win32":
+        return "Windows"
+    if env == "linux":
+        return "Linux"
+    if env == "darwin":
+        return "MacOS"
+    return "Unknown"
+
+
+def running_python_version() -> str:
+    """获取当前运行的Python版本字符串。"""
     return sys.version
 
-def running_python_path():
-    """
-    获取当前运行的Python解释器路径
-    
-    返回:
-        Python解释器的完整路径字符串
-        例如: "/usr/bin/python3" 或 "C:\\Python39\\python.exe"
-        
-    示例:
-        path = running_python_path()
-        print(path)  # 输出Python解释器的路径
-    """
-    # sys.executable 返回Python解释器的可执行文件路径
+
+def running_python_path() -> str:
+    """获取当前运行的Python解释器路径。"""
     return sys.executable
 
+
 def running_python_version_info():
-    """
-    获取当前运行的Python版本详细信息
-    
-    返回:
-        sys.version_info对象，包含版本号的各个组成部分
-        例如: sys.version_info(major=3, minor=9, micro=7, ...)
-        
-    示例:
-        version_info = running_python_version_info()
-        print(version_info.major)  # 输出主版本号，如 3
-        print(version_info.minor)  # 输出次版本号，如 9
-    """
-    # sys.version_info 返回版本信息的命名元组
+    """获取当前运行的Python版本详细信息。"""
     return sys.version_info
 
+
 def running():
-    """
-    显示完整的运行环境信息
-    
-    这个函数会打印并返回以下信息：
-    1. 操作系统类型
-    2. Python版本
-    3. Python解释器路径
-    4. Python版本详细信息
-    
-    返回:
-        一个元组，包含：
-        (操作系统名称, Python版本字符串, Python路径, Python版本信息对象)
-        
-    示例:
-        os_name, version, path, version_info = running()
-        # 同时会在控制台打印这些信息
-    """
-    # 打印分隔线（40个星号）
-    print("*"*40)
-    # 打印并获取各项信息
-    print('Running environment:', running_os())
-    print('Running Python version:', running_python_version())
-    print('Running Python path:', running_python_path())
-    print('Running Python version info:', running_python_version_info())
+    """显示完整的运行环境信息并返回元组。"""
     print("*" * 40)
-    # 返回所有信息组成的元组
+    print("Running environment:", running_os())
+    print("Running Python version:", running_python_version())
+    print("Running Python path:", running_python_path())
+    print("Running Python version info:", running_python_version_info())
+    print("*" * 40)
     return running_os(), running_python_version(), running_python_path(), running_python_version_info()
 
-def install_ipykernel():
-    """
-    安装ipykernel包
-    
-    ipykernel是什么？
-    - ipykernel是Jupyter Notebook的内核包
-    - 它允许Jupyter Notebook使用Python解释器来执行代码
-    - 必须安装ipykernel才能创建自定义的Jupyter内核
-    
-    这个函数会执行命令: pip install ipykernel
-    """
-    # 使用pip安装ipykernel包
-    # 注释中的 !pip install ipykernel 是Jupyter Notebook中的魔法命令语法
-    run_cmd('pip install ipykernel')
 
-def jupyter_kernel_list():
-    """
-    列出所有已安装的Jupyter内核
-    
-    这个函数会显示当前系统中所有可用的Jupyter内核，
-    包括内核名称、显示名称和路径等信息。
-    
-    执行命令: jupyter kernelspec list
-    """
-    # 列出所有已安装的Jupyter内核
-    # 注释中的 !jupyter kernelspec list 是Jupyter Notebook中的魔法命令语法
-    run_cmd('jupyter kernelspec list')
+def install_ipykernel() -> None:
+    """安装 ipykernel（参数列表，不经 shell）。"""
+    run_cmd([sys.executable, "-m", "pip", "install", "ipykernel"])
 
-def install_kernel():
+
+def jupyter_kernel_list() -> None:
+    """列出已安装的 Jupyter 内核。"""
+    run_cmd([sys.executable, "-m", "jupyter", "kernelspec", "list"])
+
+
+def _validate_kernel_name(name: str) -> str:
+    name = (name or "").strip()
+    if not _KERNEL_NAME_RE.match(name):
+        raise ValueError(
+            "kernel name 仅允许字母/数字/下划线/点/连字符，"
+            f"收到: {name!r}"
+        )
+    return name
+
+
+def _validate_kernel_display_name(name: str) -> str:
+    name = (name or "").strip()
+    if not _KERNEL_DISPLAY_RE.match(name):
+        raise ValueError(
+            "display name 仅允许字母/数字/下划线/点/连字符/空格，"
+            f"收到: {name!r}"
+        )
+    return name
+
+
+def install_kernel(
+    kernel_name: str | None = None,
+    kernel_display_name: str | None = None,
+) -> None:
     """
-    安装新的Jupyter内核（交互式安装）
-    
-    这个函数会：
-    1. 列出当前已安装的内核
-    2. 安装ipykernel（如果未安装）
-    3. 显示运行环境信息
-    4. 提示用户输入新内核的名称和显示名称
-    5. 安装新内核
-    
-    使用场景：
-    - 为特定的Python环境创建Jupyter内核
-    - 创建多个不同名称的Python内核
-    
-    注意：
-    - 这个函数会要求用户交互输入（使用input()）
-    - 不适合在非交互式环境中使用
+    安装新的 Jupyter 内核。
+
+    可用参数直接传入名称（测试/脚本）；不传则交互 input()。
+    名称经白名单校验后以 subprocess 参数列表执行，避免命令注入。
     """
-    # 步骤1：列出当前已安装的内核
     jupyter_kernel_list()
-    # 步骤2：安装ipykernel（如果未安装）
     install_ipykernel()
-    # 步骤3：显示运行环境信息
     running()
-    # 步骤4：获取Python解释器路径
     python_path = running_python_path()
-    # 步骤5：提示用户输入新内核的信息
     print("Please input the new kernel name and display name.")
-    # 获取内核名称（用于内部标识）
-    kernel_name = input("Please input the kernel name:")
-    # 获取显示名称（在Jupyter Notebook中显示的名称）
-    kernel_display_name = input("Please input the kernel display name:")
-    # 步骤6：安装新内核
-    # -m ipykernel install: 使用ipykernel模块安装内核
-    # --user: 安装到用户目录（不需要管理员权限）
-    # --name: 指定内核名称
-    # --display-name: 指定显示名称
-    run_cmd(python_path + ' -m ipykernel install --user --name=' + kernel_name + ' --display-name=' + kernel_display_name)
+    if kernel_name is None:
+        kernel_name = input("Please input the kernel name:")
+    if kernel_display_name is None:
+        kernel_display_name = input("Please input the kernel display name:")
+    kernel_name = _validate_kernel_name(kernel_name)
+    kernel_display_name = _validate_kernel_display_name(kernel_display_name)
+    run_cmd(
+        [
+            python_path,
+            "-m",
+            "ipykernel",
+            "install",
+            "--user",
+            f"--name={kernel_name}",
+            f"--display-name={kernel_display_name}",
+        ]
+    )
 
-def no_warning():
-    """
-    禁用 Python 警告信息（仅做 filterwarnings('ignore')）。
 
-    使用场景：
-    - 演示时希望输出更简洁
-
-    注意：
-    - 会隐藏重要提示；调试时请关掉
-    - 若还要打印环境信息，请优先用 ``from wanglaoshi import ready; ready()``
-      （不要再写一遍 ``warnings.filterwarnings``，二者重复）
-    """
+def no_warning() -> None:
+    """禁用 Python 警告信息（仅做 filterwarnings('ignore')）。"""
     import warnings
 
     warnings.filterwarnings("ignore")

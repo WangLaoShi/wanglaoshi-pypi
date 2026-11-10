@@ -91,7 +91,9 @@ from .experiment_context import ExperimentContext
 from .score_floors import SCORE_FLOORS, assert_above_floor
 from .report_meta import ChartMeta, assert_report_ok, write_chart_sidecar
 from .regression_summary import RegressionSummary, from_junit_xml
-from .testing_utils import require_data_path, optional_data_available
+
+# testing_utils 依赖 pytest，仅开发/测试需要；勿在 import wanglaoshi 时强拉
+# 仍支持：from wanglaoshi import require_data_path（首次访问时再加载）
 
 __all__ = [
     # 模块
@@ -156,3 +158,12 @@ __all__ = [
     "require_data_path",
     "optional_data_available",
 ]
+
+
+def __getattr__(name: str):
+    """懒加载仅测试用途的符号，避免生产环境强依赖 pytest。"""
+    if name in {"require_data_path", "optional_data_available"}:
+        from . import testing_utils
+
+        return getattr(testing_utils, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

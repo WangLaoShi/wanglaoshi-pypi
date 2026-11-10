@@ -98,16 +98,21 @@ def test_jupyter_env_all(monkeypatch: pytest.MonkeyPatch) -> None:
     JupyterEnv.running()
     JupyterEnv.no_warning()
 
-    class _Pipe:
-        def read(self) -> str:
-            return "ok\nline2"
+    class _Completed:
+        stdout = "ok\nline2"
+        stderr = ""
 
-    monkeypatch.setattr(JupyterEnv.os, "popen", lambda _cmd: _Pipe())
-    JupyterEnv.run_cmd("echo hi")
+    monkeypatch.setattr(
+        JupyterEnv.subprocess,
+        "run",
+        lambda *a, **k: _Completed(),
+    )
+    JupyterEnv.run_cmd(["echo", "hi"])
     JupyterEnv.install_ipykernel()
     JupyterEnv.jupyter_kernel_list()
-    monkeypatch.setattr("builtins.input", lambda _p="": "test-kernel")
-    JupyterEnv.install_kernel()
+    JupyterEnv.install_kernel(kernel_name="test-kernel", kernel_display_name="Test Kernel")
+    with pytest.raises(ValueError, match="仅允许"):
+        JupyterEnv.install_kernel(kernel_name="evil; id", kernel_display_name="x")
 
 
 @pytest.mark.quick
@@ -146,6 +151,15 @@ def test_jupyter_font_and_webgetter(tmp_path: Path, monkeypatch: pytest.MonkeyPa
         side_effect=WebGetter.requests.exceptions.RequestException("boom"),
     ):
         assert WebGetter.Wget("https://x", output_dir=str(tmp_path), filename="a.bin").download() is False
+
+    # 路径穿越：filename 中的目录成分被剥掉，不得写出 output_dir 之外
+    dest = WebGetter.Wget(
+        "https://example.com/x.bin",
+        output_dir=str(tmp_path / "dl"),
+        filename="../../etc/passwd",
+    )._safe_output_path()
+    assert dest.parent == (tmp_path / "dl").resolve()
+    assert dest.name == "passwd"
 
     # simhei / matplotlib_font_init：不真下载
     fake_font = tmp_path / "SimHei.ttf"

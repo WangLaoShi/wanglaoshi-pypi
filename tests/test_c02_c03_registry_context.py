@@ -126,13 +126,17 @@ def test_c03_maybe_sample_noop_when_small() -> None:
 
 @pytest.mark.quick
 def test_c03_stratify_fallback_on_tiny_single_class() -> None:
-    """单类/过小样本分层失败时应回退到非分层划分。"""
+    """稀有类只有 1 条时分层失败：应 warning 后回退，并标记 stratify_applied=False。"""
     ctx = ExperimentContext(random_seed=0, test_size=0.5)
     X = pd.DataFrame({"x": [1, 2, 3, 4]})
-    y = [0, 0, 0, 0]
-    Xtr, Xte, ytr, yte = ctx.split(X, y, stratify=True)
+    y = [0, 0, 0, 1]  # 类别 1 仅 1 条，分层会失败
+    with pytest.warns(UserWarning, match="无法分层"):
+        Xtr, Xte, ytr, yte = ctx.split(X, y, stratify=True)
+    assert ctx.stratify_applied is False
     assert len(Xtr) + len(Xte) == 4
     assert len(ytr) + len(yte) == 4
+    with pytest.raises(ValueError):
+        ctx.split(X, y, stratify=True, strict_stratify=True)
 
 
 @pytest.mark.quick

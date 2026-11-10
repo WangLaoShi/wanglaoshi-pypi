@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import platform
 import sys
+import warnings
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Sequence, Tuple
@@ -22,6 +23,8 @@ class ExperimentContext:
     search_budget: int = 20  # 例如 RandomizedSearch 迭代上限
     notes: str = ""
     created_at_utc: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    # 最近一次 split 是否真正使用了分层；None 表示尚未 split
+    stratify_applied: Optional[bool] = field(default=None, init=False, repr=True)
 
     def environment(self) -> Dict[str, Any]:
         return {
@@ -43,18 +46,35 @@ class ExperimentContext:
         y: Sequence,
         *,
         stratify: bool = True,
+        strict_stratify: bool = False,
     ) -> Tuple[pd.DataFrame, pd.DataFrame, Any, Any]:
+        """划分训练/测试集。
+
+        stratify=True 但无法分层时：默认 warning 后回退非分层，并设 stratify_applied=False；
+        strict_stratify=True 时直接抛出原错误。
+        """
         strat = y if stratify else None
         try:
-            return train_test_split(
+            out = train_test_split(
                 X,
                 y,
                 test_size=self.test_size,
                 random_state=self.random_seed,
                 stratify=strat,
             )
+            self.stratify_applied = strat is not None
+            return out
         except ValueError:
-            # 小样本无法分层时回退
+            if stratify and strict_stratify:
+                raise
+            if stratify:
+                warnings.warn(
+                    "ExperimentContext.split: 无法分层划分，已回退为非分层；"
+                    "如需失败请传 strict_stratify=True。",
+                    UserWarning,
+                    stacklevel=2,
+                )
+            self.stratify_applied = False
             return train_test_split(
                 X, y, test_size=self.test_size, random_state=self.random_seed, stratify=None
             )
