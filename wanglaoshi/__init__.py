@@ -8,6 +8,7 @@ wanglaoshi 顶层导出 (API)
     from wanglaoshi.compete import QuickBaseline, SubmissionGenerator
     from wanglaoshi.features import AdvancedFeatureEngineer
     from wanglaoshi.analytics import StatsToolkit, TimeSeriesTools
+    from wanglaoshi.ml import DataPreprocessor, MLModel
     from wanglaoshi.runtime import JupyterEnv, VERSIONS
     from wanglaoshi._testing import assert_close
 
@@ -29,15 +30,11 @@ from . import Useful
 from . import WebGetter
 # Analyzer_Plain 为 legacy：改懒加载，避免 import wanglaoshi 就刷 DeprecationWarning
 
-# MLDL 依赖 torch，为了不影响普通用户导入，本模块中将其视为「可选模块」。
-# - 如果用户未安装 torch，则 from wanglaoshi import MLDL 不会自动失败；
-# - 需要使用 MLDL 时，推荐：在安装 torch 后，单独 from wanglaoshi import MLDL。
-try:
-    from . import MLDL  # type: ignore  # noqa: F401
-    _MLDL_AVAILABLE = True
-except ImportError:
-    MLDL = None  # type: ignore
-    _MLDL_AVAILABLE = False
+# MLDL：实现在 ml.core；根 MLDL 为 shim。torch 可选（TORCH_AVAILABLE），模块本身始终可导入。
+from . import MLDL  # noqa: F401
+from .ml.core import TORCH_AVAILABLE as _MLDL_TORCH_AVAILABLE
+
+_MLDL_AVAILABLE = bool(_MLDL_TORCH_AVAILABLE)
 
 # 直接导出常用类和函数（方便用户少写一层模块前缀）
 from .Analyzer import DataAnalyzer, analyze_data, analyze_multiple_files, analyze_notebook
@@ -79,7 +76,7 @@ from .report_meta import ChartMeta, assert_report_ok, write_chart_sidecar
 from .regression_summary import RegressionSummary, from_junit_xml
 
 # 架构门面（Phase 1：re-export；旧路径仍可用）
-from . import compete, analyze, features, analytics, runtime
+from . import compete, analyze, features, analytics, runtime, ml
 from . import _testing  # noqa: F401
 
 # testing_utils 依赖 pytest，仅开发/测试需要；勿在 import wanglaoshi 时强拉
@@ -97,6 +94,7 @@ _STABLE_PUBLIC = [
     "features",
     "analytics",
     "runtime",
+    "ml",
     "_testing",
     "business",
     # Notebook / EDA 捷径
@@ -159,7 +157,7 @@ _COMPAT_EXPORTS = [
     "Analyzer_Plain",  # legacy：请优先 wanglaoshi.analyze
     "CompetitionTools",
     "FeatureEngineering",
-    "MLDL",  # 可选；未装 torch 时为 None
+    "MLDL",  # 兼容模块路径；推荐 wanglaoshi.ml（torch 可选）
     "JupyterFont",
     "Useful",
     "WebGetter",

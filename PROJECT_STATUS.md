@@ -183,3 +183,4 @@
 | 2026-11-10 | 架构 Phase 4：实现迁入子包 + 根 shim；extras `[compete]`/`[business]` |
 | 2026-11-10 | 架构验收：quick 170 过；函数覆盖 313/313；`scripts/check_architecture.py` |
 | 2026-11-10 | 架构收口：`stats`→`analytics/stats`；`Analyzer_Plain`/`wqe`→`analyze/{plain,wqe}` |
+| 2026-11-10 | 架构收口：`MLDL`→`ml/core`；门面 `wanglaoshi.ml`；根 `MLDL` 为 shim |

@@ -14,6 +14,7 @@ wanglaoshi/
   features/     # 特征工程（engineering.py）
   business/     # 业务流水线
   analytics/    # 时序 / 生存 / 排序 / 公平 / 校准 / 异常 / stats/
+  ml/           # ML/DL（core.py；torch 可选）
   runtime/      # ready / jupyter_* / versions / web_getter / useful
   _testing/     # 断言 / 分数下限 / 回归汇总 / 数据台账 / 实验上下文
 ```
@@ -25,6 +26,7 @@ wanglaoshi/
 | `features` | `features/engineering.py` | `FeatureEngineering.py`（shim） |
 | `business` | `business/*` | 同左 |
 | `analytics` | `analytics/*.py` + `analytics/stats/` | `timeseries.py` / `stats/`（shim） |
+| `ml` | `ml/core.py` | `MLDL.py`（shim） |
 | `runtime` | `runtime/*.py` | `ready.py` / `JupyterEnv.py` 等（shim） |
 | `_testing` | `_testing/*.py` | `asserting.py` 等（shim） |
 | legacy EDA | `analyze/plain.py` / `analyze/wqe.py` | `Analyzer_Plain.py` / `wqe.py`（shim + warning） |
@@ -59,8 +61,7 @@ wanglaoshi/
 
 - 不改 Notebook 课号与 Book 目录（教材旧 import 仍可用）。
 - 不强制用户立刻改 import（仅 soft warning）。
-- `MLDL` 仍留包根（可选 torch，单独演进）。
-- Phase 4 之后补迁：`stats/` → `analytics/stats/`；`Analyzer_Plain`/`wqe` → `analyze/{plain,wqe}.py`。
+- Phase 4 之后补迁已完成：`stats/` → `analytics/stats/`；`Analyzer_Plain`/`wqe` → `analyze/{plain,wqe}.py`；`MLDL` → `ml/core.py`。
 
 ---
 

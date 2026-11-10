@@ -37,7 +37,8 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `Analyzer_Plain` | 模块 | 同上 | **Legacy**→`analyze.plain`；soft deprecate；`WANGLAOSHI_SILENCE_LEGACY=1` 可关 |
 | `wqe`（非顶层 `__all__`） | 模块 | 同上 | **Legacy**→`analyze.wqe`；请优先 `wanglaoshi.analyze` |
 | `stats` | 子包 shim | scipy/statsmodels | 实现在 `analytics/stats`；`from wanglaoshi.stats import …` 仍可用 |
-| `MLDL` | 可选模块 | **torch** | **兼容**；未装 torch 时可能为 `None` |
+| `ml` | 子包门面 | sklearn；**torch 可选** | **稳定**；`DataPreprocessor` / `MLModel` / `TORCH_AVAILABLE` |
+| `MLDL` | 模块 shim | 同上 | **兼容**→`ml.core`；`from wanglaoshi import MLDL` 仍可用 |
 | `JupyterEnv.no_warning` | 函数 | warnings | 仅关警告；课堂请优先 `ready()` |
 | `validate_metric_dict` / `default_metric_registry` | 函数 | — | S5 指标口径版本登记 |
 

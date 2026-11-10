@@ -41,7 +41,7 @@ print(sorted(wanglaoshi.__all__))
 | `from wanglaoshi import BusinessPipeline` | 业务流水线 |
 | `from wanglaoshi import VERSIONS as V` | 版本检查 |
 | `from wanglaoshi.WebGetter import Wget` | 下载（**不要** `from WebGetter import Wget`） |
-| `from wanglaoshi import MLDL` | 可选；未装 torch 时可能为 `None` |
+| `from wanglaoshi.ml import …` / `from wanglaoshi import MLDL` | torch 可选；看 `TORCH_AVAILABLE` |
 
 ---
 

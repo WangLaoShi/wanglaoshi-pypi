@@ -63,7 +63,7 @@ pip install -e ".[dev,excel]"
 
 | 不默认安装 | 原因 |
 | --- | --- |
-| `torch` | 体积大、CPU/CUDA 源不同；未装时 `import wanglaoshi` 仍成功，`MLDL` 为 `None` |
+| `torch` | 体积大、CPU/CUDA 源不同；未装时 `import wanglaoshi` / `wanglaoshi.ml` 仍成功，`TORCH_AVAILABLE=False` |
 | `jupyter` | 只有跑 Notebook 才需要 |
 | `openpyxl` | 只有读 Excel 才需要 |
 | `optuna` | 只有贝叶斯调参才需要 |
@@ -87,7 +87,7 @@ pip install -e ".[dev,excel]"
 
 | 能力 | 未安装时 |
 | --- | --- |
-| `MLDL` / torch | 顶层导入不失败；`wanglaoshi.MLDL is None` |
+| `ml` / torch | 顶层导入不失败；`TORCH_AVAILABLE` 为 False；DL 类调用会提示安装 torch |
 | Excel | 读 xlsx 时由 pandas 提示缺少引擎 |
 | Jupyter | 不影响 `import wanglaoshi`；只是打不开 `.ipynb` 交互环境 |
 | Optuna | 调参 API 会抛出明确的 `ImportError`（测试已覆盖） |

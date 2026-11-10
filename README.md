@@ -11,7 +11,7 @@
 - **特征工程**：`wanglaoshi.features` 支持时间/文本/编码/变换/特征选择
 - **业务流水线**：`business` / `BusinessPipeline` 固化接收→清洗→指标→六视角→结论→归档（无需 AI Key）
 - **环境辅助**：`wanglaoshi.runtime`（`ready` / `VERSIONS` / `JupyterEnv` 等）
-- **可选深度学习**：`MLDL`（需自行安装 `torch`；未安装不影响其他功能）
+- **可选深度学习**：`wanglaoshi.ml`（需自行安装 `torch`；未安装不影响 sklearn 部分）
 - **架构说明**：门面分层与迁移见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 适用人群：数据分析初学者、Kaggle 选手、需要可追溯业务分析模板的同学。
@@ -52,7 +52,8 @@ wanglaoshi-pypi
     ├── compete/ analyze/ features/ analytics/ runtime/ _testing/  # 门面（实现所在）
     ├── business/                 # 业务 Skill 流水线
     ├── Analyzer.py / stats/ 等   # 兼容 shim（旧 import 仍可用）
-    ├── Analyzer_Plain.py / wqe.py / MLDL.py  # legacy shim / 可选 torch
+    ├── ml/                       # ML/DL 门面（torch 可选）
+    ├── Analyzer_Plain.py / wqe.py / MLDL.py  # legacy / 兼容 shim
     └── __init__.py               # 详见 docs/ARCHITECTURE.md
 ```
 
@@ -1233,7 +1234,7 @@ selected_features = engineer.select_features_by_mutual_info(
 | 通用分析     | 时序 / 统计 / 校准 / 公平等  | `from wanglaoshi.analytics import StatsToolkit, TimeSeriesTools` |
 | 运行时辅助   | Jupyter / 字体 / 下载        | `from wanglaoshi.runtime import JupyterEnv, VERSIONS, WebGetter` |
 | 测试治理     | 断言 / 分数下限 / 实验上下文 | `from wanglaoshi._testing import assert_close, ExperimentContext` |
-| ML/DL 基础   | 预处理、特征工程、ML/DL 模型 | `from wanglaoshi import MLDL`（可选 torch） |
+| ML/DL 基础   | 预处理、特征工程、ML/DL 模型 | `from wanglaoshi.ml import MLModel`（可选 torch） |
 
 顶层捷径仍可用（兼容课堂旧代码）：
 
@@ -1259,7 +1260,7 @@ selected_features = engineer.select_features_by_mutual_info(
 | `wqe`               | **Legacy**（同上）；请优先 `wanglaoshi.analyze`             | `import wanglaoshi.wqe` |
 | `CompetitionTools`  | （兼容）比赛工具实现模块                                    | `from wanglaoshi import CompetitionTools as CT` |
 | `FeatureEngineering`| （兼容）特征工程实现模块                                    | `from wanglaoshi import FeatureEngineering as FE` |
-| `MLDL`              | ML/DL 封装：预处理、特征工程、传统 ML 模型、PyTorch DL 模型  | `from wanglaoshi import MLDL` |
+| `ml` / `MLDL`       | ML/DL 门面（实现 `ml.core`）；`MLDL` 为兼容 shim                 | `from wanglaoshi.ml import DataPreprocessor` |
 | `JupyterEnv` / `VERSIONS` / `JupyterFont` / `Useful` / `WebGetter` | （兼容）运行时辅助 | 推荐 `wanglaoshi.runtime` |
 
 > 建议：新项目先查门面；旧 Notebook 无需立刻改 import。

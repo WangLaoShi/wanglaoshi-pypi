@@ -39,8 +39,10 @@ def check_imports_and_identity() -> list[str]:
         from wanglaoshi.asserting import assert_close as ac_shim
         from wanglaoshi.compete import SubmissionGenerator
         from wanglaoshi.features import AdvancedFeatureEngineer
+        from wanglaoshi.ml import DataPreprocessor, TORCH_AVAILABLE
         from wanglaoshi.runtime import JupyterEnv, VERSIONS, ready as ready_rt
         from wanglaoshi.stats import StatsToolkit as ST_shim
+        import wanglaoshi.MLDL as mldl_mod
 
         assert DA_facade is DataAnalyzer is DA_shim
         assert SubmissionGenerator is SG_ct is CompetitionTools.SubmissionGenerator
@@ -52,6 +54,9 @@ def check_imports_and_identity() -> list[str]:
         assert hasattr(VERSIONS, "show_env_info")
         assert hasattr(JupyterEnv, "no_warning")
         assert StatsToolkit.__module__.startswith("wanglaoshi.analytics.stats.")
+        assert mldl_mod.__name__ == "wanglaoshi.ml.core"
+        assert DataPreprocessor is mldl_mod.DataPreprocessor
+        assert isinstance(TORCH_AVAILABLE, bool)
         _ok("facade / shim / top-level imports + identity")
     except Exception as exc:  # noqa: BLE001
         errors.append(f"import/identity: {exc}")

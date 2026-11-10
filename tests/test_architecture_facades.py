@@ -44,7 +44,7 @@ def test_legacy_imports_still_work() -> None:
 def test_top_level_exports_facade_modules() -> None:
     import wanglaoshi as wl
 
-    for name in ("compete", "analyze", "features", "analytics", "runtime", "_testing", "business"):
+    for name in ("compete", "analyze", "features", "analytics", "runtime", "ml", "_testing", "business"):
         assert hasattr(wl, name), name
 
 
@@ -57,10 +57,10 @@ def test_public_surface_split_stable_vs_compat() -> None:
     assert stable.isdisjoint(compat)
     assert set(wl.__all__) == stable | compat
     # 门面必须在稳定面
-    for name in ("compete", "analyze", "features", "analytics", "runtime", "_testing", "business"):
+    for name in ("compete", "analyze", "features", "analytics", "runtime", "ml", "_testing", "business"):
         assert name in stable
-    # legacy 模块留在兼容面
-    for name in ("Analyzer_Plain", "CompetitionTools", "FeatureEngineering", "Analyzer"):
+    # legacy / 兼容模块留在兼容面
+    for name in ("Analyzer_Plain", "CompetitionTools", "FeatureEngineering", "Analyzer", "MLDL"):
         assert name in compat
     # 兼容面符号仍可从顶层取到
     assert wl.Analyzer_Plain is not None
@@ -169,6 +169,19 @@ def test_legacy_eda_lives_under_analyze() -> None:
     assert wqe.__name__ == "wanglaoshi.analyze.wqe"
     assert "analyze/plain.py" in (plain.__file__ or "").replace("\\", "/")
     assert "analyze/wqe.py" in (wqe.__file__ or "").replace("\\", "/")
+
+
+@pytest.mark.quick
+def test_mldl_lives_under_ml_facade() -> None:
+    import wanglaoshi.MLDL as mldl_mod
+    from wanglaoshi.ml import DataPreprocessor, MLModel, TORCH_AVAILABLE
+    from wanglaoshi.ml.core import DataPreprocessor as DP2
+
+    assert mldl_mod.__name__ == "wanglaoshi.ml.core"
+    assert "ml/core.py" in (mldl_mod.__file__ or "").replace("\\", "/")
+    assert DataPreprocessor is DP2 is mldl_mod.DataPreprocessor
+    assert MLModel is mldl_mod.MLModel
+    assert isinstance(TORCH_AVAILABLE, bool)
 
 
 @pytest.mark.quick
