@@ -132,3 +132,38 @@ def test_competition_tools_split_reexports_same_objects() -> None:
     assert CT.CrossValidator is CrossValidator
     assert CT.HyperparameterOptimizer is HyperparameterOptimizer
     assert CT.ExperimentTracker is ExperimentTracker
+
+
+@pytest.mark.quick
+def test_phase4_implementations_live_in_subpackages() -> None:
+    from wanglaoshi.analyze import DataAnalyzer
+    from wanglaoshi.features import AdvancedFeatureEngineer
+    from wanglaoshi.analytics import TimeSeriesTools
+    from wanglaoshi.runtime import ready
+    from wanglaoshi._testing import assert_close
+    from wanglaoshi.Analyzer import DataAnalyzer as DA_shim
+    from wanglaoshi.FeatureEngineering import AdvancedFeatureEngineer as FE_shim
+    from wanglaoshi.timeseries import TimeSeriesTools as TS_shim
+    from wanglaoshi.asserting import assert_close as ac_shim
+
+    assert DataAnalyzer.__module__.startswith("wanglaoshi.analyze.")
+    assert AdvancedFeatureEngineer.__module__.startswith("wanglaoshi.features.")
+    assert TimeSeriesTools.__module__.startswith("wanglaoshi.analytics.")
+    assert ready.__module__.startswith("wanglaoshi.runtime.")
+    assert assert_close.__module__.startswith("wanglaoshi._testing.")
+    assert DA_shim is DataAnalyzer
+    assert FE_shim is AdvancedFeatureEngineer
+    assert TS_shim is TimeSeriesTools
+    assert ac_shim is assert_close
+
+
+@pytest.mark.quick
+def test_setup_extras_include_compete_business() -> None:
+    from pathlib import Path
+    import re
+
+    setup = Path(__file__).resolve().parents[1] / "setup.py"
+    text = setup.read_text(encoding="utf-8")
+    assert re.search(r"['\"]compete['\"]\s*:", text)
+    assert re.search(r"['\"]business['\"]\s*:", text)
+    assert re.search(r"['\"]dev['\"]\s*:", text)

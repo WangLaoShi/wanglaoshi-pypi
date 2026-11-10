@@ -24,7 +24,8 @@
 | 平时上课、写作业、跑 Analyzer / business / CompetitionTools | `pip install wanglaoshi` |
 | 还要读 `.xlsx` | `pip install "wanglaoshi[excel]"` |
 | 还要跑仓库里的 Notebook 示例 | `pip install "wanglaoshi[jupyter]"` |
-| 还要用 Optuna 贝叶斯调参 | `pip install "wanglaoshi[optuna]"` |
+| 还要用 Optuna 贝叶斯调参 | `pip install "wanglaoshi[optuna]"` 或 `[compete]` |
+| 业务流水线要读 Excel | `pip install "wanglaoshi[business]"` 或 `[excel]` |
 | 上面非深度学习的可选一次装齐 | `pip install "wanglaoshi[all]"` |
 | 本地开发 / 跑 pytest | `pip install -e ".[dev]"` |
 | 构建基线工坊教材站（Jupyter Book） | `pip install -e ".[book]"` 后执行 `python scripts/build_book.py` |
@@ -76,6 +77,8 @@ pip install -e ".[dev,excel]"
 | `excel` | `openpyxl` | `pandas.read_excel` / 业务读 xlsx |
 | `jupyter` | `jupyter`, `ipykernel` | `examples/`、进阶 Notebook |
 | `optuna` | `optuna` | `HyperparameterOptimizer.bayesian_optimize` |
+| `compete` | `optuna` | 竞赛场景；与 `optuna` 等价，语义别名 |
+| `business` | `openpyxl` | 业务流水线读 xlsx；与 `excel` 等价，语义别名 |
 | `dev` | `pytest`, `pytest-cov`, `flake8` | 开发与 CI |
 | `book` | `jupyter-book`, `jupyter`, `ipykernel` | 构建基线工坊 / Pages |
 | `all` | `excel` + `jupyter` + `optuna` | 一次性装齐（**不含** torch / dev / book） |

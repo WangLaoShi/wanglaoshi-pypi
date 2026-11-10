@@ -62,6 +62,9 @@ setup(
         'excel': ['openpyxl'],
         'jupyter': ['jupyter', 'ipykernel'],
         'optuna': ['optuna'],
+        # Phase 4 场景 extras（代码默认仍随核心安装；此处是可选依赖门禁）
+        'compete': ['optuna'],  # HyperparameterOptimizer.bayesian_optimize
+        'business': ['openpyxl'],  # 业务流水线读 xlsx / Excel intake
         'dev': ['pytest', 'pytest-cov', 'flake8'],
         'book': [
             # 1.x = Sphinx 经典 Jupyter Book；2.x 换成 MystMD，配置不兼容

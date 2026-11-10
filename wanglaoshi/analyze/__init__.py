@@ -1,4 +1,4 @@
-"""EDA / 报告分析门面（零破坏：主实现仍在 ``Analyzer``）。
+"""EDA / 报告分析门面。
 
 推荐::
 
@@ -11,7 +11,7 @@
 
 from __future__ import annotations
 
-from ..Analyzer import (
+from .core import (
     DataAnalyzer,
     DataProcessor,
     ReportGenerator,

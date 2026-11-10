@@ -26,7 +26,7 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 
 | 名称 | 类型 | 依赖 | 备注 |
 | --- | --- | --- | --- |
-| `compete` / `analyze` / `features` / `analytics` / `runtime` / `_testing` | 子包门面 | — | **稳定**；见 `docs/ARCHITECTURE.md` |
+| `compete` / `analyze` / `features` / `analytics` / `runtime` / `_testing` | 子包（实现已迁入） | — | **稳定**；根上旧模块为 shim；见 `docs/ARCHITECTURE.md` |
 | `ready` | 函数 | 标准库 (+ 可选 numpy) | **稳定** Notebook 一键就绪 |
 | `DataAnalyzer` / `analyze_*` | 类/函数 | pandas/sklearn/matplotlib | **稳定**捷径（等价 `analyze` 门面） |
 | `business` / `BusinessPipeline` / … | 模块/类/函数 | pandas | **稳定**；见 `wanglaoshi.business` |

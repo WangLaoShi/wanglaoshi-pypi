@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from ..anomaly import AnomalyDetector
-from ..calibration import CalibrationReport, expected_calibration_error
-from ..fairness import GroupMetricsReport
-from ..ranking import RankingMetrics
 from ..stats import ExperimentDesign, StatsToolkit
-from ..survival import SurvivalAnalyzer
-from ..timeseries import TimeSeriesTools
+from .anomaly import AnomalyDetector
+from .calibration import CalibrationReport, expected_calibration_error
+from .fairness import GroupMetricsReport
+from .ranking import RankingMetrics
+from .survival import SurvivalAnalyzer
+from .timeseries import TimeSeriesTools
 
 __all__ = [
     "TimeSeriesTools",

@@ -9,24 +9,24 @@
 
 ```text
 wanglaoshi/
-  compete/      # 竞赛：提交 / 基线 / 泄露 / CV / 集成 …
-  analyze/      # EDA / 报告（主路径 DataAnalyzer）
-  features/     # 特征工程
-  business/     # 业务流水线（已有）
-  analytics/    # 时序 / 生存 / 排序 / 公平 / 校准 / 异常 / stats
-  runtime/      # ready / Jupyter* / VERSIONS / WebGetter
+  compete/      # 竞赛：submission / baseline / leakage / …
+  analyze/      # EDA / 报告（core.py = DataAnalyzer）
+  features/     # 特征工程（engineering.py）
+  business/     # 业务流水线
+  analytics/    # 时序 / 生存 / 排序 / 公平 / 校准 / 异常（stats/ 仍在包根）
+  runtime/      # ready / jupyter_* / versions / web_getter / useful
   _testing/     # 断言 / 分数下限 / 回归汇总 / 数据台账 / 实验上下文
 ```
 
-| 门面 | 当前实现位置（Phase 1 仍住这里） | 推荐导入 |
+| 门面 | 实现位置 | 根上兼容路径 |
 | --- | --- | --- |
-| `compete` | `CompetitionTools.py` | `from wanglaoshi.compete import SubmissionGenerator` |
-| `analyze` | `Analyzer.py` | `from wanglaoshi.analyze import DataAnalyzer` |
-| `features` | `FeatureEngineering.py` | `from wanglaoshi.features import AdvancedFeatureEngineer` |
-| `business` | `business/*` | `from wanglaoshi.business import BusinessPipeline` |
-| `analytics` | 根上各小模块 + `stats/` | `from wanglaoshi.analytics import TimeSeriesTools` |
-| `runtime` | `ready` / `Jupyter*` / … | `from wanglaoshi.runtime import ready` |
-| `_testing` | `asserting` / `score_floors` / … | `from wanglaoshi._testing import assert_close` |
+| `compete` | `compete/*.py` | `CompetitionTools.py`（shim） |
+| `analyze` | `analyze/core.py` | `Analyzer.py`（shim） |
+| `features` | `features/engineering.py` | `FeatureEngineering.py`（shim） |
+| `business` | `business/*` | 同左 |
+| `analytics` | `analytics/*.py` + `stats/` | `timeseries.py` 等（shim） |
+| `runtime` | `runtime/*.py` | `ready.py` / `JupyterEnv.py` 等（shim） |
+| `_testing` | `_testing/*.py` | `asserting.py` 等（shim） |
 
 顶层 `from wanglaoshi import DataAnalyzer, ready, …` **继续支持**（兼容课堂旧代码）。
 
@@ -34,30 +34,23 @@ wanglaoshi/
 
 ## 2. 迁移顺序（已定）
 
-### Phase 1 — 门面（本轮）✅
+### Phase 1 — 门面 ✅
 
-- 新增上述子包，仅 **re-export**，不搬文件。
-- 写本文档；加架构烟测。
-- **不发** DeprecationWarning（避免刷屏）。
+- 新增子包，仅 re-export；写本文档；架构烟测。
 
 ### Phase 2 — 收缩公开面 ✅
 
-- 文档/README 主示例改用门面导入；课堂旧导入仍可用。
-- `__all__` 区分 `_STABLE_PUBLIC` 与 `_COMPAT_EXPORTS`。
-- `Analyzer_Plain` / `wqe` 源码与 API 盘点标注 *legacy*。
+- `__all__` 分 `_STABLE_PUBLIC` / `_COMPAT_EXPORTS`；README/API 改门面；Plain/wqe 标 legacy。
 
 ### Phase 3 — soft deprecate ✅
 
-- 导入 `wanglaoshi.wqe` / `Analyzer_Plain` 发出 `DeprecationWarning`。
-  - 关闭：`export WANGLAOSHI_SILENCE_LEGACY=1`
-  - `import wanglaoshi` 本身不触发（`Analyzer_Plain` 已懒加载）。
-- `CompetitionTools` 大类拆到 `compete/{submission,baseline,leakage,ensemble,importance,cv,hyperopt,tracker}.py`；
-  `CompetitionTools.py` 与 `compete` 门面均为 re-export，旧导入路径符号不变。
+- 导入 `wqe` / `Analyzer_Plain` 发 `DeprecationWarning`（`WANGLAOSHI_SILENCE_LEGACY=1` 可关）。
+- `CompetitionTools` 拆入 `compete/*`。
 
-### Phase 4 — 搬实现
+### Phase 4 — 搬实现 ✅
 
-- 物理移动到子包目录；根上旧模块变为薄 shim：`from wanglaoshi.compete import *`。
-- 可选 extras：`[compete]` / `[business]` / `[dev]`（测试门禁）。
+- `Analyzer` / `FeatureEngineering` / analytics 叶子 / runtime / `_testing` 物理迁入子包；根模块为薄 shim。
+- extras：`[compete]`（=optuna）、`[business]`（=openpyxl）；`[dev]` 仍为测试门禁。
 
 ---
 
@@ -65,7 +58,7 @@ wanglaoshi/
 
 - 不改 Notebook 课号与 Book 目录（教材旧 import 仍可用）。
 - 不强制用户立刻改 import（仅 soft warning）。
-- Phase 3 已拆 `CompetitionTools`；`Analyzer.py` 实体搬迁留待 Phase 4。
+- `stats/` 暂留包根（已是子包）；`Analyzer_Plain` / `wqe` / `MLDL` 不在本轮物理迁入。
 
 ---
 
