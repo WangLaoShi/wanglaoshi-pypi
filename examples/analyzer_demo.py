@@ -5,7 +5,7 @@ DataAnalyzer 使用示例
 
 import pandas as pd
 import numpy as np
-from wanglaoshi import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 import os
 import json
 from pprint import pprint
@@ -194,7 +194,7 @@ def notebook_demo():
     
     ```python
     import pandas as pd
-    from wanglaoshi import DataAnalyzer
+    from wanglaoshi.analyze import DataAnalyzer
     
     # 创建或加载数据
     df = pd.DataFrame(...)

@@ -59,8 +59,8 @@ wanglaoshi/
 
 ## 3. 明确不做什么
 
-- 不改 Notebook 课号与 Book 目录（教材旧 import 仍可用）。
-- 不强制用户立刻改 import（仅 soft warning）。
+- 不强制改 `examples/advanced/*.ipynb` 与 `book/` 课号目录中的旧 import（兼容路径仍可用）。
+- 不强制用户立刻改 import（仅 soft warning）；**新文档 / API 说明书 / 脚本示例**优先门面。
 - Phase 4 之后补迁已完成：`stats/` → `analytics/stats/`；`Analyzer_Plain`/`wqe` → `analyze/{plain,wqe}.py`；`MLDL` → `ml/core.py`。
 
 ---

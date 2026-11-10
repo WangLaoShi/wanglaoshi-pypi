@@ -330,7 +330,7 @@ DataAnalyzer 使用示例
 
 import pandas as pd
 import numpy as np
-from wanglaoshi.Analyzer import DataAnalyzer
+from wanglaoshi.analyze import DataAnalyzer
 import os
 
 def create_sample_data():
@@ -514,7 +514,7 @@ def notebook_demo():
     
     ```python
     import pandas as pd
-    from wanglaoshi import DataAnalyzer
+    from wanglaoshi.analyze import DataAnalyzer
     
     # 创建或加载数据
     df = pd.DataFrame(...)
@@ -731,7 +731,7 @@ CompetitionTools 模块提供了专门用于数据科学比赛（如Kaggle）的
 自动生成符合比赛格式要求的提交文件，支持单模型提交和多模型融合。
 
 ```python
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 import pandas as pd
 import numpy as np
 
@@ -776,7 +776,7 @@ print(f"提交文件是否有效: {validation['is_valid']}")
 一键运行多个基础模型，快速获得baseline分数，适合比赛初期快速评估。
 
 ```python
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 import pandas as pd
 
 # 创建快速基线工具
@@ -816,7 +816,7 @@ best_model = results[best_model_name]['model']
 检测常见的数据泄露问题，这是数据科学比赛中最容易犯的错误之一。
 
 ```python
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 import pandas as pd
 
 # 创建泄露检测器
@@ -860,7 +860,7 @@ if distribution_leakage['has_leakage']:
 提供多种模型集成方法，包括投票、堆叠、Blending等。
 
 ```python
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 
@@ -917,7 +917,7 @@ blended_model = ensemble.blending(
 分析特征重要性，帮助理解模型和选择特征。
 
 ```python
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 # 创建分析器
 analyzer = CT.FeatureImportanceAnalyzer()
@@ -957,7 +957,7 @@ analyzer.plot_importance(importance, top_n=20)
 提供时间序列、分组、分层等高级交叉验证方法。
 
 ```python
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 validator = CT.CrossValidator()
 
@@ -992,7 +992,7 @@ stratified_result = validator.stratified_cv(
 使用贝叶斯优化进行高效的超参数搜索。
 
 ```python
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 from sklearn.ensemble import RandomForestClassifier
 
 optimizer = CT.HyperparameterOptimizer()
@@ -1032,7 +1032,7 @@ auto_result = optimizer.auto_tune(
 记录和管理机器学习实验，追踪不同实验的参数和结果。
 
 ```python
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 # 创建追踪器
 tracker = CT.ExperimentTracker('my_experiments.json')
@@ -1065,7 +1065,7 @@ FeatureEngineering 模块提供了丰富的特征工程功能，专门为数据�
 从日期时间列提取各种时间特征。
 
 ```python
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 engineer = FE.AdvancedFeatureEngineer()
 
@@ -1091,7 +1091,7 @@ df = engineer.extract_datetime_features(df, 'date')
 从文本列提取特征，支持基础统计和TF-IDF。
 
 ```python
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 engineer = FE.AdvancedFeatureEngineer()
 
@@ -1117,7 +1117,7 @@ df = engineer.extract_text_features(
 提供多种强大的类别编码方法。
 
 ```python
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 engineer = FE.AdvancedFeatureEngineer()
 
@@ -1146,7 +1146,7 @@ df = engineer.one_hot_encode(
 处理偏斜分布，使数据更接近正态分布。
 
 ```python
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 engineer = FE.AdvancedFeatureEngineer()
 
@@ -1177,7 +1177,7 @@ df = engineer.bin_features(
 基于多种方法选择重要特征。
 
 ```python
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 engineer = FE.AdvancedFeatureEngineer()
 
@@ -1242,8 +1242,8 @@ selected_features = engineer.select_features_by_mutual_info(
 |-------------------------|--------------------|----------|
 | `DataAnalyzer`          | `wanglaoshi.analyze` | `from wanglaoshi import DataAnalyzer` |
 | `analyze_data`          | `wanglaoshi.analyze` | `from wanglaoshi import analyze_data` |
-| `CompetitionTools`      | `wanglaoshi.compete` | `from wanglaoshi import CompetitionTools as CT` |
-| `FeatureEngineering`    | `wanglaoshi.features` | `from wanglaoshi import FeatureEngineering as FE` |
+| `CompetitionTools`      | `wanglaoshi.compete` | `from wanglaoshi import compete as CT` |
+| `FeatureEngineering`    | `wanglaoshi.features` | `from wanglaoshi import features as FE` |
 
 ### 模块级 API 一览
 
@@ -1259,7 +1259,7 @@ selected_features = engineer.select_features_by_mutual_info(
 | `Analyzer_Plain`    | **Legacy**（导入会警告；`WANGLAOSHI_SILENCE_LEGACY=1` 可关） | `from wanglaoshi import Analyzer_Plain` |
 | `wqe`               | **Legacy**（同上）；请优先 `wanglaoshi.analyze`             | `import wanglaoshi.wqe` |
 | `CompetitionTools`  | （兼容）比赛工具实现模块                                    | `from wanglaoshi import CompetitionTools as CT` |
-| `FeatureEngineering`| （兼容）特征工程实现模块                                    | `from wanglaoshi import FeatureEngineering as FE` |
+| `FeatureEngineering`| （兼容）特征工程实现模块                                    | `from wanglaoshi import features as FE` |
 | `ml` / `MLDL`       | ML/DL 门面（实现 `ml.core`）；`MLDL` 为兼容 shim                 | `from wanglaoshi.ml import DataPreprocessor` |
 | `JupyterEnv` / `VERSIONS` / `JupyterFont` / `Useful` / `WebGetter` | （兼容）运行时辅助 | 推荐 `wanglaoshi.runtime` |
 

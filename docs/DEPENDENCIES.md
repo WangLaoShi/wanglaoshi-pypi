@@ -102,8 +102,9 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu
 装好后：
 
 ```python
-from wanglaoshi import MLDL
-assert MLDL is not None
+from wanglaoshi.ml import TORCH_AVAILABLE, DataPreprocessor
+assert isinstance(TORCH_AVAILABLE, bool)
+_ = DataPreprocessor()
 ```
 
 ---
@@ -202,7 +203,7 @@ pip install -e ".[excel,jupyter,dev]"
 python -c "import wanglaoshi; from wanglaoshi import BusinessPipeline, DataAnalyzer, CompetitionTools; print('ok')"
 
 # 可选：torch
-python -c "from wanglaoshi import MLDL; print('MLDL', MLDL)"
+python -c "from wanglaoshi.ml import TORCH_AVAILABLE; print('torch', TORCH_AVAILABLE)"
 
 # 测试
 bash scripts/run_tests.sh quick

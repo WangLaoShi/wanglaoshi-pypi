@@ -30,18 +30,21 @@ import wanglaoshi
 print(sorted(wanglaoshi.__all__))
 ```
 
-顶层推荐导入：
+推荐导入（门面优先，详见 [ARCHITECTURE.md](ARCHITECTURE.md)）：
 
 | 写法 | 用途 |
 | --- | --- |
 | `from wanglaoshi import ready` | Notebook 一键就绪 |
-| `from wanglaoshi import DataAnalyzer, analyze_data, analyze_multiple_files, analyze_notebook` | EDA |
-| `from wanglaoshi import CompetitionTools as CT` | 竞赛工具 |
-| `from wanglaoshi import FeatureEngineering as FE` | 特征工程 |
+| `from wanglaoshi.analyze import DataAnalyzer, analyze_data` | EDA |
+| `from wanglaoshi.compete import SubmissionGenerator, QuickBaseline` | 竞赛工具 |
+| `from wanglaoshi.features import AdvancedFeatureEngineer` | 特征工程 |
 | `from wanglaoshi import BusinessPipeline` | 业务流水线 |
-| `from wanglaoshi import VERSIONS as V` | 版本检查 |
-| `from wanglaoshi.WebGetter import Wget` | 下载（**不要** `from WebGetter import Wget`） |
-| `from wanglaoshi.ml import …` / `from wanglaoshi import MLDL` | torch 可选；看 `TORCH_AVAILABLE` |
+| `from wanglaoshi.runtime import VERSIONS, JupyterEnv, WebGetter` | 环境 / 下载 |
+| `from wanglaoshi.ml import DataPreprocessor, MLModel, TORCH_AVAILABLE` | ML/DL（torch 可选） |
+| `from wanglaoshi.analytics import StatsToolkit, TimeSeriesTools` | 统计 / 时序等 |
+| `from wanglaoshi._testing import assert_close` | 测试断言 |
+
+兼容旧写法（仍可用）：`from wanglaoshi import CompetitionTools as CT` / `FeatureEngineering as FE` / `MLDL`。
 
 ---
 
@@ -67,7 +70,7 @@ print(sorted(info.keys())[:8] if info else "ok")
 
 ---
 
-## 2. `DataAnalyzer` / EDA 函数
+## 2. `wanglaoshi.analyze` — `DataAnalyzer` / EDA 函数
 
 ### 2.1 构造
 
@@ -115,7 +118,7 @@ import matplotlib
 matplotlib.use("Agg")
 
 from sklearn.datasets import load_iris
-from wanglaoshi import DataAnalyzer, analyze_data, analyze_notebook, analyze_multiple_files
+from wanglaoshi.analyze import DataAnalyzer, analyze_data, analyze_notebook, analyze_multiple_files
 
 out = Path("_api_ref_out")
 out.mkdir(exist_ok=True)
@@ -148,7 +151,7 @@ print("DataAnalyzer OK", info.get("shape", list(info)[:3]))
 
 ---
 
-## 3. `CompetitionTools`（`import wanglaoshi.CompetitionTools as CT`）
+## 3. `wanglaoshi.compete`（兼容：`import wanglaoshi.CompetitionTools as CT`）
 
 ### 3.1 `SubmissionGenerator`
 
@@ -175,7 +178,7 @@ import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 out = Path("_api_ref_out")
 out.mkdir(exist_ok=True)
@@ -225,7 +228,7 @@ print("SubmissionGenerator OK", val["info"]["submission_shape"])
 # 【可运行】
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 X, y = load_iris(return_X_y=True, as_frame=True)
 X_tr, X_te, y_tr, y_te = train_test_split(
@@ -254,7 +257,7 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 df = load_iris(as_frame=True).frame
 X = df.drop(columns=["target"])
@@ -301,7 +304,7 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 X, y = load_iris(return_X_y=True, as_frame=True)
 X_tr, X_te, y_tr, y_te = train_test_split(
@@ -350,7 +353,7 @@ plot_importance(importance_df, top_n=20, figsize=(10, 8)) -> None
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 X, y = load_iris(return_X_y=True, as_frame=True)
 X_tr, X_te, y_tr, y_te = train_test_split(
@@ -377,7 +380,7 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 X, y = load_iris(return_X_y=True, as_frame=True)
 model = LogisticRegression(max_iter=500)
@@ -402,7 +405,7 @@ compare_experiments(experiment_names=None) -> DataFrame
 ```python
 # 【可运行】
 from pathlib import Path
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 log = Path("_api_ref_out") / "experiments.json"
 log.parent.mkdir(exist_ok=True)
@@ -435,7 +438,7 @@ auto_tune(model_class, X, y, model_type='auto')
 
 ```python
 # 【可运行】
-from wanglaoshi import CompetitionTools as CT
+from wanglaoshi import compete as CT
 
 opt = CT.HyperparameterOptimizer()
 try:
@@ -457,7 +460,7 @@ else:
 
 ---
 
-## 4. `FeatureEngineering.AdvancedFeatureEngineer`
+## 4. `wanglaoshi.features` — `AdvancedFeatureEngineer`
 
 构造：`AdvancedFeatureEngineer()`
 
@@ -481,7 +484,7 @@ else:
 # 【可运行】
 import pandas as pd
 from sklearn.datasets import load_iris
-from wanglaoshi import FeatureEngineering as FE
+from wanglaoshi import features as FE
 
 df = load_iris(as_frame=True).frame.copy()
 df["event_time"] = pd.date_range("2024-01-01", periods=len(df), freq="D")
@@ -614,7 +617,7 @@ print("BusinessPipeline OK", summary["run_id"], len(summary["stages"]))
 
 ---
 
-## 5.5 `wanglaoshi.stats`（P0）
+## 5.5 `wanglaoshi.analytics.stats`（兼容：`wanglaoshi.stats`）
 
 | 名称 | 用途 |
 | --- | --- |
@@ -627,7 +630,7 @@ print("BusinessPipeline OK", summary["run_id"], len(summary["stages"]))
 
 ```python
 # 【可运行】
-from wanglaoshi import StatsToolkit, ExperimentDesign
+from wanglaoshi.analytics import StatsToolkit, ExperimentDesign
 
 a = [1, 2, 3, 4, 5, 6]
 b = [2, 3, 4, 5, 6, 8]
@@ -662,7 +665,7 @@ print("stats OK", round(t["pvalue"], 4), n["n_per_arm"], round(bayes["prob_b_bea
 # 【可运行】
 import numpy as np
 import pandas as pd
-from wanglaoshi import (
+from wanglaoshi.analytics import (
     TimeSeriesTools,
     CalibrationReport,
     GroupMetricsReport,
@@ -683,7 +686,8 @@ X = np.vstack([np.random.default_rng(0).normal(0, 1, (40, 2)), np.random.default
 summ = AnomalyDetector(contamination=0.1, random_state=0).fit_predict_summary(X)
 assert summ["n_flagged"] >= 1
 assert RankingMetrics.ndcg_at_k([1, 2, 3], {1}, k=3) == 1.0
-from wanglaoshi import SurvivalAnalyzer, convert_units
+from wanglaoshi.analytics import SurvivalAnalyzer
+from wanglaoshi import convert_units
 km = SurvivalAnalyzer.km([1, 2, 3], [1, 1, 1])
 assert km["n"] == 3
 u = convert_units(pd.DataFrame({"amount": [10000.0]}), "amount", from_unit="yuan", to_unit="wan")
@@ -693,7 +697,7 @@ print("p1 toolkit OK", round(cal["ece"], 4), summ["n_flagged"], km["median_survi
 
 ---
 
-## 6. `VERSIONS`
+## 6. `wanglaoshi.runtime.VERSIONS`
 
 | 函数 | 说明 |
 | --- | --- |
@@ -706,7 +710,7 @@ print("p1 toolkit OK", round(cal["ece"], 4), summ["n_flagged"], km["median_survi
 
 ```python
 # 【可运行】
-from wanglaoshi import VERSIONS as V
+from wanglaoshi.runtime import VERSIONS as V
 
 V.check_all_versions(version="simple")
 versions = V.check_versions(version="simple")
@@ -716,7 +720,7 @@ print("numpy =", versions["numpy"])
 
 ---
 
-## 7. `JupyterEnv` / `JupyterFont` / `WebGetter` / `Useful`
+## 7. `wanglaoshi.runtime` — `JupyterEnv` / `JupyterFont` / `WebGetter` / `Useful`
 
 ### 7.1 `JupyterEnv`
 
@@ -729,7 +733,7 @@ print("numpy =", versions["numpy"])
 
 ```python
 # 【可运行】
-from wanglaoshi import JupyterEnv as JE
+from wanglaoshi.runtime import JupyterEnv as JE
 
 assert callable(JE.jupyter_kernel_list)
 assert callable(JE.install_kernel)
@@ -746,7 +750,7 @@ fonts(show_demo=False)
 
 ```python
 # 【可运行】
-from wanglaoshi import JupyterFont as JF
+from wanglaoshi.runtime import JupyterFont as JF
 
 JF.matplotlib_font_init(show_demo=False)
 print("JupyterFont OK")
@@ -757,16 +761,16 @@ print("JupyterFont OK")
 **正确导入：**
 
 ```python
-from wanglaoshi.WebGetter import Wget
+from wanglaoshi.runtime.web_getter import Wget
 # 或
-from wanglaoshi import WebGetter
+from wanglaoshi.runtime import WebGetter
 downloader = WebGetter.Wget(url=..., output_dir=".", filename=None)
 downloader.download()
 ```
 
 ```python
 # 【可运行】
-from wanglaoshi.WebGetter import Wget
+from wanglaoshi.runtime.web_getter import Wget
 
 # 只校验构造；不发起真实下载（避免文档校验依赖外网）
 dl = Wget(url="https://example.com/file.zip", output_dir=".", filename="file.zip")
@@ -780,7 +784,7 @@ print("Wget OK", type(dl).__name__)
 
 ```python
 # 【可运行】
-from wanglaoshi import Useful
+from wanglaoshi.runtime import Useful
 
 assert callable(Useful.helps)
 print("Useful OK")
@@ -788,25 +792,30 @@ print("Useful OK")
 
 ---
 
-## 8. `MLDL` 【需可选依赖：torch】
+## 8. `wanglaoshi.ml` 【torch 可选】
 
-- `from wanglaoshi import MLDL`：未装 torch 时 **`MLDL is None`**，不会让整个包装载失败。  
-- 使用前请按 [PyTorch 官网](https://pytorch.org/) 安装，再：
+- 推荐：`from wanglaoshi.ml import DataPreprocessor, MLModel, TORCH_AVAILABLE`
+- 兼容：`from wanglaoshi import MLDL`（shim → `ml.core`）
+- 未装 torch 时模块仍可导入；`TORCH_AVAILABLE is False`，DL 类实例化会提示安装 torch。
+- 安装请按 [PyTorch 官网](https://pytorch.org/)。
 
 ```python
 # 【可运行】
-from wanglaoshi import MLDL
+from wanglaoshi.ml import DataPreprocessor, MLModel, TORCH_AVAILABLE
+import wanglaoshi.MLDL as MLDL
 
-if MLDL is None:
-    print("MLDL 不可用：未安装 torch（预期）")
-else:
-    assert hasattr(MLDL, "DataPreprocessor") or True
-    print("MLDL 模块已加载", MLDL)
+assert DataPreprocessor is MLDL.DataPreprocessor
+assert isinstance(TORCH_AVAILABLE, bool)
+print("ml OK", "torch" if TORCH_AVAILABLE else "no-torch")
+_ = DataPreprocessor()
+_ = MLModel("logistic")
 ```
 
 ---
 
 ## 9. 与 README / 教材的关系
+
+> 进阶 Notebook（`examples/advanced/`）与 `book/` 教材仍大量使用兼容导入（`CompetitionTools as CT` 等），**有意保留**以免打断课堂旧代码；新示例与本说明书优先门面。
 
 | 文档 | 角色 |
 | --- | --- |

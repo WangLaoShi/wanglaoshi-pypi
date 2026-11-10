@@ -1,5 +1,8 @@
 # 示例入口
 
+新代码优先门面导入（`wanglaoshi.analyze` / `compete` / `features` / `ml` 等），见 [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)。  
+`advanced/` 进阶 Notebook 与 `book/` 教材仍多用兼容写法（`CompetitionTools as CT`），有意保留课堂旧路径。
+
 | 示例 | 类型 | 说明 | 是否可离线跑 |
 | --- | --- | --- | --- |
 | [analyzer_demo.py](analyzer_demo.py) | 脚本 | `DataAnalyzer` EDA 与报告 | 是（合成数据） |

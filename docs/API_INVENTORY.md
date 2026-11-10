@@ -16,6 +16,7 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 | `wanglaoshi.analyze` | `DataAnalyzer`, `analyze_data` |
 | `wanglaoshi.features` | `AdvancedFeatureEngineer` |
 | `wanglaoshi.analytics` | `StatsToolkit`, `TimeSeriesTools` |
+| `wanglaoshi.ml` | `DataPreprocessor`, `MLModel`, `TORCH_AVAILABLE` |
 | `wanglaoshi.runtime` | `ready`, `VERSIONS`, `JupyterEnv` |
 | `wanglaoshi._testing` | `assert_close`, `ExperimentContext` |
 | `wanglaoshi.business` | `BusinessPipeline` |
