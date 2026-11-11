@@ -42,7 +42,7 @@ pip install -e ".[dev,excel]"
 
 ## 2. 默认核心（`install_requires`）
 
-`python_requires>=3.8`。
+`python_requires>=3.9`（与 CI 矩阵及本仓库验收证据对齐；不再声明未经验证的 3.8）。
 
 | 包 | 用途 |
 | --- | --- |
@@ -75,13 +75,13 @@ pip install -e ".[dev,excel]"
 | extras 名 | 安装的包 | 什么时候用 |
 | --- | --- | --- |
 | `excel` | `openpyxl` | `pandas.read_excel` / 业务读 xlsx |
-| `jupyter` | `jupyter`, `ipykernel` | `examples/`、进阶 Notebook |
+| `jupyter` | `jupyter`, `ipykernel`, `nbformat`, `nbclient` | `examples/`、进阶 Notebook / 证据脚本 |
 | `optuna` | `optuna` | `HyperparameterOptimizer.bayesian_optimize` |
 | `compete` | `optuna` | 竞赛场景；与 `optuna` 等价，语义别名 |
 | `business` | `openpyxl` | 业务流水线读 xlsx；与 `excel` 等价，语义别名 |
 | `dev` | `pytest`, `pytest-cov`, `flake8` | 开发与 CI |
-| `book` | `jupyter-book`, `jupyter`, `ipykernel` | 构建基线工坊 / Pages |
-| `all` | `excel` + `jupyter` + `optuna` | 一次性装齐（**不含** torch / dev / book） |
+| `book` | `jupyter-book`, `jupyter`, `ipykernel`, `nbformat`, `nbclient` | 构建基线工坊 / Pages；`release_check full` 前置 |
+| `all` | `excel` + `jupyter` + `optuna`（含 nbformat/nbclient） | 一次性装齐（**不含** torch / dev / book） |
 
 ### 未安装时的行为
 

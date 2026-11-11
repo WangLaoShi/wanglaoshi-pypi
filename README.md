@@ -75,7 +75,7 @@ wanglaoshi-pypi
 
 ## 安装方式
 
-推荐 Python `>=3.8`。
+推荐 Python `>=3.9`（`python_requires` 与 CI 一致）。
 
 依赖怎么分层（核心 / Excel / Jupyter / Optuna / torch）、以及 `requirements/` 文件说明，见 **[docs/DEPENDENCIES.md](docs/DEPENDENCIES.md)**。
 

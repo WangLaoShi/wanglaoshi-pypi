@@ -66,6 +66,13 @@ def test_feature_engineering_datetime_and_frequency() -> None:
     assert "channel_frequency" in enc.columns
     assert abs(float(enc.loc[0, "channel_frequency"]) - 2 / 3) < 1e-9
 
+    # 未知类别 / NaN 频率须显式填 0（避免链式 inplace 静默失效）
+    with_na = out.copy()
+    with_na.loc[1, "channel"] = None
+    enc_na = fe.frequency_encode(with_na, "channel")
+    assert float(enc_na.loc[1, "channel_frequency"]) == 0.0
+    assert enc_na["channel_frequency"].isna().sum() == 0
+
 
 @pytest.mark.quick
 def test_leakage_detector_high_correlation() -> None:

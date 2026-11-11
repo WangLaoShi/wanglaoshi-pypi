@@ -372,8 +372,9 @@ class AdvancedFeatureEngineer:
         # 应用编码
         df_result[f'{categorical_col}_frequency'] = df_result[categorical_col].map(frequency_map)
         
-        # 填充缺失值（新类别）
-        df_result[f'{categorical_col}_frequency'].fillna(0, inplace=True)
+        # 填充缺失值（新类别）；避免链式 inplace 在副本上静默失效
+        freq_col = f"{categorical_col}_frequency"
+        df_result[freq_col] = df_result[freq_col].fillna(0)
         
         logger.info(f"对 {categorical_col} 进行了频率编码")
         

@@ -22,3 +22,12 @@
 ## 日常演示
 
 允许合成与 DEMO；教学烟测继续用 `scripts/run_advanced_evidence.py`。
+
+## 脚本如何记录
+
+`run_advanced_evidence.py` 在每个案例结果里写入：
+
+- `data_mode`：若 Notebook 命名空间有 `DEMO=True` → `demo`；`DEMO=False` → `real_or_local`（或 Notebook 自设的 `data_mode`）；否则 `unspecified`
+- 可选透传：`data_source` / `n_rows` / `data_sha256`（需 Notebook 自行赋值）
+
+汇总字段 `demo_or_synthetic` / `real_or_local_claimed` 仅作分类，**不得**把 `demo` 记进「真实数据通过」。发布级真实验收仍须按上表手填或单独流水线产出。

@@ -3,7 +3,7 @@
 #
 #   ./scripts/release_check.sh          # 默认 = release（发版前）
 #   ./scripts/release_check.sh quick    # 日常改代码后
-#   ./scripts/release_check.sh full     # 最全：含 12 案例证据 + 教材构建
+#   ./scripts/release_check.sh full     # 最全：含案例证据 + 教材构建
 #
 # 不用背一长串脚本名。失败即停，最后打印清单。
 
@@ -49,6 +49,12 @@ case "$MODE" in
 esac
 
 echo "wanglaoshi release_check  mode=$MODE  root=$ROOT"
+echo "python: $(command -v python) ($(python -c 'import sys; print(sys.version.split()[0])'))"
+
+# 0) full：先装 Notebook/教材依赖，避免证据步骤缺 nbformat
+if [[ "$MODE" == "full" ]]; then
+  step "安装 Notebook/教材依赖 [book]" python -m pip install -q -e ".[book]"
+fi
 
 # 1) 测试
 if [[ "$MODE" == "quick" ]]; then
@@ -63,7 +69,7 @@ step "API 说明书【可运行】示例" python scripts/verify_api_reference.py
 # 3) 文档示例烟测
 step "文档/示例烟测" python scripts/smoke_docs_examples.py
 
-# 4) 发版档：导入确认
+# 4) 发版档：导入 + 包内资源（字体/模板）
 if [[ "$MODE" != "quick" ]]; then
   step "公开接口导入烟测" python -c "
 import wanglaoshi
@@ -74,12 +80,17 @@ from wanglaoshi.business import BusinessPipeline
 from wanglaoshi.WebGetter import Wget
 print('ok', wanglaoshi.__file__, ready, DataAnalyzer, SubmissionGenerator, BusinessPipeline, Wget)
 "
+  step "包内中文字体与报告资源" python scripts/verify_wheel_assets.py
+  step "Optuna 调参方向专项" bash -c '
+    python -m pip install -q "optuna>=3"
+    python -m pytest -q tests/test_scoring_direction_metric_registry.py::test_hyperopt_regression_selects_lower_mse tests/test_hyperopt_optuna_live.py -q
+  '
 fi
 
-# 5) 大版本：证据 + 教材
+# 5) 大版本：证据 + 教材（依赖已在步骤 0 安装）
 if [[ "$MODE" == "full" ]]; then
-  step "12 进阶 Notebook 证据" python scripts/run_advanced_evidence.py
-  step "构建 Jupyter Book 教材" bash -c 'python -m pip install -q -e ".[book]" && python scripts/build_book.py'
+  step "22 进阶 Notebook 证据（含 data_mode）" python scripts/run_advanced_evidence.py
+  step "构建 Jupyter Book 教材" python scripts/build_book.py
 fi
 
 ELAPSED=$(( $(date +%s) - START_TS ))
@@ -96,6 +107,7 @@ echo "  3. git commit / push（先于 tag）"
 echo "  4. 构建：rm -rf build dist *.egg-info && python setup.py sdist bdist_wheel"
 echo "  5. 检查并上传：twine check dist/* && twine upload dist/*"
 echo "  6. 打 tag：git tag vX.Y.Z && git push origin vX.Y.Z"
+echo "  7. wheel 安装后再跑：python scripts/verify_wheel_assets.py"
 echo ""
 echo "日常只记一句：  ./scripts/release_check.sh quick"
 echo "发版前记一句：  ./scripts/release_check.sh"

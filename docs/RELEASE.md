@@ -13,11 +13,15 @@
 
 ## 各档跑什么
 
-| 档 | 测试 | API 说明书 | 文档烟测 | 导入 | 案例证据 | 构建 Book |
-| --- | --- | --- | --- | --- | --- | --- |
-| `quick` | quick | ✅ | ✅ | — | — | — |
-| `release`（默认） | 全量 | ✅ | ✅ | ✅ | — | — |
-| `full` | 全量 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 档 | 测试 | API 说明书 | 文档烟测 | 导入 | 包内字体/模板 | Optuna 方向 | 案例证据 | 构建 Book |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `quick` | quick | ✅ | ✅ | — | — | — | — | — |
+| `release`（默认） | 全量 | ✅ | ✅ | ✅ | ✅ | ✅ | — | — |
+| `full` | 全量 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅（先装 `[book]`） | ✅ |
+
+`full` 会在跑 Notebook 证据**之前**安装 `.[book]`（含 `nbformat`/`nbclient`）。案例 `passed` ≠ 真实数据验收，见 `docs/evidence/DATA_ACCEPTANCE.md`。
+
+发版产物验收：构建 wheel 后在干净环境安装，再跑 `python scripts/verify_wheel_assets.py`（确认 `SimHei.ttf` 等资源进包）。支持的最低 Python：**3.9**。
 
 ## 发版请分步（不要一条龙）
 
@@ -44,5 +48,6 @@
 | `scripts/smoke_docs_examples.py` | 只改了 README / 教程示例 |
 | `scripts/run_advanced_evidence.py` | 只改了进阶 Notebook |
 | `scripts/build_book.py` | 只改了教材文稿 |
+| `scripts/verify_wheel_assets.py` | wheel / 可编辑安装后核对中文字体与报告模板 |
 
 默认验收入口：**`./scripts/release_check.sh`**。干净环境证据入口：**`./scripts/verify_clean_env.sh`**。

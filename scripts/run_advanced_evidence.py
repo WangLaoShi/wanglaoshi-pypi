@@ -117,7 +117,21 @@ def run_one_inprocess(slug: str) -> dict:
 
         result["status"] = "passed"
         result["cells_executed"] = executed
-        log_path.write_text(f"PASSED {slug}\ncells={executed}\n", encoding="utf-8")
+        # Notebook 约定：DEMO=True 表示合成/演示回退；False 表示走了非 DEMO 路径
+        demo_flag = g.get("DEMO", None)
+        if demo_flag is True:
+            result["data_mode"] = "demo"
+        elif demo_flag is False:
+            result["data_mode"] = str(g.get("data_mode") or "real_or_local")
+        else:
+            result["data_mode"] = str(g.get("data_mode") or "unspecified")
+        for key in ("data_source", "n_rows", "data_sha256"):
+            if key in g:
+                result[key] = g.get(key)
+        log_path.write_text(
+            f"PASSED {slug}\ncells={executed}\ndata_mode={result.get('data_mode')}\n",
+            encoding="utf-8",
+        )
     except Exception as e:  # noqa: BLE001
         result["status"] = "error"
         result["error"] = f"{type(e).__name__}: {e}\n{traceback.format_exc()[-1200:]}"
@@ -230,7 +244,20 @@ def main() -> int:
 
     passed = sum(1 for r in evidence["results"] if r["status"] == "passed")
     failed = sum(1 for r in evidence["results"] if r["status"] in {"failed", "error", "missing"})
-    evidence["summary"] = {"passed": passed, "failed": failed, "total": len(evidence["results"])}
+    demo_n = sum(1 for r in evidence["results"] if r.get("data_mode") == "demo")
+    real_n = sum(
+        1
+        for r in evidence["results"]
+        if r["status"] == "passed" and str(r.get("data_mode", "")).startswith("real")
+    )
+    evidence["summary"] = {
+        "passed": passed,
+        "failed": failed,
+        "total": len(evidence["results"]),
+        "demo_or_synthetic": demo_n,
+        "real_or_local_claimed": real_n,
+        "note": "passed≠真实数据验收；见 DATA_ACCEPTANCE.md",
+    }
 
     out = OUT_DIR / "evidence.json"
     out.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -242,18 +269,24 @@ def main() -> int:
     md_lines = [
         "# Advanced Notebook 跑通证据",
         "",
+        "> **验收边界：** `passed` 只证明执行未抛错，**不**等于真实数据验收通过。",
+        "> `data_mode=demo` 表示 Notebook 内 `DEMO=True`（合成/演示回退）。",
+        "> 发布级真实数据字段见 [`DATA_ACCEPTANCE.md`](DATA_ACCEPTANCE.md)。",
+        "",
         f"- 生成时间(UTC): `{evidence['generated_at_utc']}`",
         f"- Python: `{evidence['python']}`",
-        f"- 汇总: passed={passed}, failed={failed}, total={evidence['summary']['total']}",
+        f"- 汇总: passed={passed}, failed={failed}, total={evidence['summary']['total']}, "
+        f"demo={demo_n}, real_or_local_claimed={real_n}",
         "",
-        "| Notebook | Status | Cells | Note |",
-        "| --- | --- | --- | --- |",
+        "| Notebook | Status | Cells | data_mode | Note |",
+        "| --- | --- | --- | --- | --- |",
     ]
     for r in evidence["results"]:
         err = (r.get("error") or "").splitlines()[0][:100] if r.get("error") else ""
         note = err if r["status"] != "passed" else r.get("mode", "")
+        mode = r.get("data_mode", "unspecified")
         md_lines.append(
-            f"| `{r['slug']}` | **{r['status']}** | {r.get('cells_executed', 0)} | {note} |"
+            f"| `{r['slug']}` | **{r['status']}** | {r.get('cells_executed', 0)} | `{mode}` | {note} |"
         )
     md_lines += [
         "",

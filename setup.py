@@ -37,6 +37,16 @@ setup(
     version=about['__version__'],  # 版本号
     packages=find_packages(),  # 自动找到所有模块
     include_package_data=True,
+    # wheel 必须带上报告中文字体与模板/静态资源（仅靠源码树测试会掩盖遗漏）
+    package_data={
+        "wanglaoshi": [
+            "SimHei.ttf",
+            "templates/*",
+            "static/js/*",
+            "static/css/*",
+            "static/*",
+        ],
+    },
     install_requires=[         # 默认课堂核（与 requirements/core.txt 对齐）
         'rich',
         'requests',
@@ -54,7 +64,7 @@ setup(
     extras_require={
         # 说明见 docs/DEPENDENCIES.md；保持少量分组，避免维护成本过高
         'excel': ['openpyxl'],
-        'jupyter': ['jupyter', 'ipykernel'],
+        'jupyter': ['jupyter', 'ipykernel', 'nbformat', 'nbclient'],
         'optuna': ['optuna'],
         # Phase 4 场景 extras（代码默认仍随核心安装；此处是可选依赖门禁）
         'compete': ['optuna'],  # HyperparameterOptimizer.bayesian_optimize
@@ -65,8 +75,10 @@ setup(
             'jupyter-book>=1.0.0,<2',
             'jupyter',
             'ipykernel',
+            'nbformat',
+            'nbclient',
         ],
-        'all': ['openpyxl', 'jupyter', 'ipykernel', 'optuna'],
+        'all': ['openpyxl', 'jupyter', 'ipykernel', 'nbformat', 'nbclient', 'optuna'],
     },
     author='WangLaoShi',  # 作者
     author_email='ginger547@gmail.com',  # 邮箱
@@ -76,10 +88,14 @@ setup(
     url='https://github.com/wanglaoshi/wanglaoshi-pypi',  # 项目的 GitHub 链接
     classifiers=[   # 分类信息
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.8',  # Python 版本要求
+    # 与 CI / 本仓库验收矩阵对齐（已验证 3.9+；3.8 暂无对应证据）
+    python_requires='>=3.9',
     cmdclass={
         'upload': UploadCommand,
     }
