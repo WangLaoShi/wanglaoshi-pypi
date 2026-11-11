@@ -50,6 +50,8 @@
 | `scripts/build_book.py` | 只改了教材文稿 |
 | `scripts/verify_wheel_assets.py` | wheel / 可编辑安装后核对中文字体与报告模板 |
 | `scripts/verify_chinese_plot.py` | 用包内 SimHei 渲染中文标题图（无缺字警告） |
+| `scripts/verify_chinese_report.py` | 中文列名完整报告（含 PCA）并捕获缺字/DejaVu 回退 |
 | `scripts/fetch_release_case_data.py` | 欺诈/共享单车真实数据指纹（见 RELEASE_CASE_DATA.md） |
+| `scripts/run_advanced_evidence.py --release-data` | 必填真实数据案例不得 DEMO（退出码 2） |
 
 默认验收入口：**`./scripts/release_check.sh`**。干净环境证据入口：**`./scripts/verify_clean_env.sh`**。

@@ -82,6 +82,7 @@ print('ok', wanglaoshi.__file__, ready, DataAnalyzer, SubmissionGenerator, Busin
 "
   step "包内中文字体与报告资源" python scripts/verify_wheel_assets.py
   step "中文图表渲染烟测" python scripts/verify_chinese_plot.py
+  step "中文完整报告（含 PCA）缺字检查" python scripts/verify_chinese_report.py
   step "Optuna 调参方向专项" bash -c '
     python -m pip install -q "optuna>=3"
     python -m pytest -q tests/test_scoring_direction_metric_registry.py::test_hyperopt_regression_selects_lower_mse tests/test_hyperopt_optuna_live.py -q

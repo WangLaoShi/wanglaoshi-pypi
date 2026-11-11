@@ -51,20 +51,30 @@ current_dir = _PKG_ROOT
 # 定义中文字体文件路径
 font_path = os.path.join(current_dir, 'SimHei.ttf')
 
-# 配置matplotlib支持中文显示
+# 配置 matplotlib 中文：必须 addfont，否则仅写族名会回退 DejaVu Sans
 if os.path.exists(font_path):
-    # 如果找到中文字体文件，则加载它
+    try:
+        fm.fontManager.addfont(font_path)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("addfont 失败: %s", exc)
     font_prop = fm.FontProperties(fname=font_path)
-    rcParams['font.family'] = 'sans-serif'
-    rcParams['font.sans-serif'] = ['SimHei'] + rcParams['font.sans-serif']
-    rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
-    logger.info(f"已加载字体文件: {font_path}")
+    family = font_prop.get_name() or "SimHei"
+    rcParams["font.family"] = "sans-serif"
+    preferred = [family, "SimHei"]
+    rest = [x for x in rcParams.get("font.sans-serif", []) if x not in preferred]
+    rcParams["font.sans-serif"] = preferred + rest
+    rcParams["axes.unicode_minus"] = False
+    logger.info(f"已加载字体文件: {font_path} (family={family})")
 else:
-    # 如果没找到字体文件，使用系统默认中文字体
     logger.warning(f"警告: 未找到字体文件: {font_path}")
     font_prop = fm.FontProperties()
-    rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'WenQuanYi Micro Hei', 'sans-serif']
-    rcParams['axes.unicode_minus'] = False
+    rcParams["font.sans-serif"] = [
+        "SimHei",
+        "Microsoft YaHei",
+        "WenQuanYi Micro Hei",
+        "sans-serif",
+    ]
+    rcParams["axes.unicode_minus"] = False
 
 class DataProcessor:
     """数据处理器 - 负责处理各种数据转换任务的小工具集合"""
@@ -482,25 +492,28 @@ class DataAnalyzer:
         # 确定主成分数量（解释95%方差所需的主成分数）
         n_components = np.argmax(cumulative_variance >= 0.95) + 1
 
-        # 可视化
+        # 可视化（显式中文字体，避免回退 DejaVu Sans）
+        fp = self.font_prop
         plt.figure(figsize=(12, 6))
 
-        # 绘制碎石图
         plt.subplot(1, 2, 1)
         plt.plot(range(1, len(variance_ratio) + 1),
                 cumulative_variance, 'bo-')
         plt.axhline(y=0.95, color='r', linestyle='--')
-        plt.xlabel('主成分数量')
-        plt.ylabel('累计方差贡献率')
-        plt.title('碎石图')
+        plt.xlabel('主成分数量', fontproperties=fp)
+        plt.ylabel('累计方差贡献率', fontproperties=fp)
+        plt.title('碎石图', fontproperties=fp)
+        plt.xticks(fontproperties=fp)
+        plt.yticks(fontproperties=fp)
 
-        # 绘制主成分载荷图
         plt.subplot(1, 2, 2)
         plt.bar(range(1, len(variance_ratio) + 1),
                 variance_ratio)
-        plt.xlabel('主成分')
-        plt.ylabel('方差贡献率')
-        plt.title('主成分方差贡献率')
+        plt.xlabel('主成分', fontproperties=fp)
+        plt.ylabel('方差贡献率', fontproperties=fp)
+        plt.title('主成分方差贡献率', fontproperties=fp)
+        plt.xticks(fontproperties=fp)
+        plt.yticks(fontproperties=fp)
 
         plt.tight_layout()
         plt.show()

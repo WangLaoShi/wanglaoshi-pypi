@@ -19,18 +19,21 @@
 
 若运行中发生 DEMO/合成回退：`data_mode` 必须记为 `demo`/`synthetic`，且**不得**计入「真实数据验收通过」。
 
-## 发布优先案例
+## 发布优先案例（`REQUIRE_REAL_DATA`）
 
-| 案例 | 真实数据入口 | 命令 |
+下列案例在 `python scripts/run_advanced_evidence.py --release-data` 下**不得**以 `demo` / `unspecified` 计为发布通过（执行 `passed` 仍可，但 `release_data_verdict=data_fail`，退出码 2）：
+
+| 案例 | 真实数据入口 | 允许 DEMO（教学） |
 | --- | --- | --- |
-| `05_credit_card_fraud` | 手动放入 `data/creditcard.csv`（Kaggle） | `python scripts/fetch_release_case_data.py` |
-| `08_bike_sharing` | `data/bike_sharing_hour.csv` 或 OpenML 拉取 | 同上 |
+| `05_credit_card_fraud` | `data/creditcard.csv`（Kaggle，需人工放置） | 是 |
+| `08_bike_sharing` | `data/bike_sharing_hour.csv` 或 OpenML v2 | 是 |
+| `09_mall_customers` | 本地/约定数据源；当前常见合成回退 | 是 |
 
-详见 [`RELEASE_CASE_DATA.md`](RELEASE_CASE_DATA.md)（由脚本生成）。
+其余案例默认允许合成 / DEMO。指纹台账见 [`RELEASE_CASE_DATA.md`](RELEASE_CASE_DATA.md)。
 
 ## 日常演示
 
-允许合成与 DEMO；教学烟测继续用 `scripts/run_advanced_evidence.py`。
+允许合成与 DEMO；教学烟测：`python scripts/run_advanced_evidence.py`（退出码只看执行失败）。
 
 ## 脚本如何记录
 

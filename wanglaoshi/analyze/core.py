@@ -103,26 +103,41 @@ current_dir = _PKG_ROOT
 # 构建字体文件的完整路径（SimHei.ttf是黑体字体，用于显示中文）
 font_path = os.path.join(current_dir, 'SimHei.ttf')
 
-# 检查字体文件是否存在，如果存在则加载，否则使用系统默认字体
-if os.path.exists(font_path):
-    # 创建字体属性对象，指定字体文件路径
-    font_prop = fm.FontProperties(fname=font_path)
-    # 设置matplotlib的字体族为无衬线字体
-    rcParams['font.family'] = 'sans-serif'
-    # 将SimHei添加到字体列表的最前面（优先使用）
-    rcParams['font.sans-serif'] = ['SimHei'] + rcParams['font.sans-serif']
-    # 解决负号显示问题（默认情况下负号可能显示为方块）
-    rcParams['axes.unicode_minus'] = False
-    logger.info(f"已加载字体文件: {font_path}")
-else:
-    # 如果字体文件不存在，记录警告并使用系统默认字体
-    logger.warning(f"警告: 未找到字体文件: {font_path}")
-    # 使用系统默认字体属性
-    font_prop = fm.FontProperties()
-    # 设置字体列表，按优先级排序（SimHei > Microsoft YaHei > WenQuanYi Micro Hei > 系统默认）
-    rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'WenQuanYi Micro Hei', 'sans-serif']
-    # 解决负号显示问题
-    rcParams['axes.unicode_minus'] = False
+def _register_chinese_font(path: str) -> fm.FontProperties:
+    """注册包内字体，使 rcParams 名与 fontproperties(fname=...) 都生效。
+
+    仅设置 ``font.sans-serif=['SimHei']`` 而不 ``addfont`` 时，matplotlib
+    找不到该族会回退 DejaVu Sans，PCA 等未显式传 fontproperties 的图就会缺字。
+    """
+    if not os.path.exists(path):
+        logger.warning(f"警告: 未找到字体文件: {path}")
+        rcParams["font.sans-serif"] = [
+            "SimHei",
+            "Microsoft YaHei",
+            "WenQuanYi Micro Hei",
+            "sans-serif",
+        ]
+        rcParams["axes.unicode_minus"] = False
+        return fm.FontProperties()
+
+    try:
+        fm.fontManager.addfont(path)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("addfont 失败，仍尝试用路径加载: %s", exc)
+
+    prop = fm.FontProperties(fname=path)
+    family = prop.get_name() or "SimHei"
+    rcParams["font.family"] = "sans-serif"
+    # 族名 + 文件名双保险；去掉重复项
+    preferred = [family, "SimHei"]
+    rest = [x for x in rcParams.get("font.sans-serif", []) if x not in preferred]
+    rcParams["font.sans-serif"] = preferred + rest
+    rcParams["axes.unicode_minus"] = False
+    logger.info(f"已加载字体文件: {path} (family={family})")
+    return prop
+
+
+font_prop = _register_chinese_font(font_path)
 
 class DataProcessor:
     """
@@ -915,18 +930,23 @@ class DataAnalyzer:
         else:
             n_components = int(len(cumulative_variance))
 
+        fp = self.font_prop
         plt.figure(figsize=(12, 6))
         plt.subplot(1, 2, 1)
         plt.plot(range(1, len(variance_ratio) + 1), cumulative_variance, "bo-")
         plt.axhline(y=0.95, color="r", linestyle="--")
-        plt.xlabel("主成分数量")
-        plt.ylabel("累计方差贡献率")
-        plt.title("碎石图")
+        plt.xlabel("主成分数量", fontproperties=fp)
+        plt.ylabel("累计方差贡献率", fontproperties=fp)
+        plt.title("碎石图", fontproperties=fp)
+        plt.xticks(fontproperties=fp)
+        plt.yticks(fontproperties=fp)
         plt.subplot(1, 2, 2)
         plt.bar(range(1, len(variance_ratio) + 1), variance_ratio)
-        plt.xlabel("主成分")
-        plt.ylabel("方差贡献率")
-        plt.title("主成分方差贡献率")
+        plt.xlabel("主成分", fontproperties=fp)
+        plt.ylabel("方差贡献率", fontproperties=fp)
+        plt.title("主成分方差贡献率", fontproperties=fp)
+        plt.xticks(fontproperties=fp)
+        plt.yticks(fontproperties=fp)
         plt.tight_layout()
         plt.close()
 
@@ -1414,6 +1434,14 @@ class Visualizer:
             fig: 要关闭的图表对象
         """
         plt.close(fig)
+
+    def _apply_font_to_current_axes(self) -> None:
+        """把包内中文字体应用到当前 axes（含 tick，覆盖 seaborn 默认字体）。"""
+        ax = plt.gca()
+        for label in list(ax.get_xticklabels()) + list(ax.get_yticklabels()):
+            label.set_fontproperties(self.font_prop)
+        for text in ax.texts:
+            text.set_fontproperties(self.font_prop)
     
     def plot_distribution(self, data: pd.Series, column: str) -> str:
         """
@@ -1442,6 +1470,7 @@ class Visualizer:
                 plt.title(f"{column} 的分布", fontproperties=self.font_prop)
                 plt.xlabel(column, fontproperties=self.font_prop)
                 plt.ylabel('频数', fontproperties=self.font_prop)
+                self._apply_font_to_current_axes()
             else:
                 # ========== 分类型数据：绘制条形图 ==========
                 # countplot() 绘制计数条形图（统计每个类别的数量）
@@ -1452,6 +1481,7 @@ class Visualizer:
                 # rotation=45 将x轴标签旋转45度（避免重叠）
                 plt.xticks(rotation=45, fontproperties=self.font_prop)
                 plt.yticks(fontproperties=self.font_prop)
+                self._apply_font_to_current_axes()
             
             # ========== 将图表转换为Base64编码 ==========
             # BytesIO() 创建一个内存中的二进制流（类似文件对象）
@@ -1502,6 +1532,7 @@ class Visualizer:
             plt.title('相关性热图', fontproperties=self.font_prop)
             plt.xticks(fontproperties=self.font_prop)
             plt.yticks(fontproperties=self.font_prop)
+            self._apply_font_to_current_axes()
             
             # 转换为Base64编码（与plot_distribution()相同）
             buf = BytesIO()

@@ -16,6 +16,46 @@ from wanglaoshi.analyze.core import (
 
 
 @pytest.mark.quick
+def test_pca_chinese_labels_no_glyph_warnings() -> None:
+    """PCA 碎石图必须用包内中文字体，不得回退 DejaVu 缺字。"""
+    import logging
+    import warnings
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+
+    logs: list[str] = []
+
+    class _H(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            msg = record.getMessage()
+            if "Glyph" in msg or "DejaVu" in msg:
+                logs.append(msg)
+
+    handler = _H()
+    logging.getLogger("matplotlib.font_manager").addHandler(handler)
+    try:
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            rng = np.random.default_rng(0)
+            df = pd.DataFrame(
+                {
+                    "销售额": rng.normal(size=40),
+                    "成本": rng.normal(size=40),
+                    "利润": rng.normal(size=40),
+                }
+            )
+            out = DataAnalyzer(df).pca_analysis()
+            assert out["applicable"] is True
+        text = [str(w.message) for w in caught if "Glyph" in str(w.message) or "DejaVu" in str(w.message)]
+    finally:
+        logging.getLogger("matplotlib.font_manager").removeHandler(handler)
+
+    assert not logs and not text, f"glyph warnings: {logs + text}"
+
+
+@pytest.mark.quick
 def test_pca_handles_n_less_than_p_and_all_null_column() -> None:
     rng = np.random.default_rng(0)
     wide = pd.DataFrame({f"f{i}": rng.normal(size=5) for i in range(8)})

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """执行 examples/advanced 下 Notebook（E01–E22），产出跑通证据。
 
 默认在当前解释器进程内执行 code cell（避免 Jupyter kernel 环境不一致）。
@@ -6,6 +7,7 @@
 用法：
   python scripts/run_advanced_evidence.py
   python scripts/run_advanced_evidence.py --only 01_iris,04_breast_cancer
+  python scripts/run_advanced_evidence.py --release-data   # 发布：必填真实数据案例不得 DEMO
 """
 
 from __future__ import annotations
@@ -13,14 +15,12 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import traceback
 from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
-
-import nbformat
-
 
 ROOT = Path(__file__).resolve().parents[1]
 NB_DIR = ROOT / "examples" / "advanced"
@@ -52,12 +52,100 @@ DEFAULT_ORDER = [
     "22_movielens_ndcg",
 ]
 
+# 发布验收：这些案例不允许用合成 DEMO 充当「真实数据通过」
+# 教学烟测（默认）仍可 DEMO；加 --release-data 时单独判定
+REQUIRE_REAL_DATA = {
+    "05_credit_card_fraud",
+    "08_bike_sharing",
+    "09_mall_customers",
+}
+
 
 def _ensure_path() -> None:
     root = str(ROOT)
     if root not in sys.path:
         sys.path.insert(0, root)
     os.environ["PYTHONPATH"] = root + os.pathsep + os.environ.get("PYTHONPATH", "")
+
+
+def _data_mode_from_namespace(g: dict) -> dict:
+    meta: dict = {}
+    demo_flag = g.get("DEMO", None)
+    if demo_flag is True:
+        meta["data_mode"] = "demo"
+    elif demo_flag is False:
+        meta["data_mode"] = str(g.get("data_mode") or "real_or_local")
+    else:
+        meta["data_mode"] = str(g.get("data_mode") or "unspecified")
+    for key in ("data_source", "n_rows", "data_sha256"):
+        if key in g:
+            meta[key] = g.get(key)
+    return meta
+
+
+def _collect_notebook_text(nb) -> str:
+    chunks: list[str] = []
+    for cell in nb.cells:
+        for out in cell.get("outputs") or []:
+            if out.get("output_type") == "stream":
+                text = out.get("text", "")
+                chunks.append(text if isinstance(text, str) else "".join(text))
+            elif out.get("output_type") in {"execute_result", "display_data"}:
+                data = out.get("data") or {}
+                plain = data.get("text/plain", "")
+                chunks.append(plain if isinstance(plain, str) else "".join(plain))
+    return "\n".join(chunks)
+
+
+def _data_mode_from_output_text(blob: str) -> dict:
+    """从 kernel 执行输出中解析 DEMO / data_mode（无进程内命名空间时用）。"""
+    meta: dict = {"data_mode": "unspecified"}
+    if re.search(r"DEMO\s*(mode\s*)?=\s*True", blob):
+        meta["data_mode"] = "demo"
+    elif re.search(r"DEMO\s*(mode\s*)?=\s*False", blob):
+        meta["data_mode"] = "real_or_local"
+
+    m = re.search(r"['\"]data_mode['\"]\s*:\s*['\"]([^'\"]+)['\"]", blob)
+    if m:
+        meta["data_mode"] = m.group(1)
+    m = re.search(r"\bdata_mode\s*=\s*['\"]?([a-zA-Z0-9_]+)['\"]?", blob)
+    if m and meta["data_mode"] == "unspecified":
+        meta["data_mode"] = m.group(1)
+
+    m = re.search(r"['\"]n_rows['\"]\s*:\s*(\d+)", blob)
+    if m:
+        meta["n_rows"] = int(m.group(1))
+    m = re.search(r"['\"]data_source['\"]\s*:\s*['\"]([^'\"]+)['\"]", blob)
+    if m:
+        meta["data_source"] = m.group(1)
+    m = re.search(r"['\"]data_sha256['\"]\s*:\s*['\"]([0-9a-fA-F]+)['\"]", blob)
+    if m:
+        meta["data_sha256"] = m.group(1)
+    return meta
+
+
+def _release_data_verdict(slug: str, result: dict) -> str:
+    """返回 ok | n/a | data_fail。"""
+    if slug not in REQUIRE_REAL_DATA:
+        return "n/a"
+    if result.get("status") != "passed":
+        return "data_fail"
+    mode = str(result.get("data_mode") or "unspecified")
+    if mode in {"demo", "synthetic", "unspecified", "missing"}:
+        return "data_fail"
+    if mode.startswith("real"):
+        return "ok"
+    return "data_fail"
+
+
+def _read_notebook(path: Path) -> dict:
+    """优先 nbformat；无依赖时退回 json（inprocess 足够）。"""
+    try:
+        import nbformat
+
+        return nbformat.read(path, as_version=4)
+    except ImportError:
+        return json.loads(path.read_text(encoding="utf-8"))
 
 
 def run_one_inprocess(slug: str) -> dict:
@@ -84,12 +172,10 @@ def run_one_inprocess(slug: str) -> dict:
 
         matplotlib.use("Agg")
         os.chdir(NB_DIR)
-        nb = nbformat.read(path, as_version=4)
-        # shared namespace across cells
+        nb = _read_notebook(path)
         g: dict = {"__name__": "__main__"}
         executed = 0
-        buf = StringIO()
-        for i, cell in enumerate(nb.cells):
+        for i, cell in enumerate(nb.get("cells", [])):
             if cell.get("cell_type") != "code":
                 continue
             src = cell.get("source") or ""
@@ -98,8 +184,8 @@ def run_one_inprocess(slug: str) -> dict:
             if not str(src).strip():
                 continue
             try:
-                # display() shim for notebooks
                 if "display" not in g:
+
                     def display(x=None, *args, **kwargs):  # noqa: ANN001
                         return x
 
@@ -108,7 +194,9 @@ def run_one_inprocess(slug: str) -> dict:
                 executed += 1
             except Exception as e:  # noqa: BLE001
                 result["status"] = "failed"
-                result["error"] = f"cell[{i}]: {type(e).__name__}: {e}\n{traceback.format_exc()[-1200:]}"
+                result["error"] = (
+                    f"cell[{i}]: {type(e).__name__}: {e}\n{traceback.format_exc()[-1200:]}"
+                )
                 result["cells_executed"] = executed
                 log_path.write_text(f"FAILED {slug}\n{result['error']}\n", encoding="utf-8")
                 result["finished_at"] = datetime.now(timezone.utc).isoformat()
@@ -117,17 +205,7 @@ def run_one_inprocess(slug: str) -> dict:
 
         result["status"] = "passed"
         result["cells_executed"] = executed
-        # Notebook 约定：DEMO=True 表示合成/演示回退；False 表示走了非 DEMO 路径
-        demo_flag = g.get("DEMO", None)
-        if demo_flag is True:
-            result["data_mode"] = "demo"
-        elif demo_flag is False:
-            result["data_mode"] = str(g.get("data_mode") or "real_or_local")
-        else:
-            result["data_mode"] = str(g.get("data_mode") or "unspecified")
-        for key in ("data_source", "n_rows", "data_sha256"):
-            if key in g:
-                result[key] = g.get(key)
+        result.update(_data_mode_from_namespace(g))
         log_path.write_text(
             f"PASSED {slug}\ncells={executed}\ndata_mode={result.get('data_mode')}\n",
             encoding="utf-8",
@@ -145,6 +223,7 @@ def run_one_inprocess(slug: str) -> dict:
 
 
 def run_one_kernel(slug: str, timeout: int) -> dict:
+    import nbformat
     from nbclient import NotebookClient
     from nbclient.exceptions import CellExecutionError
 
@@ -176,7 +255,12 @@ def run_one_kernel(slug: str, timeout: int) -> dict:
         client.execute(cwd=str(NB_DIR))
         result["status"] = "passed"
         result["cells_executed"] = sum(1 for c in nb.cells if c.cell_type == "code")
-        log_path.write_text(f"PASSED {slug}\ncells={result['cells_executed']}\n", encoding="utf-8")
+        result.update(_data_mode_from_output_text(_collect_notebook_text(nb)))
+        log_path.write_text(
+            f"PASSED {slug}\ncells={result['cells_executed']}\n"
+            f"data_mode={result.get('data_mode')}\n",
+            encoding="utf-8",
+        )
     except CellExecutionError as e:
         result["status"] = "failed"
         result["error"] = str(e)[:2000]
@@ -197,6 +281,11 @@ def main() -> int:
     parser.add_argument("--kernel", action="store_true", help="use jupyter kernel via nbclient")
     parser.add_argument("--stop-on-fail", action="store_true")
     parser.add_argument("--merge", action="store_true", help="merge with existing docs evidence by slug")
+    parser.add_argument(
+        "--release-data",
+        action="store_true",
+        help="发布数据验收：REQUIRE_REAL_DATA 案例不得为 demo/unspecified",
+    )
     args = parser.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -210,6 +299,8 @@ def main() -> int:
         "notebook_dir": str(NB_DIR.relative_to(ROOT)),
         "python": sys.executable,
         "timeout_sec": args.timeout,
+        "release_data": bool(args.release_data),
+        "require_real_data": sorted(REQUIRE_REAL_DATA),
         "results": [],
     }
     by_slug: dict = {}
@@ -225,12 +316,18 @@ def main() -> int:
     for slug in slugs:
         print(f"[run] {slug} ...", flush=True)
         item = run_one_kernel(slug, args.timeout) if args.kernel else run_one_inprocess(slug)
+        item["release_data_verdict"] = _release_data_verdict(slug, item)
         by_slug[slug] = item
-        print(f"  -> {item['status']}", flush=True)
+        print(
+            f"  -> {item['status']} data_mode={item.get('data_mode', '—')} "
+            f"release={item['release_data_verdict']}",
+            flush=True,
+        )
         if args.stop_on_fail and item["status"] not in {"passed"}:
             break
+        if args.release_data and args.stop_on_fail and item["release_data_verdict"] == "data_fail":
+            break
 
-    # keep DEFAULT_ORDER then any extras
     ordered = []
     seen = set()
     for s in DEFAULT_ORDER:
@@ -250,13 +347,15 @@ def main() -> int:
         for r in evidence["results"]
         if r["status"] == "passed" and str(r.get("data_mode", "")).startswith("real")
     )
+    data_fail_n = sum(1 for r in evidence["results"] if r.get("release_data_verdict") == "data_fail")
     evidence["summary"] = {
         "passed": passed,
         "failed": failed,
         "total": len(evidence["results"]),
         "demo_or_synthetic": demo_n,
         "real_or_local_claimed": real_n,
-        "note": "passed≠真实数据验收；见 DATA_ACCEPTANCE.md",
+        "release_data_fail": data_fail_n,
+        "note": "passed≠真实数据验收；--release-data 时 REQUIRE_REAL_DATA 单独判定",
     }
 
     out = OUT_DIR / "evidence.json"
@@ -271,22 +370,26 @@ def main() -> int:
         "",
         "> **验收边界：** `passed` 只证明执行未抛错，**不**等于真实数据验收通过。",
         "> `data_mode=demo` 表示 Notebook 内 `DEMO=True`（合成/演示回退）。",
-        "> 发布级真实数据字段见 [`DATA_ACCEPTANCE.md`](DATA_ACCEPTANCE.md)。",
+        "> 发布必填真实数据案例：`" + "`, `".join(sorted(REQUIRE_REAL_DATA)) + "`。",
+        "> 发布级字段见 [`DATA_ACCEPTANCE.md`](DATA_ACCEPTANCE.md)。",
         "",
         f"- 生成时间(UTC): `{evidence['generated_at_utc']}`",
         f"- Python: `{evidence['python']}`",
+        f"- release_data 模式: `{args.release_data}`",
         f"- 汇总: passed={passed}, failed={failed}, total={evidence['summary']['total']}, "
-        f"demo={demo_n}, real_or_local_claimed={real_n}",
+        f"demo={demo_n}, real_or_local_claimed={real_n}, release_data_fail={data_fail_n}",
         "",
-        "| Notebook | Status | Cells | data_mode | Note |",
-        "| --- | --- | --- | --- | --- |",
+        "| Notebook | Status | Cells | data_mode | release_data | Note |",
+        "| --- | --- | --- | --- | --- | --- |",
     ]
     for r in evidence["results"]:
         err = (r.get("error") or "").splitlines()[0][:100] if r.get("error") else ""
         note = err if r["status"] != "passed" else r.get("mode", "")
         mode = r.get("data_mode", "unspecified")
+        verdict = r.get("release_data_verdict", "n/a")
         md_lines.append(
-            f"| `{r['slug']}` | **{r['status']}** | {r.get('cells_executed', 0)} | `{mode}` | {note} |"
+            f"| `{r['slug']}` | **{r['status']}** | {r.get('cells_executed', 0)} | "
+            f"`{mode}` | `{verdict}` | {note} |"
         )
     md_lines += [
         "",
@@ -295,13 +398,22 @@ def main() -> int:
         "复现：",
         "```bash",
         "python scripts/run_advanced_evidence.py",
+        "python scripts/run_advanced_evidence.py --release-data",
         "```",
         "",
     ]
     (DOCS_EVIDENCE / "ADVANCED_EVIDENCE.md").write_text("\n".join(md_lines), encoding="utf-8")
 
     print(f"[done] {docs_json} summary={evidence['summary']}", flush=True)
-    return 0 if failed == 0 else 1
+    if failed:
+        return 1
+    if args.release_data and data_fail_n:
+        print(
+            f"[release-data] {data_fail_n} required-real case(s) failed data acceptance",
+            flush=True,
+        )
+        return 2
+    return 0
 
 
 if __name__ == "__main__":
