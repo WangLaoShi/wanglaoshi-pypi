@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import copy
 from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
@@ -35,6 +36,33 @@ DEFAULT_METRIC_DICT: Dict[str, Dict[str, Any]] = {
         "direction": "higher_better",
     },
 }
+
+
+def build_metric_dict(
+    *,
+    value_col: str = "amount",
+    order_id_col: str = "order_id",
+    base: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> Dict[str, Dict[str, Any]]:
+    """按字段角色生成指标字典，避免 GMV 写死 ``amount``。
+
+    流水线配置了 ``value_col="revenue"`` 时，应调用本函数再交给
+    :func:`calculate_metrics`，否则趋势与 GMV 会口径脱节。
+    """
+    mdict = copy.deepcopy(base if base is not None else DEFAULT_METRIC_DICT)
+    if "gmv" in mdict:
+        mdict["gmv"] = {
+            **mdict["gmv"],
+            "value_col": value_col,
+            "formula": f"sum({value_col})",
+        }
+    if "orders" in mdict:
+        mdict["orders"] = {
+            **mdict["orders"],
+            "value_col": order_id_col,
+            "formula": f"count({order_id_col})",
+        }
+    return mdict
 
 
 def _agg_value(df: pd.DataFrame, col: str, how: str) -> float:

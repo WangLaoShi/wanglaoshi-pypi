@@ -22,21 +22,15 @@ class UploadCommand(Command):
         pass
 
     def run(self):
-        self.status('Clean build,dist,wanglaoshi.egg-info directory …')
-        os.system('rm -rf ./build ./dist ./*.egg-info')
-        self.status('Building Source and Wheel distribution…')
-        os.system('{0} setup.py sdist bdist_wheel'.format(sys.executable))
-
-        self.status('Uploading the package to PyPI via Twine…')
-        os.system('twine upload dist/*')
-
-        self.status('Pushing git tags…')
-        os.system('git tag v{0}'.format(about['__version__']))
-        os.system('git add .')
-        os.system('git commit -m v{0} .'.format(about['__version__']))
-        os.system('git push --tags')
-        os.system('git push')
-        sys.exit()
+        # 故意不再一键清理+上传+commit+push：失败难定位，也易误推。
+        # 分步流程见 docs/RELEASE.md
+        self.status('UploadCommand 已停用（请分步发布）')
+        print('按 docs/RELEASE.md：')
+        print('  1) ./scripts/release_check.sh')
+        print('  2) rm -rf build dist *.egg-info && python setup.py sdist bdist_wheel')
+        print('  3) twine check dist/* && twine upload dist/*')
+        print('  4) git tag v{0} && git push origin v{0} && git push'.format(about['__version__']))
+        sys.exit(2)
 
 setup(
     name=about['__project_name__'],  # 包的名称

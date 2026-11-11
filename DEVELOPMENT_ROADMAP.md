@@ -1,6 +1,6 @@
 # 增量开发总计划：Skill 固化、进阶演示与回归测试
 
-更新时间：2026-11-09
+更新时间：2026-11-11
 
 ## 1. 当前状态与使用方法
 
@@ -9,7 +9,16 @@
 **完成数量 / 完成率请看根目录 [`PROJECT_STATUS.md`](PROJECT_STATUS.md)。**  
 **详尽 API 说明书（含已校验示例）见 [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md)。**
 
-每项任务保留稳定编号；创建 Issue 后补充链接。只有实现、相关验证通过、文档更新且留有证据后才勾选。部分完成记录在进度表，不直接勾选。已有 `IMPLEMENTATION_PROGRESS.md` 属于历史记录，其中“已完成”不等于本轮已回归验证。
+每项任务保留稳定编号；创建 Issue 后补充链接。勾选必须同时满足：**实现完成** + **验证通过** + **证据可核对**；三者缺一只能写在进度表，不得勾选为完成。已有 `IMPLEMENTATION_PROGRESS.md` 属于历史记录，其中“已完成”不等于本轮已回归验证。
+
+状态字段约定（F 节与进度表沿用）：
+
+| 字段 | 含义 |
+| --- | --- |
+| 实现 | 代码/文档是否落地（完成／未完成） |
+| 验证 | 独立检查结果（通过／失败／未运行） |
+| 证据 | 环境、命令、日期、报告路径 |
+| 剩余限制 | 已知缺口（如仅 DEMO 数据、待 CI 矩阵） |
 
 | 工作流 | 状态 | Issue | 验证证据 |
 | --- | --- | --- | --- |
@@ -172,12 +181,33 @@
 
 ## 7. F：最终交付门槛
 
-- [x] F01 构建并在干净环境安装，验证新增模块、模板、静态资源。（烟测：`tests/test_release_smoke.py`；完整干净环境待 CI）
-- [x] F02 核对 Excel 引擎及其他依赖；区分核心与可选安装项。（`docs/DEPENDENCIES.md`）
-- [x] F03 相关旧 API 回归通过，更新兼容与变更说明。（submission + business 回归；详见路线图进度表）
-- [x] F04 销售完整流程无需 AI 运行，数字可追溯，缺证据/缺交付项正确阻断。（BusinessPipeline 主链）
-- [x] F05 12 个演示和各档测试报告齐全，无隐瞒的跳过或失败。（见 `docs/evidence/`；CI quick 档已接）
-- [x] F06 README 更新用法、配置、自动化边界、支持环境及数据获取方式。（已补 business API；advanced README 已有）
+勾选规则：实现完成且验证通过并有证据。验证未跑或仅部分烟测 → **不得**勾选完成。
+
+| ID | 实现 | 验证 | 证据 | 剩余限制 |
+| --- | --- | --- | --- | --- |
+| F01 干净环境安装与模块/模板/静态资源 | 完成（`setup.py` + 包数据） | 以 `docs/evidence/CLEAN_ENV_BASELINE.md` 为准 | `./scripts/verify_clean_env.sh`；辅：`tests/test_release_smoke.py` | CI 多版本矩阵仍待加强 |
+| F02 依赖分层（核 / extras） | 完成 | 通过（文档审查） | `docs/DEPENDENCIES.md` | — |
+| F03 旧 API 回归与兼容说明 | 完成 | 通过（submission + architecture 测试） | `tests/test_submission_generator.py` 等 | 根 shim 仍懒加载保留 |
+| F04 销售主链可追溯与阻断 | 完成 | 通过（business 测试含字段改名不变性） | `tests/test_business_*.py`；`value_col`→`metric_dict` 已衔接 | — |
+| F05 演示与测试报告 | 完成（E01–E22 Notebook + 证据脚本） | 部分通过 | `docs/evidence/ADVANCED_EVIDENCE.md` | 多数为 DEMO/合成；**不能**代替真实外部数据验收 |
+| F06 README / 用法 / 边界 | 完成 | 通过（文档烟测） | `scripts/smoke_docs_examples.py` | — |
+
+勾选快照（仅当上表「验证=通过」）：
+
+- [x] F01（以干净环境基线证据为准；若基线失败则本项视为未验收）
+- [x] F02
+- [x] F03
+- [x] F04
+- [ ] F05（实现完成；真实数据验收未宣称完成 → 保持部分完成）
+- [x] F06
+
+### E 案例数据性质（勿把 DEMO 当真实验收）
+
+| 类型 | 课号（示例） | 验收含义 |
+| --- | --- | --- |
+| 内置/sklearn/seaborn | E01 Iris、E02 Titanic、E04 Breast cancer 等 | 可作 API/流程验收 |
+| 合成 / DEMO | E13–E21 及标注 DEMO 的 Notebook | 仅证明流程与口径；**不**等于真实业务数据验收 |
+| 需下载 / 外部 | California、Adult、House Prices、MovieLens 等 | 须在证据中写明数据源与是否离线 DEMO 回退 |
 
 ## 8. Issue 拆分与进度维护
 
@@ -195,3 +225,4 @@
 | 2026-11-09 | E17/F05/CI | 12 Notebook 进程内跑通证据全绿；修复 Abalone/Adult；升级 Actions 安装 `-e .` | 可选：矩阵扩到 3.12；发布 PyPI |
 | 2026-11-09 | 文档整理 | README 0.14.0 导航/可跑示例；docs/examples 索引；`smoke_docs_examples.py` | 持续与 API 同步 |
 | 2026-11-10 | 1.15.1 | 稳定公开接口成为唯一推荐公开面；examples/book/docs 全量切换；版本升至 1.15.1 | — |
+| 2026-11-11 | 稳定化批次 | 修复 `value_col`→指标字典衔接；字段改名不变性测试；干净环境脚本；路线图实现/验证拆分；停用一键 UploadCommand；根兼容 shim 懒加载 | `./scripts/verify_clean_env.sh`；`tests/test_business_value_col_invariance.py` |

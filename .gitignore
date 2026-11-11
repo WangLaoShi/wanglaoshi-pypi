@@ -39,3 +39,5 @@ book/tutorials/
 artifacts/
 coverage.xml
 htmlcov/
+
+.venv-clean-baseline/

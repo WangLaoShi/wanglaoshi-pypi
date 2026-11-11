@@ -26,7 +26,7 @@ from .cleaning import clean_dataframe
 from .eda import run_eda_profile
 from .derived import derive_metrics
 from .planning import build_analysis_plan
-from .metrics import calculate_metrics
+from .metrics import build_metric_dict, calculate_metrics
 from .analysis import run_multidimensional_analysis
 from .visualization import archive_charts
 from .insights import generate_insights
@@ -97,6 +97,8 @@ class BusinessPipeline:
         dim_cols: Optional[Sequence[str]] = None,
         segment_cols: Optional[Sequence[str]] = None,
         metric_group_cols: Optional[Sequence[str]] = None,
+        order_id_col: str = "order_id",
+        metric_dict: Optional[Dict[str, Any]] = None,
         redact_fields: Optional[Sequence[str]] = None,
         chart_unit: str = "currency_unit",
     ) -> None:
@@ -109,6 +111,8 @@ class BusinessPipeline:
         - random_seed       : 抽样等随机过程的种子，保证可复现
         - stop_on_block     : True 时上游 blocked 立即跳过下游
         - date_col/value_col/dim_cols/segment_cols : 字段角色（强烈建议显式传入）
+        - order_id_col      : 订单计数字段，传入指标字典（默认 order_id）
+        - metric_dict       : 自定义指标字典；默认按 value_col/order_id_col 自动构造
         - redact_fields     : 归档时脱敏的字段名列表
         - chart_unit        : 图纵轴单位文案，如 CNY
         """
@@ -122,6 +126,8 @@ class BusinessPipeline:
         self.dim_cols = list(dim_cols) if dim_cols else None
         self.segment_cols = list(segment_cols) if segment_cols else None
         self.metric_group_cols = list(metric_group_cols) if metric_group_cols else None
+        self.order_id_col = order_id_col
+        self.metric_dict = metric_dict
         self.redact_fields = list(redact_fields) if redact_fields else None
         self.chart_unit = chart_unit
 
@@ -140,6 +146,7 @@ class BusinessPipeline:
                 "value_col": self.value_col,
                 "dim_cols": self.dim_cols,
                 "segment_cols": self.segment_cols,
+                "order_id_col": self.order_id_col,
             },
             random_seed=self.random_seed,
         )
@@ -241,10 +248,20 @@ class BusinessPipeline:
         )
         record.add_stage(planning)
 
-        # ========== D06 指标 ==========
+        # ========== D06 指标（metric_dict 必须跟 value_col 对齐）==========
         group_cols = self.metric_group_cols or dim_cols[:1] or None
+        if self.metric_dict is not None:
+            metric_dict = self.metric_dict
+        elif value_col:
+            metric_dict = build_metric_dict(
+                value_col=value_col,
+                order_id_col=self.order_id_col,
+            )
+        else:
+            metric_dict = None
         metrics = calculate_metrics(
             derived_df,
+            metric_dict=metric_dict,
             group_cols=group_cols,
             share_of="gmv" if value_col else None,
         )

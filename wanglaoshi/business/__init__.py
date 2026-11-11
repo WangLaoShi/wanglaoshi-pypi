@@ -21,7 +21,7 @@ from .cleaning import clean_dataframe
 from .eda import run_eda_profile, STAT_METHOD_CATALOG
 from .derived import derive_metrics, add_value_tiers
 from .planning import build_analysis_plan
-from .metrics import calculate_metrics, DEFAULT_METRIC_DICT
+from .metrics import build_metric_dict, calculate_metrics, DEFAULT_METRIC_DICT
 from .analysis import run_multidimensional_analysis
 from .visualization import archive_charts
 from .insights import generate_insights
@@ -45,6 +45,7 @@ __all__ = [
     "add_value_tiers",
     "build_analysis_plan",
     "calculate_metrics",
+    "build_metric_dict",
     "DEFAULT_METRIC_DICT",
     "run_multidimensional_analysis",
     "archive_charts",
