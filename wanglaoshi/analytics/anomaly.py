@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -23,27 +23,66 @@ class AnomalyDetector:
         self.random_state = random_state
         self.kwargs = kwargs
         self.model_: Optional[IsolationForest] = None
+        self.feature_names_: Optional[List[str]] = None
+        self.n_features_: Optional[int] = None
+
+    def _to_matrix(self, X: Union[pd.DataFrame, np.ndarray], *, fitting: bool) -> np.ndarray:
+        if isinstance(X, pd.DataFrame):
+            if fitting:
+                self.feature_names_ = list(X.columns)
+                self.n_features_ = int(X.shape[1])
+                return X.to_numpy(dtype=float, copy=True)
+            if self.feature_names_ is None:
+                # 训练时用的是 ndarray
+                if self.n_features_ is not None and X.shape[1] != self.n_features_:
+                    raise ValueError(
+                        f"feature width mismatch: expected {self.n_features_}, got {X.shape[1]}"
+                    )
+                return X.to_numpy(dtype=float, copy=True)
+            missing = [c for c in self.feature_names_ if c not in X.columns]
+            if missing:
+                raise ValueError(f"missing columns for scoring: {missing}")
+            # 按训练列名对齐，拒绝静默列顺序错位
+            return X.loc[:, self.feature_names_].to_numpy(dtype=float, copy=True)
+
+        arr = np.asarray(X, dtype=float)
+        if arr.ndim != 2:
+            raise ValueError("X must be 2-d")
+        if fitting:
+            self.feature_names_ = None
+            self.n_features_ = int(arr.shape[1])
+            return arr
+        if self.feature_names_ is not None:
+            raise ValueError(
+                "model was fit on a DataFrame; pass a DataFrame with the same columns"
+            )
+        if self.n_features_ is not None and arr.shape[1] != self.n_features_:
+            raise ValueError(
+                f"feature width mismatch: expected {self.n_features_}, got {arr.shape[1]}"
+            )
+        return arr
 
     def fit(self, X: Union[pd.DataFrame, np.ndarray]) -> "AnomalyDetector":
+        mat = self._to_matrix(X, fitting=True)
         self.model_ = IsolationForest(
             contamination=self.contamination,
             random_state=self.random_state,
             **self.kwargs,
         )
-        self.model_.fit(np.asarray(X))
+        self.model_.fit(mat)
         return self
 
     def score_samples(self, X: Union[pd.DataFrame, np.ndarray]) -> np.ndarray:
         if self.model_ is None:
             raise RuntimeError("call fit() first")
         # sklearn: higher score = more normal; flip for "anomaly score"
-        return -self.model_.score_samples(np.asarray(X))
+        return -self.model_.score_samples(self._to_matrix(X, fitting=False))
 
     def predict(self, X: Union[pd.DataFrame, np.ndarray]) -> np.ndarray:
         """返回 1=异常, 0=正常。"""
         if self.model_ is None:
             raise RuntimeError("call fit() first")
-        raw = self.model_.predict(np.asarray(X))  # -1 anomaly
+        raw = self.model_.predict(self._to_matrix(X, fitting=False))  # -1 anomaly
         return (raw == -1).astype(int)
 
     def fit_predict_summary(

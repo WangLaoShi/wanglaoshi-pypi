@@ -8,13 +8,33 @@ import numpy as np
 import pandas as pd
 
 
+def _validate_km_inputs(times: Sequence[float], events: Sequence[int]) -> Tuple[np.ndarray, np.ndarray]:
+    times_a = np.asarray(times, dtype=float).reshape(-1)
+    events_raw = np.asarray(events).reshape(-1)
+    if times_a.size == 0 or events_raw.size == 0:
+        raise ValueError("times and events must be non-empty")
+    if times_a.shape[0] != events_raw.shape[0]:
+        raise ValueError("times and events length mismatch")
+    if not np.isfinite(times_a).all():
+        raise ValueError("times must be finite")
+    if np.any(times_a < 0):
+        raise ValueError("times must be non-negative")
+    # 事件标记必须在类型收窄前校验为 {0,1}
+    events_f = pd.to_numeric(pd.Series(events_raw), errors="coerce").to_numpy(dtype=float)
+    if not np.isfinite(events_f).all():
+        raise ValueError("events must be finite 0/1 labels")
+    uniq = set(np.unique(events_f).tolist())
+    if not uniq.issubset({0.0, 1.0}):
+        raise ValueError("events must be binary labels in {0, 1}")
+    return times_a, events_f.astype(int)
+
+
 def kaplan_meier(
     times: Sequence[float],
     events: Sequence[int],
 ) -> Tuple[np.ndarray, np.ndarray]:
     """手写 KM：返回 (t_axis, survival)。"""
-    times_a = np.asarray(times, dtype=float)
-    events_a = np.asarray(events, dtype=int)
+    times_a, events_a = _validate_km_inputs(times, events)
     order = np.argsort(times_a)
     times_a, events_a = times_a[order], events_a[order]
     uniq = np.unique(times_a)
@@ -41,13 +61,14 @@ class SurvivalAnalyzer:
         *,
         name: str = "all",
     ) -> Dict[str, Any]:
-        t_axis, surv = kaplan_meier(times, events)
+        times_a, events_a = _validate_km_inputs(times, events)
+        t_axis, surv = kaplan_meier(times_a, events_a)
         return {
             "name": name,
             "time": t_axis,
             "survival": surv,
-            "n": int(len(times)),
-            "event_rate": float(np.mean(np.asarray(events))),
+            "n": int(len(times_a)),
+            "event_rate": float(np.mean(events_a)),
             "median_survival": SurvivalAnalyzer._median_survival(t_axis, surv),
         }
 
