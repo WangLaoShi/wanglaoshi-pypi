@@ -85,7 +85,7 @@ def test_hyperopt_regression_selects_lower_mse(monkeypatch: pytest.MonkeyPatch) 
         def predict(self, X):  # noqa: ANN001, N803
             return np.zeros(len(X))
 
-    def fake_cv(model, X, y, cv=5, scoring=None, n_jobs=-1):  # noqa: ANN001
+    def fake_cv(model, X, y, cv=5, scoring=None, n_jobs=-1, error_score=None):  # noqa: ANN001
         # 目标函数应直接 maximize neg_mse：level=1 → -1；level=10 → -10
         assert scoring == "neg_mean_squared_error"
         neg = -float(model.level)
@@ -97,6 +97,7 @@ def test_hyperopt_regression_selects_lower_mse(monkeypatch: pytest.MonkeyPatch) 
             assert direction == "maximize"
             self.best_params = None
             self.best_value = None
+            self.trials = []
 
         def optimize(self, objective, n_trials, show_progress_bar=True):  # noqa: ANN001
             values = {}
@@ -107,12 +108,19 @@ def test_hyperopt_regression_selects_lower_mse(monkeypatch: pytest.MonkeyPatch) 
                     suggest_float=lambda *a, **k: 1.0,
                 )
                 values[level] = objective(trial)
+                self.trials.append(
+                    SimpleNamespace(
+                        state=SimpleNamespace(name="COMPLETE"),
+                        value=values[level],
+                    )
+                )
             best_level = max(values, key=values.get)
             self.best_params = {"level": best_level}
             self.best_value = values[best_level]
 
     fake_optuna = ModuleType("optuna")
     fake_optuna.create_study = lambda direction="maximize": _Study(direction)
+    fake_optuna.TrialPruned = type("TrialPruned", (Exception,), {})
     monkeypatch.setitem(sys.modules, "optuna", fake_optuna)
 
     X = pd.DataFrame({"x": np.arange(30, dtype=float)})

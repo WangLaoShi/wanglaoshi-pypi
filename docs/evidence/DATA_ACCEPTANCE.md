@@ -19,6 +19,15 @@
 
 若运行中发生 DEMO/合成回退：`data_mode` 必须记为 `demo`/`synthetic`，且**不得**计入「真实数据验收通过」。
 
+## 发布优先案例
+
+| 案例 | 真实数据入口 | 命令 |
+| --- | --- | --- |
+| `05_credit_card_fraud` | 手动放入 `data/creditcard.csv`（Kaggle） | `python scripts/fetch_release_case_data.py` |
+| `08_bike_sharing` | `data/bike_sharing_hour.csv` 或 OpenML 拉取 | 同上 |
+
+详见 [`RELEASE_CASE_DATA.md`](RELEASE_CASE_DATA.md)（由脚本生成）。
+
 ## 日常演示
 
 允许合成与 DEMO；教学烟测继续用 `scripts/run_advanced_evidence.py`。

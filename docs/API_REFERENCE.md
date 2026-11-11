@@ -430,9 +430,12 @@ print(tr.compare_experiments())
 ### 3.8 `HyperparameterOptimizer` 【需可选依赖】
 
 ```text
-bayesian_optimize(model_class, param_space, X, y, n_trials=100, cv=5)  # 需要 optuna
-auto_tune(model_class, X, y, model_type='auto')
+bayesian_optimize(model_class, param_space, X, y, n_trials=100, cv=5,
+                  scoring=None, task_type='auto', n_jobs=-1)  # 需要 optuna
+auto_tune(model_class, X, y, model_type='auto', scoring=None, task_type='auto')
 ```
+
+默认评分：**优先估计器类型**（`RegressorMixin` → MSE，`ClassifierMixin` → accuracy），再按目标列推断；连续浮点即使唯一值 &lt;20 也走回归。可用 `scoring=` / `task_type=` 显式覆盖。
 
 未安装 Optuna 时会 `ImportError`（`pip install wanglaoshi[optuna]` 或 `pip install optuna`）。
 

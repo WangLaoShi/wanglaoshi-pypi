@@ -49,5 +49,7 @@
 | `scripts/run_advanced_evidence.py` | 只改了进阶 Notebook |
 | `scripts/build_book.py` | 只改了教材文稿 |
 | `scripts/verify_wheel_assets.py` | wheel / 可编辑安装后核对中文字体与报告模板 |
+| `scripts/verify_chinese_plot.py` | 用包内 SimHei 渲染中文标题图（无缺字警告） |
+| `scripts/fetch_release_case_data.py` | 欺诈/共享单车真实数据指纹（见 RELEASE_CASE_DATA.md） |
 
 默认验收入口：**`./scripts/release_check.sh`**。干净环境证据入口：**`./scripts/verify_clean_env.sh`**。

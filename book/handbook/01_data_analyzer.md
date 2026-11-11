@@ -84,6 +84,6 @@ print("pca keys", sorted(pca.keys())[:8])
 
 ## 相关文档
 
-- 短教程：[tutorials/01](../tutorials/01_ready_and_eda.md) / [12](../tutorials/12_analyze_helpers.md)  
+- 短教程：[tutorials/01](../tutorials/01_ready_and_eda) / [12](../tutorials/12_analyze_helpers)  
 - 签名表：[API_REFERENCE §2](../reference/api)  
 - 深课：`examples/advanced/01_iris.ipynb`、`02_titanic.ipynb`

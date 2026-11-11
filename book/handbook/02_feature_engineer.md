@@ -92,6 +92,6 @@ print("mi", sel_mi)
 
 ## 相关文档
 
-- 短教程：[tutorials/03](../tutorials/03_features_encode.md)  
+- 短教程：[tutorials/03](../tutorials/03_features_encode)  
 - 精讲：`book/lessons/feature_fit_discipline.md`  
 - 深课：`examples/advanced/10_adult_census.ipynb`

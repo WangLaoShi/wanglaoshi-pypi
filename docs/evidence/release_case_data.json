@@ -1,0 +1,20 @@
+{
+  "generated_at_utc": "2026-11-11T04:28:29.279054+00:00",
+  "cases": [
+    {
+      "slug": "05_credit_card_fraud",
+      "data_mode": "missing",
+      "source": "expected:data/creditcard.csv (Kaggle creditcardfraud)",
+      "status": "blocked",
+      "note": "需人工放置授权 CSV；禁止无授权自动下载"
+    },
+    {
+      "slug": "08_bike_sharing",
+      "data_mode": "real",
+      "source": "OpenML:Bike_Sharing_Demand/v2 → data/bike_sharing_hour.csv",
+      "n_rows": 17379,
+      "sha256": "375d870c6a8adb4cd7ad0af1c9b072c9907c3615bfc0355677f51a38d0ba9ffd",
+      "status": "ready"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ book/cases/*.ipynb 与部分 reference/*.md 为生成物。
 
 from __future__ import annotations
 
+import re
 import shutil
 from pathlib import Path
 
@@ -124,6 +125,14 @@ def main() -> None:
         text = text.replace("](API_INVENTORY.md)", "](api-inventory.md)")
         text = text.replace("](API_REFERENCE.md)", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/API_REFERENCE.md)")
         text = text.replace("](DEPENDENCIES.md)", "](dependencies.md)")
+        text = text.replace(
+            "](ARCHITECTURE.md)",
+            "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/ARCHITECTURE.md)",
+        )
+        text = text.replace(
+            "](DATA_ACCEPTANCE.md)",
+            "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/evidence/DATA_ACCEPTANCE.md)",
+        )
         banner = (
             "```{note}\n"
             f"本页从仓库 `docs/{src_rel}` 同步生成；请以仓库文件为编辑源。\n"
@@ -146,7 +155,8 @@ def main() -> None:
         text = text.replace("](../ARCHITECTURE.md)", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/ARCHITECTURE.md)")
         text = text.replace("](../../examples/tutorials/", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/tutorials/")
         text = text.replace("](../../examples/advanced/", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/advanced/")
-        text = text.replace("](../handbook/", "](../handbook/")
+        # 目录链接 → README 页（勿只替换前缀，否则 `](.../)` 会多一个 `)`）
+        text = text.replace("](../handbook/)", "](../handbook/README)")
         banner = (
             "```{note}\n"
             f"本页从仓库 `docs/tutorials/{name}` 同步生成；请以仓库文件为编辑源。\n"
@@ -165,7 +175,9 @@ def main() -> None:
         dst = HANDBOOK / name
         text = src.read_text(encoding="utf-8")
         text = text.replace("](../API_REFERENCE.md)", "](../reference/api)")
-        text = text.replace("](../tutorials/", "](../tutorials/")
+        text = text.replace("](../tutorials/)", "](../tutorials/README)")
+        # MyST 文档链：去掉 .md 后缀
+        text = re.sub(r"\]\(\.\./tutorials/([^)#]+)\.md\)", r"](../tutorials/\1)", text)
         text = text.replace(
             "](../../examples/handbook/",
             "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/handbook/",

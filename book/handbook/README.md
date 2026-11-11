@@ -4,7 +4,7 @@
 
 # 使用手册（类与方法 · 带案例）
 
-本目录是相对 [`docs/API_REFERENCE.md`](../reference/api)（查签名）与 [`docs/tutorials/`](../tutorials/)（公开接口短教程）的**第三层文档**：按**类 / 方法**讲「什么时候用、怎么用、一个完整小案例」。
+本目录是相对 [`docs/API_REFERENCE.md`](../reference/api)（查签名）与 [`docs/tutorials/`](../tutorials/README)（公开接口短教程）的**第三层文档**：按**类 / 方法**讲「什么时候用、怎么用、一个完整小案例」。
 
 | 手册 | 核心类 / 模块 | 案例数据 |
 | --- | --- | --- |
