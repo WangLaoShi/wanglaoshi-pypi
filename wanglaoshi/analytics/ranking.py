@@ -24,11 +24,28 @@ class RankingMetrics:
         relevant: Union[Set, Iterable],
         k: int = 10,
     ) -> float:
+        """NDCG@k。
+
+        同一相关项多次出现时**只计首次命中**，避免重复推荐刷高分数。
+        有效输入下返回值落在 ``[0, 1]``。
+        """
+        if k < 1:
+            raise ValueError("k must be >= 1")
         rel_set = set(relevant)
-        rels = [1.0 if i in rel_set else 0.0 for i in list(recommended)[:k]]
+        seen: Set = set()
+        rels = []
+        for item in list(recommended)[:k]:
+            if item in rel_set and item not in seen:
+                rels.append(1.0)
+                seen.add(item)
+            else:
+                rels.append(0.0)
         dcg = RankingMetrics.dcg_at_k(rels, k)
         ideal = RankingMetrics.dcg_at_k([1.0] * min(k, len(rel_set)), k)
-        return 0.0 if ideal == 0 else float(dcg / ideal)
+        if ideal == 0:
+            return 0.0
+        score = float(dcg / ideal)
+        return float(min(1.0, max(0.0, score)))
 
     @staticmethod
     def hit_rate_at_k(recommended: Sequence, relevant: Union[Set, Iterable], k: int = 10) -> float:

@@ -18,9 +18,21 @@ class ExperimentDesign:
         x2: int,
         n2: int,
     ) -> Dict[str, Any]:
-        """两比例 z 检验（pooled）+ 未合并 SE 的 95% CI。"""
-        if min(n1, n2) <= 0:
-            raise ValueError("n1 and n2 must be positive")
+        """两比例 z 检验（pooled）+ 未合并 SE 的 95% CI。
+
+        退化输入（整列/整行为零，如两组均无转化）时：
+        - 不抛异常中断；
+        - ``chi2_applicable`` / ``ci95_applicable`` 标明方法是否适用；
+        - Wald CI 在经验比例为 0 或 1 时 SE=0，点估计坍缩，**不**表示差异已精确确定。
+        """
+        for name, n in (("n1", n1), ("n2", n2)):
+            if int(n) <= 0:
+                raise ValueError(f"{name} must be positive")
+        for name, x, n in (("x1", x1, n1), ("x2", x2, n2)):
+            if int(x) < 0 or int(x) > int(n):
+                raise ValueError(f"{name} must be in [0, {n}]")
+
+        x1, n1, x2, n2 = int(x1), int(n1), int(x2), int(n2)
         p1, p2 = x1 / n1, x2 / n2
         p = (x1 + x2) / (n1 + n2)
         se = np.sqrt(p * (1 - p) * (1 / n1 + 1 / n2))
@@ -28,10 +40,38 @@ class ExperimentDesign:
         pval = float(2 * (1 - stats.norm.cdf(abs(z))))
         se_unpooled = np.sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2)
         diff = p2 - p1
-        ci = (float(diff - 1.96 * se_unpooled), float(diff + 1.96 * se_unpooled))
-        # χ² 2x2
+        ci95_applicable = bool(se_unpooled > 0)
+        if ci95_applicable:
+            ci: Optional[Tuple[float, float]] = (
+                float(diff - 1.96 * se_unpooled),
+                float(diff + 1.96 * se_unpooled),
+            )
+        else:
+            ci = None
+
         table = np.array([[x1, n1 - x1], [x2, n2 - x2]], dtype=float)
-        chi2, p_chi, dof, _ = stats.chi2_contingency(table)
+        # 任一行列合计为 0 → 期望频数为 0，χ² 不适用
+        chi2_applicable = bool((table.sum(axis=0) > 0).all() and (table.sum(axis=1) > 0).all())
+        if chi2_applicable:
+            chi2, p_chi, dof, _ = stats.chi2_contingency(table)
+            chi2_v: Optional[float] = float(chi2)
+            chi2_p: Optional[float] = float(p_chi)
+            dof_v: Optional[int] = int(dof)
+        else:
+            chi2_v, chi2_p, dof_v = None, None, None
+
+        notes = []
+        if not ci95_applicable:
+            notes.append(
+                "Wald CI not applicable: unpooled SE is 0 "
+                "(empirical rates are both 0 or both 1); a [0,0] interval would be misleading"
+            )
+        if not chi2_applicable:
+            notes.append(
+                "chi-square not applicable: contingency table has a zero row/column "
+                "(e.g. zero conversions in both arms)"
+            )
+
         return {
             "p1": float(p1),
             "p2": float(p2),
@@ -39,11 +79,15 @@ class ExperimentDesign:
             "z": float(z),
             "pvalue": pval,
             "ci95": ci,
-            "chi2": float(chi2),
-            "chi2_pvalue": float(p_chi),
-            "dof": int(dof),
-            "n1": int(n1),
-            "n2": int(n2),
+            "ci95_applicable": ci95_applicable,
+            "chi2": chi2_v,
+            "chi2_pvalue": chi2_p,
+            "chi2_applicable": chi2_applicable,
+            "dof": dof_v,
+            "n1": n1,
+            "n2": n2,
+            "applicable": bool(ci95_applicable and chi2_applicable),
+            "notes": notes,
         }
 
     @staticmethod

@@ -151,14 +151,13 @@ class ModelEnsemble:
             # 第二层：训练元模型
             logger.info("训练第二层（元）模型")
             meta_model.fit(first_level_train, y_train)
-            
+
+            # 两条路径共用：在完整训练集上拟合第一层，保证返回的模型可直接预测新数据
+            for model in models:
+                model.fit(X_train, y_train)
+
             # 如果提供了测试集，生成最终预测
             if X_test is not None:
-                # 训练所有第一层模型
-                for model in models:
-                    model.fit(X_train, y_train)
-                
-                # 生成测试集的第一层预测
                 first_level_test = []
                 for model in models:
                     if hasattr(model, 'predict_proba') and len(y_train.unique()) < 20:
@@ -170,18 +169,17 @@ class ModelEnsemble:
                     else:
                         pred = model.predict(X_test)
                         first_level_test.append(pred.reshape(-1, 1))
-                
+
                 first_level_test = np.hstack(first_level_test)
-                
+
                 if use_features_in_secondary:
                     first_level_test = np.hstack([X_test.values, first_level_test])
-                
-                # 第二层预测
+
                 final_predictions = meta_model.predict(first_level_test)
-                
+
                 logger.info("堆叠集成完成，返回预测结果")
                 return final_predictions
-            
+
             logger.info("堆叠集成完成")
             return {
                 'meta_model': meta_model,
@@ -238,38 +236,71 @@ class ModelEnsemble:
                 first_level_predictions.append(pred.reshape(-1, 1))
         
         first_level_val = np.hstack(first_level_predictions)
-        
+
         # 第二层
         if meta_model is None:
-            # 简单平均或加权平均
             if weights is None:
                 weights = [1.0 / len(models)] * len(models)
-            
+            if len(weights) != len(models):
+                raise ValueError(
+                    f"权重数量 ({len(weights)}) 与模型数量 ({len(models)}) 不匹配"
+                )
+            w = np.asarray(weights, dtype=float)
+            if not np.isfinite(w).all() or np.any(w < 0) or float(w.sum()) <= 0:
+                raise ValueError("weights must be finite, non-negative, and sum to a positive value")
+
             logger.info("使用加权平均作为第二层")
-            
-            # 返回一个可以预测的函数
-            # 注意：分类概率矩阵不能直接与「按模型数」的权重做 axis=1 平均；
-            # 先把每个模型压成一维分数（二分类取正类概率），再按模型加权。
+
+            # 分类：按 classes_ 对齐概率列后按列融合；回归：一维分数加权平均
+            is_clf = all(hasattr(m, "predict_proba") for m in models) and len(y_train.unique()) < 20
+            classes_: Optional[np.ndarray] = None
+            if is_clf:
+                # 以训练集标签顺序为权威列序，再按各模型 classes_ 对齐
+                classes_ = np.asarray(sorted(pd.unique(y_train), key=lambda x: str(x)))
+
+                def _align_proba(model: Any, X_test: pd.DataFrame) -> np.ndarray:
+                    assert classes_ is not None
+                    raw = np.asarray(model.predict_proba(X_test), dtype=float)
+                    model_classes = np.asarray(getattr(model, "classes_"))
+                    aligned = np.zeros((raw.shape[0], len(classes_)), dtype=float)
+                    index = {c: i for i, c in enumerate(classes_)}
+                    for j, c in enumerate(model_classes):
+                        if c not in index:
+                            raise ValueError(
+                                f"model class {c!r} not in training labels {classes_.tolist()}"
+                            )
+                        aligned[:, index[c]] = raw[:, j]
+                    return aligned
+
+                def predict_proba(X_test):
+                    mats = [_align_proba(m, X_test) for m in models]
+                    stacked = np.stack(mats, axis=0)  # (n_models, n_samples, n_classes)
+                    return np.average(stacked, axis=0, weights=w)
+
+                def predict(X_test):
+                    assert classes_ is not None
+                    proba = predict_proba(X_test)
+                    return classes_[np.argmax(proba, axis=1)]
+
+                return {
+                    "models": models,
+                    "weights": weights,
+                    "classes_": classes_,
+                    "predict": predict,
+                    "predict_proba": predict_proba,
+                }
+
             def predict(X_test):
                 model_scores = []
                 for model in models:
-                    if hasattr(model, 'predict_proba') and len(y_train.unique()) < 20:
-                        pred = model.predict_proba(X_test)
-                        if pred.ndim > 1 and pred.shape[1] > 1:
-                            # 二分类取正类；多分类取最大类概率作为可比较分数
-                            model_scores.append(pred[:, 1] if pred.shape[1] == 2 else pred.max(axis=1))
-                        else:
-                            model_scores.append(np.asarray(pred).reshape(-1))
-                    else:
-                        model_scores.append(np.asarray(model.predict(X_test)).reshape(-1))
-
+                    model_scores.append(np.asarray(model.predict(X_test), dtype=float).reshape(-1))
                 stacked = np.vstack(model_scores)
-                return np.average(stacked, axis=0, weights=weights)
-            
+                return np.average(stacked, axis=0, weights=w)
+
             return {
-                'models': models,
-                'weights': weights,
-                'predict': predict
+                "models": models,
+                "weights": weights,
+                "predict": predict,
             }
         else:
             # 使用元模型

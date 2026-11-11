@@ -39,6 +39,10 @@ def test_stacking_returns_meta_bundle(clf_xy) -> None:
     assert isinstance(result, dict)
     assert "meta_model" in result
     assert len(result["first_level_models"]) == 2
+    # 省略 X_test 时返回的第一层模型必须已在完整训练集上拟合，可直接预测
+    for m in result["first_level_models"]:
+        pred = m.predict(X.iloc[:3])
+        assert len(pred) == 3
 
 
 @pytest.mark.quick

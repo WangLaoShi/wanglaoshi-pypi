@@ -14,9 +14,29 @@ def expected_calibration_error(
     *,
     n_bins: int = 10,
 ) -> float:
-    """固定等宽分箱 ECE。"""
-    y_true = np.asarray(y_true, dtype=float)
-    y_prob = np.asarray(y_prob, dtype=float)
+    """固定等宽分箱 ECE。
+
+    要求：非空、等长、``y_true ∈ {0,1}``、``y_prob`` 有限且落在 ``[0, 1]``。
+    无效概率不得被静默忽略成「完美校准」(ECE=0)。
+    """
+    if n_bins < 1:
+        raise ValueError("n_bins must be >= 1")
+    y_true = np.asarray(y_true, dtype=float).reshape(-1)
+    y_prob = np.asarray(y_prob, dtype=float).reshape(-1)
+    if y_true.size == 0 or y_prob.size == 0:
+        raise ValueError("y_true and y_prob must be non-empty")
+    if y_true.shape[0] != y_prob.shape[0]:
+        raise ValueError("y_true and y_prob length mismatch")
+    if not np.isfinite(y_prob).all():
+        raise ValueError("y_prob must be finite")
+    if np.any(y_prob < 0.0) or np.any(y_prob > 1.0):
+        raise ValueError("y_prob must be in [0, 1]")
+    if not np.isfinite(y_true).all():
+        raise ValueError("y_true must be finite")
+    uniq = set(np.unique(y_true).tolist())
+    if not uniq.issubset({0.0, 1.0}):
+        raise ValueError("y_true must be binary labels in {0, 1}")
+
     bins = np.linspace(0.0, 1.0, n_bins + 1)
     ece = 0.0
     for i in range(n_bins):
