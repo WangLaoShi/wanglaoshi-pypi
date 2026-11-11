@@ -295,8 +295,8 @@ print("LeakageDetector OK", len(leaks), tinfo["has_leakage"], dinfo["has_leakage
 | 方法 | 关键参数 |
 | --- | --- |
 | `voting(models, X, y, voting='soft', weights=None)` | 拟合投票器 |
-| `stacking(models, meta_model, X_train, y_train, X_test=None, cv=5, ...)` | 堆叠 |
-| `blending(models, X_train, y_train, X_val, y_val, meta_model=None, weights=None)` | **必须**提供验证集 `X_val`/`y_val` |
+| `stacking(models, meta_model, X_train, y_train, X_test=None, cv=5, ...)` | 堆叠；省略 `X_test` 时返回的 `first_level_models` 已在全量训练集拟合 |
+| `blending(models, X_train, y_train, X_val, y_val, meta_model=None, weights=None)` | **必须**提供验证集；无元模型时分类返回 `predict` / `predict_proba` / `classes_`（按列对齐融合） |
 
 ```python
 # 【可运行】
@@ -624,7 +624,7 @@ print("BusinessPipeline OK", summary["run_id"], len(summary["stages"]))
 | `StatsToolkit.ttest_ind` | Welch/独立 t + Cohen's d + 适用性提示 |
 | `StatsToolkit.chi2_independence` | 列联表 χ² + 期望频数警告 |
 | `StatsToolkit.anova_oneway` | 单因素 ANOVA + η² |
-| `ExperimentDesign.two_proportion_test` | 两比例 z / χ²、提升 pp、CI |
+| `ExperimentDesign.two_proportion_test` | 两比例 z / χ²、提升 pp、CI；退化输入看 `applicable` / `notes` |
 | `ExperimentDesign.sample_size_two_proportion` | 每臂样本量 |
 | `ExperimentDesign.bayes_prob_beat` / `prior_sensitivity` | Beta-Binomial 门槛概率 |
 
