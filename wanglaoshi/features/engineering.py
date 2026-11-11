@@ -117,11 +117,96 @@ class AdvancedFeatureEngineer:
     
     # ==================== 文本特征提取 ====================
     
+    @staticmethod
+    def _prepare_text_documents(series: pd.Series) -> List[str]:
+        """缺失保留为空文档；先识别 NA 再转字符串，避免 ``None``→``"None"`` 成词。"""
+        docs: List[str] = []
+        for value in series.tolist():
+            if value is None:
+                docs.append("")
+            elif isinstance(value, float) and np.isnan(value):
+                docs.append("")
+            elif pd.isna(value):
+                docs.append("")
+            else:
+                docs.append(str(value))
+        return docs
+
+    @staticmethod
+    def _sanitize_term(term: str) -> str:
+        cleaned = "".join(ch if ch.isalnum() else "_" for ch in str(term))
+        return cleaned or "term"
+
+    def fit_text_vectorizer(
+        self,
+        df: pd.DataFrame,
+        text_col: str,
+        *,
+        method: str = "count",
+        max_features: int = 100,
+        key: Optional[str] = None,
+    ) -> str:
+        """在训练集上拟合词表，供后续 ``transform_text_features`` 复用。"""
+        if method not in {"count", "tfidf"}:
+            raise ValueError("fit_text_vectorizer only supports method='count' or 'tfidf'")
+        if text_col not in df.columns:
+            raise KeyError(f"text_col not found: {text_col}")
+        from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+
+        docs = self._prepare_text_documents(df[text_col])
+        if method == "tfidf":
+            vectorizer = TfidfVectorizer(max_features=max_features, ngram_range=(1, 2))
+        else:
+            vectorizer = CountVectorizer(max_features=max_features, ngram_range=(1, 2))
+        vectorizer.fit(docs)
+        terms = [self._sanitize_term(t) for t in vectorizer.get_feature_names_out()]
+        feature_names = [f"{text_col}_{method}_{term}" for term in terms]
+        store_key = key or f"{text_col}_{method}"
+        self._fitted_transformers[store_key] = {
+            "kind": "text_vectorizer",
+            "method": method,
+            "text_col": text_col,
+            "vectorizer": vectorizer,
+            "feature_names": feature_names,
+        }
+        logger.info(f"拟合文本向量器 {store_key}: {len(feature_names)} terms")
+        return store_key
+
+    def transform_text_features(
+        self,
+        df: pd.DataFrame,
+        *,
+        key: str,
+        text_col: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """用已拟合词表变换；未见词不计新列，缺失文档为全零向量。"""
+        if key not in self._fitted_transformers:
+            raise KeyError(f"text vectorizer not fitted: {key}")
+        spec = self._fitted_transformers[key]
+        if spec.get("kind") != "text_vectorizer":
+            raise TypeError(f"key {key!r} is not a text vectorizer")
+        col = text_col or spec["text_col"]
+        if col not in df.columns:
+            raise KeyError(f"text_col not found: {col}")
+        vectorizer = spec["vectorizer"]
+        feature_names = list(spec["feature_names"])
+        docs = self._prepare_text_documents(df[col])
+        matrix = vectorizer.transform(docs)
+        feat_df = pd.DataFrame(
+            matrix.toarray(),
+            columns=feature_names,
+            index=df.index,
+        )
+        return pd.concat([df.copy(), feat_df], axis=1)
+
     def extract_text_features(self,
                               df: pd.DataFrame,
                               text_col: str,
                               method: str = 'basic',
-                              max_features: int = 100) -> pd.DataFrame:
+                              max_features: int = 100,
+                              *,
+                              key: Optional[str] = None,
+                              refit: bool = True) -> pd.DataFrame:
         """
         从文本列提取特征
         
@@ -129,73 +214,34 @@ class AdvancedFeatureEngineer:
         - 'basic': 基础统计特征（长度、词数、字符数等）
         - 'tfidf': TF-IDF特征（需要sklearn）
         - 'count': 词频特征（需要sklearn）
-        
-        参数:
-            df: 输入数据框
-            text_col: 文本列名
-            method: 提取方法
-            max_features: TF-IDF/Count的最大特征数（仅用于tfidf和count方法）
-            
-        返回:
-            添加了文本特征的数据框
-            
-        示例:
-            engineer = AdvancedFeatureEngineer()
-            df = engineer.extract_text_features(df, 'text_col', method='basic')
+
+        对 count/tfidf：默认在当前数据上拟合并缓存词表；预测阶段请
+        ``fit_text_vectorizer`` + ``transform_text_features``，或 ``refit=False`` 复用 ``key``。
         """
         df_result = df.copy()
         
         if method == 'basic':
-            # 基础统计特征
-            text_series = df_result[text_col].astype(str)
+            # 基础统计：缺失当空串，避免把 None 显示成长度 4 的 "None"
+            docs = self._prepare_text_documents(df_result[text_col])
+            text_series = pd.Series(docs, index=df_result.index)
             
-            # 文本长度
             df_result[f'{text_col}_length'] = text_series.str.len()
-            
-            # 词数（按空格分割）
             df_result[f'{text_col}_word_count'] = text_series.str.split().str.len()
-            
-            # 字符数（不含空格）
-            df_result[f'{text_col}_char_count'] = text_series.str.replace(' ', '').str.len()
-            
-            # 大写字母数
+            df_result[f'{text_col}_char_count'] = text_series.str.replace(' ', '', regex=False).str.len()
             df_result[f'{text_col}_upper_count'] = text_series.str.findall(r'[A-Z]').str.len()
-            
-            # 数字数
             df_result[f'{text_col}_digit_count'] = text_series.str.findall(r'\d').str.len()
-            
-            # 特殊字符数
             df_result[f'{text_col}_special_count'] = text_series.str.findall(r'[^A-Za-z0-9\s]').str.len()
             
             logger.info(f"从 {text_col} 提取了基础文本特征")
             
         elif method in ['tfidf', 'count']:
             try:
-                from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-                
-                text_series = df_result[text_col].astype(str).fillna('')
-                
-                if method == 'tfidf':
-                    vectorizer = TfidfVectorizer(max_features=max_features, ngram_range=(1, 2))
-                    features = vectorizer.fit_transform(text_series)
-                    feature_names = [f'{text_col}_tfidf_{i}' for i in range(features.shape[1])]
-                else:  # count
-                    vectorizer = CountVectorizer(max_features=max_features, ngram_range=(1, 2))
-                    features = vectorizer.fit_transform(text_series)
-                    feature_names = [f'{text_col}_count_{i}' for i in range(features.shape[1])]
-                
-                # 转换为DataFrame
-                text_features_df = pd.DataFrame(
-                    features.toarray(),
-                    columns=feature_names,
-                    index=df_result.index
-                )
-                
-                # 合并到原数据框
-                df_result = pd.concat([df_result, text_features_df], axis=1)
-                
-                logger.info(f"从 {text_col} 提取了 {len(feature_names)} 个 {method.upper()} 特征")
-                
+                store_key = key or f"{text_col}_{method}"
+                if refit or store_key not in self._fitted_transformers:
+                    self.fit_text_vectorizer(
+                        df_result, text_col, method=method, max_features=max_features, key=store_key
+                    )
+                return self.transform_text_features(df_result, key=store_key, text_col=text_col)
             except ImportError:
                 logger.warning("sklearn未安装，无法使用TF-IDF/Count方法，改用基础方法")
                 return self.extract_text_features(df, text_col, method='basic')

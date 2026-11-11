@@ -99,6 +99,45 @@ class SubmissionGenerator:
             return predictions
         raise TypeError(f"不支持的预测结果类型: {type(predictions)}")
 
+    @classmethod
+    def _peek_columns(cls, path: str) -> List[str]:
+        return list(pd.read_csv(path, nrows=0).columns)
+
+    @classmethod
+    def read_submission_csv(
+        cls,
+        path: str,
+        *,
+        id_column: Optional[str] = None,
+        target_column: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """读取提交/模板 CSV，ID 列强制按原始文本保留（含前导零）。"""
+        cols = cls._peek_columns(path)
+        probe = pd.DataFrame(columns=cols)
+        resolved_id, _ = cls._resolve_id_and_target_columns(
+            probe, id_column=id_column, target_column=target_column
+        )
+        df = pd.read_csv(path, dtype={resolved_id: str})
+        df[resolved_id] = df[resolved_id].astype(str)
+        return df
+
+    @staticmethod
+    def _validate_probability_matrix(arr_2d: np.ndarray) -> None:
+        """argmax 前校验：有限、落在 [0,1]、每行和约为 1。"""
+        if arr_2d.ndim != 2 or arr_2d.shape[1] < 2:
+            raise ValueError("probability matrix must be 2-d with at least 2 columns")
+        if not np.isfinite(arr_2d).all():
+            raise ValueError("probabilities must be finite (no NaN/Inf)")
+        if np.any(arr_2d < 0.0) or np.any(arr_2d > 1.0):
+            raise ValueError("probabilities must be in [0, 1]")
+        row_sums = arr_2d.sum(axis=1)
+        if not np.allclose(row_sums, 1.0, atol=1e-3):
+            bad = int((~np.isclose(row_sums, 1.0, atol=1e-3)).sum())
+            raise ValueError(
+                f"multiclass probability rows must sum to 1 (±1e-3); "
+                f"{bad}/{len(row_sums)} row(s) invalid"
+            )
+
     def create_submission(
         self,
         predictions: Union[np.ndarray, pd.Series, List, pd.DataFrame],
@@ -132,14 +171,16 @@ class SubmissionGenerator:
             需要标签时请使用 prediction_type='label'，或提供 class_labels。
         """
         try:
-            sample_submission = pd.read_csv(sample_submission_path)
+            sample_submission = self.read_submission_csv(
+                sample_submission_path, id_column=id_column, target_column=target_column
+            )
             logger.info(f"读取样本提交文件: {sample_submission_path}")
             logger.info(f"样本文件列名: {sample_submission.columns.tolist()}")
 
             resolved_id, resolved_targets = self._resolve_id_and_target_columns(
                 sample_submission, id_column=id_column, target_column=target_column
             )
-            submission_ids = sample_submission[resolved_id].values
+            submission_ids = sample_submission[resolved_id].astype(str).to_numpy()
             n = len(submission_ids)
 
             arr = self._to_prediction_array(predictions)
@@ -184,6 +225,8 @@ class SubmissionGenerator:
                 # 若模板只有 1 个目标列，必须显式用 class_labels（或用户先 argmax）
                 if arr_2d.shape[1] < 2:
                     raise ValueError("prediction_type='proba' 需要至少 2 列概率")
+                proba = np.asarray(arr_2d, dtype=float)
+                self._validate_probability_matrix(proba)
                 if len(resolved_targets) == 1:
                     if class_labels is None:
                         raise ValueError(
@@ -191,18 +234,18 @@ class SubmissionGenerator:
                             "请先自行转换为标签，或传入 class_labels 以安全映射 argmax 结果；"
                             "禁止静默 argmax。"
                         )
-                    if len(class_labels) != arr_2d.shape[1]:
+                    if len(class_labels) != proba.shape[1]:
                         raise ValueError(
-                            f"class_labels 长度 ({len(class_labels)}) 与概率列数 ({arr_2d.shape[1]}) 不一致"
+                            f"class_labels 长度 ({len(class_labels)}) 与概率列数 ({proba.shape[1]}) 不一致"
                         )
-                    idx = np.argmax(arr_2d, axis=1)
+                    idx = np.argmax(proba, axis=1)
                     submission_df[resolved_targets[0]] = [class_labels[i] for i in idx]
-                elif len(resolved_targets) == arr_2d.shape[1]:
+                elif len(resolved_targets) == proba.shape[1]:
                     for i, col in enumerate(resolved_targets):
-                        submission_df[col] = arr_2d[:, i]
+                        submission_df[col] = proba[:, i]
                 else:
                     raise ValueError(
-                        f"概率列数 ({arr_2d.shape[1]}) 与模板目标列数 ({len(resolved_targets)}) 不一致: "
+                        f"概率列数 ({proba.shape[1]}) 与模板目标列数 ({len(resolved_targets)}) 不一致: "
                         f"{resolved_targets}"
                     )
 
@@ -220,7 +263,8 @@ class SubmissionGenerator:
                     f"可选: auto/label/proba/multioutput"
                 )
 
-            # 按样本模板列顺序重排
+            # 按样本模板列顺序重排；ID 保持文本（前导零）
+            submission_df[resolved_id] = submission_df[resolved_id].astype(str)
             submission_df = submission_df[sample_submission.columns.tolist()]
             submission_df.to_csv(output_path, index=False)
             logger.info(f"提交文件已生成: {output_path}，形状={submission_df.shape}")
@@ -274,51 +318,30 @@ class SubmissionGenerator:
             if len(submission_files) < 2:
                 raise ValueError("至少需要2个提交文件才能进行融合")
             
-            # 读取所有提交文件
+            # 读取所有提交文件（ID 按文本保留）
             submissions = []
             for file_path in submission_files:
                 if not os.path.exists(file_path):
                     raise FileNotFoundError(f"未找到提交文件: {file_path}")
-                df = pd.read_csv(file_path)
+                df = self.read_submission_csv(file_path)
                 submissions.append(df)
                 logger.info(f"读取提交文件: {file_path}, 形状: {df.shape}")
-            
-            # 检查所有文件是否有相同的列
+
             first_cols = set(submissions[0].columns)
             for i, df in enumerate(submissions[1:], 1):
                 if set(df.columns) != first_cols:
                     raise ValueError(f"提交文件 {submission_files[i]} 的列与第一个文件不匹配")
-            
-            # 确定ID列和目标列
-            id_column = None
-            target_column = None
-            
-            # 尝试识别ID列（通常是第一列或名为'id'/'Id'/'ID'的列）
-            possible_id_cols = ['id', 'Id', 'ID', 'index', 'Index']
-            for col in possible_id_cols:
-                if col in submissions[0].columns:
-                    id_column = col
-                    break
-            
-            if id_column is None:
-                # 使用第一列作为ID列
-                id_column = submissions[0].columns[0]
-            
-            # 目标列是除了ID列之外的其他列
-            target_columns = [col for col in submissions[0].columns if col != id_column]
-            
+
+            id_column, target_columns = self._resolve_id_and_target_columns(submissions[0])
             if len(target_columns) == 0:
                 raise ValueError("未找到目标列")
-            
-            # 获取ID
-            ids = submissions[0][id_column].values
-            
-            # 检查所有文件的ID是否一致
+
+            ids = submissions[0][id_column].astype(str).to_numpy()
             for i, df in enumerate(submissions[1:], 1):
-                if not np.array_equal(df[id_column].values, ids):
+                other_ids = df[id_column].astype(str).to_numpy()
+                if not np.array_equal(other_ids, ids):
                     raise ValueError(f"提交文件 {submission_files[i]} 的ID与第一个文件不匹配")
-            
-            # 融合预测结果
+
             ensemble_df = pd.DataFrame({id_column: ids})
             
             for target_col in target_columns:
@@ -378,18 +401,18 @@ class SubmissionGenerator:
                         f"ensemble predictions for {target_col!r} contain non-finite values; refuse to write"
                     )
                 ensemble_df[target_col] = ensemble_pred
-            
-            # 校验通过后再落盘，避免失败时留下空/损坏提交
+
+            ensemble_df[id_column] = ensemble_df[id_column].astype(str)
             ensemble_df.to_csv(output_path, index=False)
             logger.info(f"融合提交文件已生成: {output_path}")
             logger.info(f"融合了 {len(submissions)} 个提交文件")
-            
+
             return ensemble_df
-            
+
         except Exception as e:
             logger.error(f"融合提交文件时出错: {str(e)}")
             raise
-    
+
     def validate_submission(
         self,
         submission_path: str,
@@ -399,7 +422,7 @@ class SubmissionGenerator:
         target_column: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        验证提交文件格式是否正确（与 create_submission 共用列解析规则）。
+        验证提交文件格式是否正确（与 create_submission 共用列解析与 ID 文本规则）。
 
         数值列使用数值统计；字符串/类别标签使用类别统计，避免对标签做 min/mean 误判。
         """
@@ -411,8 +434,12 @@ class SubmissionGenerator:
         }
 
         try:
-            submission = pd.read_csv(submission_path)
-            sample = pd.read_csv(sample_submission_path)
+            sample = self.read_submission_csv(
+                sample_submission_path, id_column=id_column, target_column=target_column
+            )
+            submission = self.read_submission_csv(
+                submission_path, id_column=id_column, target_column=target_column
+            )
 
             result['info']['submission_shape'] = submission.shape
             result['info']['sample_shape'] = sample.shape
@@ -423,7 +450,6 @@ class SubmissionGenerator:
             expected_cols = sample.columns.tolist()
 
             if list(submission.columns) != expected_cols:
-                # 允许列集合相同但顺序不同时给出明确错误（要求顺序一致）
                 if set(submission.columns) != set(expected_cols):
                     result['is_valid'] = False
                     result['errors'].append(
@@ -445,7 +471,9 @@ class SubmissionGenerator:
                 result['is_valid'] = False
                 result['errors'].append(f"未找到 ID 列: {resolved_id}")
             elif len(submission) == len(sample):
-                if not submission[resolved_id].astype(str).equals(sample[resolved_id].astype(str)):
+                sub_ids = submission[resolved_id].astype(str)
+                sample_ids = sample[resolved_id].astype(str)
+                if not sub_ids.equals(sample_ids):
                     result['is_valid'] = False
                     result['errors'].append("ID 列内容不匹配")
 
