@@ -132,7 +132,10 @@ class QuickBaseline:
                             'model': model,
                             'test_accuracy': score,
                             'test_f1': f1,
-                            'predictions': y_pred
+                            'predictions': y_pred,
+                            'metric': 'accuracy',
+                            'higher_is_better': True,
+                            'task_type': task_type,
                         }
                     else:
                         mse = mean_squared_error(y_test, y_pred)
@@ -141,19 +144,26 @@ class QuickBaseline:
                             'model': model,
                             'test_mse': mse,
                             'test_r2': r2,
-                            'predictions': y_pred
+                            'predictions': y_pred,
+                            'metric': 'mse',
+                            'higher_is_better': False,
+                            'task_type': task_type,
                         }
                 else:
                     # 使用交叉验证
                     cv_scores = cross_val_score(model, X_train, y_train, cv=cv, scoring=scoring, n_jobs=-1)
                     if task_type == 'regression':
-                        cv_scores = -cv_scores  # neg_mean_squared_error需要取负
-                    
+                        # 展示用正 MSE；排序方向由 higher_is_better=False 决定
+                        cv_scores = -cv_scores
+
                     results[model_name] = {
                         'model': model,
-                        'cv_mean': cv_scores.mean(),
-                        'cv_std': cv_scores.std(),
-                        'cv_scores': cv_scores
+                        'cv_mean': float(cv_scores.mean()),
+                        'cv_std': float(cv_scores.std()),
+                        'cv_scores': cv_scores,
+                        'metric': 'mse' if task_type == 'regression' else 'accuracy',
+                        'higher_is_better': task_type != 'regression',
+                        'task_type': task_type,
                     }
                 
                 logger.info(f"{model_name} 完成")
@@ -193,20 +203,49 @@ class QuickBaseline:
             comparison.append(row)
         
         df = pd.DataFrame(comparison)
-        
-        # 排序
-        if 'Test Accuracy' in df.columns:
-            df = df.sort_values('Test Accuracy', ascending=False)
-        elif 'Test R2' in df.columns:
-            df = df.sort_values('Test R2', ascending=False)
-        elif 'CV Mean' in df.columns:
-            df = df.sort_values('CV Mean', ascending=False)
-        
-        # 显示前N个
-        print("\n" + "="*60)
+
+        # 按结果元数据决定排序方向（回归 MSE 升序，分类准确率降序）
+        higher_flags = [
+            bool(result.get("higher_is_better", True))
+            for result in results.values()
+            if any(k in result for k in ("test_accuracy", "test_mse", "cv_mean"))
+        ]
+        higher_is_better = True if not higher_flags else all(higher_flags)
+        metrics = sorted(
+            {
+                str(result.get("metric"))
+                for result in results.values()
+                if result.get("metric") is not None
+            }
+        )
+
+        if "Test Accuracy" in df.columns:
+            sort_col, ascending = "Test Accuracy", False
+        elif "Test MSE" in df.columns and not higher_is_better:
+            # 回归持有测试集时优先按 MSE 升序（更差的误差不应排第一）
+            sort_col, ascending = "Test MSE", True
+        elif "Test R2" in df.columns:
+            sort_col, ascending = "Test R2", False
+        elif "CV Mean" in df.columns:
+            sort_col, ascending = "CV Mean", (not higher_is_better)
+        else:
+            sort_col, ascending = None, False
+
+        if sort_col is not None:
+            df = df.sort_values(sort_col, ascending=ascending).reset_index(drop=True)
+
+        df.attrs["sort_column"] = sort_col
+        df.attrs["sort_ascending"] = ascending
+        df.attrs["higher_is_better"] = higher_is_better
+        df.attrs["metrics"] = metrics
+
+        print("\n" + "=" * 60)
         print("模型性能对比")
-        print("="*60)
+        if sort_col is not None:
+            direction = "升序(越小越好)" if ascending else "降序(越大越好)"
+            print(f"排序: {sort_col} {direction}; metrics={metrics}")
+        print("=" * 60)
         print(df.head(top_n).to_string(index=False))
-        print("="*60 + "\n")
-        
+        print("=" * 60 + "\n")
+
         return df

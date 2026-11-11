@@ -79,30 +79,49 @@ class HyperparameterOptimizer:
                 # 创建模型
                 model = model_class(**params)
                 
-                # 交叉验证
+                # 交叉验证：Optuna 始终 maximize「越大越好」的分数
+                # 回归保留 neg_mean_squared_error，禁止取反成正 MSE 再 maximize
                 if y.dtype == 'object' or y.dtype.name == 'category' or len(y.unique()) < 20:
                     scoring = 'accuracy'
                 else:
                     scoring = 'neg_mean_squared_error'
-                
+
                 scores = cross_val_score(model, X, y, cv=cv, scoring=scoring, n_jobs=-1)
-                
-                if scoring == 'neg_mean_squared_error':
-                    return -scores.mean()
-                return scores.mean()
-            
+                return float(scores.mean())
+
+            is_clf = y.dtype == 'object' or y.dtype.name == 'category' or len(y.unique()) < 20
+            scoring = 'accuracy' if is_clf else 'neg_mean_squared_error'
+
             study = optuna.create_study(direction='maximize')
             study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
-            
+
+            # 展示：回归换算回正 MSE；优化目标仍是 neg_mse
+            best_objective = float(study.best_value)
+            if scoring == 'neg_mean_squared_error':
+                display_score = float(-best_objective)
+                metric = 'mse'
+                higher_is_better = False
+            else:
+                display_score = best_objective
+                metric = 'accuracy'
+                higher_is_better = True
+
             result = {
                 'best_params': study.best_params,
-                'best_score': study.best_value,
-                'n_trials': n_trials
+                'best_score': display_score,
+                'best_objective': best_objective,
+                'scoring': scoring,
+                'metric': metric,
+                'higher_is_better': higher_is_better,
+                'n_trials': n_trials,
             }
-            
-            logger.info(f"贝叶斯优化完成，最佳分数: {result['best_score']:.4f}")
+
+            logger.info(
+                f"贝叶斯优化完成，最佳{metric}: {result['best_score']:.4f} "
+                f"(objective={best_objective:.4f})"
+            )
             logger.info(f"最佳参数: {result['best_params']}")
-            
+
             return result
             
         except ImportError:

@@ -121,42 +121,53 @@ class LeakageDetector:
         }
         
         try:
-            # 确保日期列是datetime类型
-            if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
-                df[date_col] = pd.to_datetime(df[date_col])
-            
-            # 按日期排序
-            df_sorted = df.sort_values(date_col)
-            
-            # 检查目标变量是否与未来日期相关
+            work = df.copy()
+            if not pd.api.types.is_datetime64_any_dtype(work[date_col]):
+                work[date_col] = pd.to_datetime(work[date_col])
+            df_sorted = work.sort_values(date_col)
+
+            # 目标与「未来窗口均值」的相关只说明序列自相关/时间趋势，
+            # 没有特征列时不能据此判定泄露。
             if check_future:
-                # 计算目标变量的移动平均（使用未来值）
-                future_window = 7  # 检查未来7天
-                df_sorted['target_future_mean'] = df_sorted[target_col].shift(-future_window).rolling(
-                    window=future_window
-                ).mean()
-                
-                # 计算相关性
-                corr = df_sorted[target_col].corr(df_sorted['target_future_mean'])
-                
-                if abs(corr) > 0.5:
-                    result['has_leakage'] = True
-                    result['warnings'].append(
-                        f"检测到时间泄露：目标变量与未来信息的相关性为 {corr:.4f}"
+                future_window = 7
+                future_mean = (
+                    df_sorted[target_col]
+                    .shift(-future_window)
+                    .rolling(window=future_window)
+                    .mean()
+                )
+                corr = float(df_sorted[target_col].corr(future_mean))
+                result["info"]["target_serial_corr_with_future_mean"] = corr
+                if np.isfinite(corr) and abs(corr) > 0.5:
+                    result["info"]["serial_correlation_flag"] = True
+                    result["warnings"].append(
+                        f"目标序列与未来窗口均值相关 {corr:.4f}："
+                        f"更像时间趋势/自相关，不单独构成时间泄露"
                     )
-            
-            # 检查特征中是否包含未来日期
-            for col in df.columns:
-                if col in [date_col, target_col]:
+
+            feature_cols = [c for c in df.columns if c not in {date_col, target_col}]
+            result["info"]["n_feature_cols"] = len(feature_cols)
+
+            # 泄露判定：特征名暗示未来不可用信息；或特征时间戳晚于样本日期
+            for col in feature_cols:
+                lower = col.lower()
+                if "future" in lower or "next" in lower or "tomorrow" in lower:
+                    result["has_leakage"] = True
+                    result["warnings"].append(f"特征 {col} 可能包含未来信息（命名提示）")
                     continue
-                
-                if 'future' in col.lower() or 'next' in col.lower() or 'tomorrow' in col.lower():
-                    result['has_leakage'] = True
-                    result['warnings'].append(f"特征 {col} 可能包含未来信息")
-            
-            result['info']['date_range'] = {
-                'start': str(df_sorted[date_col].min()),
-                'end': str(df_sorted[date_col].max())
+                if pd.api.types.is_datetime64_any_dtype(df_sorted[col]):
+                    # 特征日期晚于行日期 → 预测时不可用
+                    late = df_sorted[col] > df_sorted[date_col]
+                    if bool(late.any()):
+                        result["has_leakage"] = True
+                        n_late = int(late.sum())
+                        result["warnings"].append(
+                            f"特征 {col} 有 {n_late} 行时间戳晚于 {date_col}，疑似训练/验证时间边界泄露"
+                        )
+
+            result["info"]["date_range"] = {
+                "start": str(df_sorted[date_col].min()),
+                "end": str(df_sorted[date_col].max()),
             }
             
             if result['has_leakage']:

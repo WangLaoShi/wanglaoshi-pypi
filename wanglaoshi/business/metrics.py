@@ -17,6 +17,9 @@ import pandas as pd
 from .contracts import StageResult
 
 
+# 注册器与计算器共用；非法 agg 须在校验阶段拦截
+SUPPORTED_AGGS = frozenset({"sum", "count", "mean"})
+
 DEFAULT_METRIC_DICT: Dict[str, Dict[str, Any]] = {
     "gmv": {
         "formula": "sum(amount)",
@@ -66,6 +69,8 @@ def build_metric_dict(
 
 
 def _agg_value(df: pd.DataFrame, col: str, how: str) -> float:
+    if how not in SUPPORTED_AGGS:
+        raise ValueError(f"unsupported agg: {how}; supported={sorted(SUPPORTED_AGGS)}")
     if col not in df.columns:
         return float("nan")
     s = df[col]
