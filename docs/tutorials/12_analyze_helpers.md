@@ -4,7 +4,7 @@
 
 覆盖 `DataAnalyzer` 之外的公开入口：`load_data` / `analyze_*` / `DataProcessor` / `Visualizer` / `ReportGenerator`。
 
-## 用到的门面 API
+## 本节公开接口
 
 `load_data` · `analyze_data` · `analyze_multiple_files` · `analyze_notebook` · `DataProcessor` · `Visualizer` · `ReportGenerator`
 

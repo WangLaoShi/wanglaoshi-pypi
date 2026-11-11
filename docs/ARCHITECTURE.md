@@ -1,7 +1,7 @@
 # wanglaoshi 架构与迁移
 
-**更新日期：** 2026-11-10 · **当前版本：1.15.1**  
-**原则：** 公开写法以门面为准；根上旧路径仅作过渡 shim，**不再作为文档 / 示例 / 教材推荐**。
+**更新日期：** 2026-11-11 · **当前版本：1.15.1**  
+**原则：** 公开写法以**稳定公开接口**（Facade / public API surface）为准；根上旧路径仅作过渡 shim，**不再作为文档 / 示例 / 教材推荐**。
 
 ---
 
@@ -19,7 +19,7 @@ wanglaoshi/
   _testing/     # 断言 / 分数下限 / 回归汇总 / 数据台账 / 实验上下文
 ```
 
-| 门面 | 实现位置 | 根上兼容路径 |
+| 接口模块 | 实现位置 | 根上兼容路径 |
 | --- | --- | --- |
 | `compete` | `compete/*.py` | `CompetitionTools.py`（shim） |
 | `analyze` | `analyze/core.py` | `Analyzer.py`（shim） |
@@ -47,13 +47,13 @@ from wanglaoshi.ml import DataPreprocessor, MLModel
 
 ## 2. 迁移顺序（已定）
 
-### Phase 1 — 门面 ✅
+### Phase 1 — 稳定公开接口 ✅
 
 - 新增子包，仅 re-export；写本文档；架构烟测。
 
 ### Phase 2 — 收缩公开面 ✅
 
-- `__all__` 分 `_STABLE_PUBLIC` / `_COMPAT_EXPORTS`；README/API 改门面；Plain/wqe 标 legacy。
+- `__all__` 分 `_STABLE_PUBLIC` / `_COMPAT_EXPORTS`；README/API 改公开接口；Plain/wqe 标 legacy。
 
 ### Phase 3 — soft deprecate ✅
 
@@ -69,7 +69,7 @@ from wanglaoshi.ml import DataPreprocessor, MLModel
 
 ## 3. 1.15.1 起的公开约定
 
-- `examples/`、`book/`、`docs/`、`README` **全部改为门面导入**；旧顶层捷径不再写入新示例。
+- `examples/`、`book/`、`docs/`、`README` **全部改为公开接口导入**；旧顶层捷径不再写入新示例。
 - 根 shim 暂留，便于未升级课堂环境；**新代码勿再依赖**。
 - Phase 4 之后补迁已完成：`stats/` → `analytics/stats/`；`Analyzer_Plain`/`wqe` → `analyze/{plain,wqe}.py`；`MLDL` → `ml/core.py`。
 

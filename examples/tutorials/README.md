@@ -1,4 +1,4 @@
-# 门面教程脚本
+# 公开接口教程脚本
 
 与 [`docs/tutorials/`](../../docs/tutorials/) 一一对应，供本地快速验证与 CI 烟测。
 

@@ -72,7 +72,7 @@ print("打开 iris_eda.html，检查：样本量、各类计数、是否有缺�
 
 | 资源 | 用途 |
 | --- | --- |
-| {doc}`../tutorials/01_ready_and_eda` | 门面短教程（Iris / tips） |
+| {doc}`../tutorials/01_ready_and_eda` | 公开接口短教程（Iris / tips） |
 | {doc}`../cases/01_iris` | 最小闭环 |
 | {doc}`../cases/02_titanic` | 缺失与类别 |
 | {doc}`../cases/04_breast_cancer` | 医疗表质量与缩放 |

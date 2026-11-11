@@ -4,7 +4,7 @@
 
 补齐 `assert_metrics_close`、`assert_frame_contract`、`ChartMeta`、`assert_report_ok`、`write_chart_sidecar`、`RegressionSummary`、`from_junit_xml`、`optional_data_available`、`require_data_path`。
 
-## 用到的门面 API
+## 本节公开接口
 
 上述符号。
 

@@ -4,7 +4,7 @@
 
 补齐 `AnomalyDetector`、`RankingMetrics`、`SurvivalAnalyzer`。
 
-## 用到的门面 API
+## 本节公开接口
 
 上述三类及 `fit_predict_summary` / `ndcg_at_k` / `hit_rate_at_k` / `dcg_at_k` / `km` / `km_by_group`
 

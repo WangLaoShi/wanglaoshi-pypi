@@ -10,7 +10,7 @@
 教材源：`book/`（`python scripts/build_book.py`）。  
 批量证据：`docs/evidence/ADVANCED_EVIDENCE.md`（最近 **22/22 passed**）。
 
-> 导入说明：本目录 Notebook 使用门面写法（`wanglaoshi.runtime` / `analyze` / `compete as CT` / `features as FE`）。上手短教程见 [`docs/tutorials/`](../../docs/tutorials/)。
+> 导入说明：本目录 Notebook 使用公开接口写法（`wanglaoshi.runtime` / `analyze` / `compete as CT` / `features as FE`）。上手短教程见 [`docs/tutorials/`](../../docs/tutorials/)。
 
 ## 学习顺序
 

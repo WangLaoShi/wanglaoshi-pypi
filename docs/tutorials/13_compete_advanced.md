@@ -4,7 +4,7 @@
 
 覆盖 `ModelEnsemble`、`FeatureImportanceAnalyzer`、`ExperimentTracker`、`HyperparameterOptimizer`。
 
-## 用到的门面 API
+## 本节公开接口
 
 上述四个类及其方法：`voting` / `stacking` / `blending` · `calculate_importance` · `log_experiment` / `get_experiment_history` / `compare_experiments` · `bayesian_optimize` / `auto_tune`
 

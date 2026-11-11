@@ -4,9 +4,9 @@
 
 15 分钟内：对比概率校准（ECE / Brier），并按合成敏感属性做分组 TPR/FPR 审计。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `CalibrationReport` | `analytics` | Brier / ECE / 对比表 |
 | `expected_calibration_error` | `analytics` | 单模型 ECE |

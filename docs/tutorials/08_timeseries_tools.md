@@ -4,9 +4,9 @@
 
 10 分钟内：用 `TimeSeriesTools` 做安全滞后、滚动均值、ADF 与季节分解摘要。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `TimeSeriesTools` | `analytics` | lag / rolling / ADF / 分解 |
 | `ready` | `runtime` | 环境就绪 |

@@ -1,24 +1,25 @@
 # 中文术语表
 
 进阶课号一律 **E01–E22**（勿与配套勾选 EM01–EM05 混淆）。  
-包版本以 **1.15.1+** 为准：公开写法走**架构门面**，根上旧模块名为过渡 shim。
+包版本以 **1.15.1+** 为准：公开写法走**稳定公开接口**，根上旧模块名为过渡 shim。
 
 按主题分组；与 [API 参考](api.md)、[分析覆盖矩阵](analysis-coverage.md)、仓库 [`docs/ARCHITECTURE.md`](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/ARCHITECTURE.md) 对照。包内符号用反引号标出。
 
-## 包架构与门面（1.15.1+）
+## 包架构与稳定公开接口（1.15.1+）
 
 | 术语 | 英文 / 符号 | 含义 |
 | --- | --- | --- |
-| 门面 | facade | 对外稳定入口子包；实现细节藏在子模块里 |
-| 竞赛门面 | `wanglaoshi.compete` | 提交、基线、泄漏、集成、CV、调参、实验追踪 |
-| 分析门面 | `wanglaoshi.analyze` | EDA / 报告（`DataAnalyzer`、`analyze_data` 等） |
-| 特征门面 | `wanglaoshi.features` | `AdvancedFeatureEngineer` |
-| 分析学门面 | `wanglaoshi.analytics` | 时序 / 统计 / 校准 / 公平 / 异常 / 排序 / 生存 |
-| ML 门面 | `wanglaoshi.ml` | 预处理与建模；`TORCH_AVAILABLE` 标识是否装了 torch |
-| 运行时门面 | `wanglaoshi.runtime` | `ready` / `VERSIONS` / `JupyterEnv` / 字体 / 下载 |
-| 测试门面 | `wanglaoshi._testing` | 断言、分数下限、数据台账、实验上下文、回归摘要 |
+| 稳定公开接口 | Facade / public API surface | 对外稳定入口子包（设计模式 Facade）；实现细节藏在子模块里 |
+| 接口模块 | facade module | 某一稳定公开接口对应的子包，如 `compete`、`analyze` |
+| 竞赛公开接口 | `wanglaoshi.compete` | 提交、基线、泄漏、集成、CV、调参、实验追踪 |
+| 分析公开接口 | `wanglaoshi.analyze` | EDA / 报告（`DataAnalyzer`、`analyze_data` 等） |
+| 特征公开接口 | `wanglaoshi.features` | `AdvancedFeatureEngineer` |
+| 分析学公开接口 | `wanglaoshi.analytics` | 时序 / 统计 / 校准 / 公平 / 异常 / 排序 / 生存 |
+| ML 公开接口 | `wanglaoshi.ml` | 预处理与建模；`TORCH_AVAILABLE` 标识是否装了 torch |
+| 运行时公开接口 | `wanglaoshi.runtime` | `ready` / `VERSIONS` / `JupyterEnv` / 字体 / 下载 |
+| 测试公开接口 | `wanglaoshi._testing` | 断言、分数下限、数据台账、实验上下文、回归摘要 |
 | 业务包 | `wanglaoshi.business` | Skill 固化流水线（接收→清洗→指标→结论→归档） |
-| shim | compatibility shim | 根上旧路径转发到门面；**新代码勿依赖** |
+| shim | compatibility shim | 根上旧路径转发到公开接口；**新代码勿依赖** |
 | legacy | soft-deprecated | 如 `Analyzer_Plain` / `wqe`；导入有警告 |
 | 静默 legacy | `WANGLAOSHI_SILENCE_LEGACY=1` | 关闭 Plain/wqe 的 DeprecationWarning |
 
@@ -235,4 +236,4 @@ from wanglaoshi._testing import assert_close
 
 ---
 
-**维护：** 新增进阶课或门面 API 变更时同步补词；签名与可运行示例以仓库 `docs/API_REFERENCE.md` 为准，架构以 `docs/ARCHITECTURE.md` 为准。
+**维护：** 新增进阶课或公开接口变更时同步补词；签名与可运行示例以仓库 `docs/API_REFERENCE.md` 为准，架构以 `docs/ARCHITECTURE.md` 为准。

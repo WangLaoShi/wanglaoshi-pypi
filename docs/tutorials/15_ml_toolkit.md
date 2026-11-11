@@ -4,7 +4,7 @@
 
 覆盖 `FeatureEngineer`、`ModelEvaluator`、`DLModel`、`NeuralNetwork`、`example_usage`。
 
-## 用到的门面 API
+## 本节公开接口
 
 上述符号 + `DataPreprocessor` / `MLModel` / `TORCH_AVAILABLE`
 

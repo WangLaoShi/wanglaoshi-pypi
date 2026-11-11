@@ -1,4 +1,4 @@
-"""ML / DL 门面（可选 torch；无 torch 时 sklearn 部分仍可用）。
+"""ML / DL 公开接口（可选 torch；无 torch 时 sklearn 部分仍可用）。
 
 ::
 

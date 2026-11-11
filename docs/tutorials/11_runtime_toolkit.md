@@ -4,7 +4,7 @@
 
 10 分钟摸清 `runtime` 其余公开入口（不只是 `ready`）。
 
-## 用到的门面 API
+## 本节公开接口
 
 `VERSIONS` · `JupyterEnv` · `JupyterFont` · `Useful` · `WebGetter`（及 `Wget`）
 

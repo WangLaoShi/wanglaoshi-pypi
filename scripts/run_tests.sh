@@ -4,7 +4,7 @@
 #   ./scripts/run_tests.sh full
 #   ./scripts/run_tests.sh coverage   # C12：产品口径覆盖率（见 .coveragerc）
 #   ./scripts/run_tests.sh summary    # C10：junit + 回归汇总 JSON
-#   ./scripts/run_tests.sh arch       # 架构门面 / shim 兼容验收
+#   ./scripts/run_tests.sh arch       # 稳定公开接口 / shim 兼容验收
 #
 # 发版请用总入口（测试 + API 说明书 + 烟测 + …）：
 #   ./scripts/release_check.sh

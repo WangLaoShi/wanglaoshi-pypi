@@ -4,9 +4,9 @@
 
 10 分钟内：用 `DataPreprocessor` 处理缺失/缩放，用 `MLModel` 训练并评估。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `DataPreprocessor` | `wanglaoshi.ml` | 缺失、类别编码、缩放 |
 | `MLModel` | `wanglaoshi.ml` | 统一接口的经典 ML 模型 |

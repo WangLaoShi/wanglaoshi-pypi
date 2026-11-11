@@ -4,9 +4,9 @@
 
 10 分钟内：用 `AdvancedFeatureEngineer` 做频率编码与目标编码，并理解「拟合范围 = 传入 DataFrame」。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `AdvancedFeatureEngineer` | `wanglaoshi.features` | 目标编码 / 频率编码等 |
 | `ready` | `runtime` | 环境就绪 |

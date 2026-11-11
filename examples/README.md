@@ -1,10 +1,10 @@
 # 示例入口
 
-新代码只教门面导入（`wanglaoshi.analyze` / `compete` / `features` / `ml` / `runtime` / `business` 等），见 [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)。
+新代码只教公开接口导入（`wanglaoshi.analyze` / `compete` / `features` / `ml` / `runtime` / `business` 等），见 [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)。
 
 | 示例 | 类型 | 说明 | 是否可离线跑 |
 | --- | --- | --- | --- |
-| [tutorials/](tutorials/) | 脚本 | **门面短教程**（对应 [docs/tutorials/](../docs/tutorials/)） | 是（sklearn / seaborn / 合成） |
+| [tutorials/](tutorials/) | 脚本 | **公开接口短教程**（对应 [docs/tutorials/](../docs/tutorials/)） | 是（sklearn / seaborn / 合成） |
 | [handbook/](handbook/) | 脚本 | **使用手册**（对应 [docs/handbook/](../docs/handbook/)） | 是（sklearn / seaborn / 合成） |
 | [analyzer_demo.py](analyzer_demo.py) | 脚本 | `DataAnalyzer` EDA 与报告 | 是（合成数据） |
 | [business_intake_demo.ipynb](business_intake_demo.ipynb) | Notebook | 业务流水线短 demo | 是（合成订单） |
@@ -13,7 +13,7 @@
 
 ## 建议学习顺序
 
-1. [docs/tutorials/](../docs/tutorials/) — 按门面 + 公开数据上手  
+1. [docs/tutorials/](../docs/tutorials/) — 按公开接口 + 公开数据上手  
 2. [docs/handbook/](../docs/handbook/) — 按类/方法深挖（带案例）  
 3. `analyzer_demo.py` — 熟悉 EDA  
 4. `advanced/01_iris.ipynb` → `02_titanic.ipynb` → `04_breast_cancer.ipynb`  

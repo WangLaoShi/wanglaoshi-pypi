@@ -4,9 +4,9 @@
 
 10 分钟内：用 `StatsToolkit` 做独立样本 t 检验，并用 `ExperimentDesign` 看样本量直觉。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `StatsToolkit` | `wanglaoshi.analytics` | t / χ² / ANOVA 等 |
 | `ExperimentDesign` | `wanglaoshi.analytics` | 比例检验与样本量 |

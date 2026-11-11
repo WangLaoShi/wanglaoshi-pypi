@@ -146,7 +146,7 @@
 | G08 | 教材完成度纳入发布检查 | ✅ `release_check.sh full` 含 build_book |
 | G09 | 详尽 API 说明书 + 自动校验 | ✅ `docs/API_REFERENCE.md` |
 | G10 | 发布步骤收成一条命令 | ✅ `scripts/release_check.sh` + `docs/RELEASE.md` |
-| G11 | 中文术语表扩到统计/时序/生存/因果；1.15.1 补门面/shim/业务治理词条 | ✅ `book/reference/glossary.md` |
+| G11 | 中文术语表扩到统计/时序/生存/因果；1.15.1 补公开接口/shim/业务治理词条 | ✅ `book/reference/glossary.md` |
 | G12 | 分析覆盖矩阵 + E01–E22（六缺口收口） | ✅ `docs/ANALYSIS_COVERAGE.md` |
 
 ---
@@ -177,10 +177,10 @@
 | 2026-11-10 | C02–C03/C05–C06/C10–C12 收口；正式点 **45/45 = 100%** |
 | 2026-11-10 | C12 加深：修复 rank_average / boxcox；CT+FE 深度测；产品覆盖约 **86%**（门槛 78） |
 | 2026-11-10 | C12 函数级 **100%**：全模块冒烟 + `check_function_coverage.py`；MLDL torch 改可选 |
-| 2026-11-10 | 架构 Phase 1：`compete/analyze/features/analytics/runtime/_testing` 门面 + `docs/ARCHITECTURE.md` |
-| 2026-11-10 | 架构 Phase 2：`__all__` 分层；README/API 改门面示例；`Analyzer_Plain`/`wqe` 标 legacy |
+| 2026-11-10 | 架构 Phase 1：`compete/analyze/features/analytics/runtime/_testing` 稳定公开接口 + `docs/ARCHITECTURE.md` |
+| 2026-11-10 | 架构 Phase 2：`__all__` 分层；README/API 改公开接口示例；`Analyzer_Plain`/`wqe` 标 legacy |
 | 2026-11-10 | 架构 Phase 3：Plain/wqe soft deprecate（可 env 关）；`CompetitionTools` 拆入 `compete/*` |
 | 2026-11-10 | 架构 Phase 4：实现迁入子包 + 根 shim；extras `[compete]`/`[business]` |
 | 2026-11-10 | 架构验收：quick 170 过；函数覆盖 313/313；`scripts/check_architecture.py` |
 | 2026-11-10 | 架构收口：`stats`→`analytics/stats`；`Analyzer_Plain`/`wqe`→`analyze/{plain,wqe}` |
-| 2026-11-10 | 架构收口：`MLDL`→`ml/core`；门面 `wanglaoshi.ml`；根 `MLDL` 为 shim |
+| 2026-11-10 | 架构收口：`MLDL`→`ml/core`；公开接口 `wanglaoshi.ml`；根 `MLDL` 为 shim |

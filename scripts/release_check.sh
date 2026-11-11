@@ -65,7 +65,7 @@ step "文档/示例烟测" python scripts/smoke_docs_examples.py
 
 # 4) 发版档：导入确认
 if [[ "$MODE" != "quick" ]]; then
-  step "门面导入烟测" python -c "
+  step "公开接口导入烟测" python -c "
 import wanglaoshi
 from wanglaoshi.runtime import ready, WebGetter
 from wanglaoshi.analyze import DataAnalyzer

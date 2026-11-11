@@ -2,9 +2,9 @@
 
 ## 目标
 
-在合成订单上调用 `business` 门面中流水线以外的主要公开函数与常量。
+在合成订单上调用 `business` 公开接口中流水线以外的主要公开函数与常量。
 
-## 用到的门面 API
+## 本节公开接口
 
 `intake_file` · `structure_dataframe` · `structure_file` · `clean_dataframe` · `run_eda_profile` · `STAT_METHOD_CATALOG` · `derive_metrics` · `add_value_tiers` · `build_analysis_plan` · `calculate_metrics` · `DEFAULT_METRIC_DICT` · `run_multidimensional_analysis` · `archive_charts` · `generate_insights` · `archive_delivery` · `check_join_inflation` · `reconcile_to_source` · `complete_period_index` · `yoy_with_rules` · `yoy_stage` · `convert_units` · `DEFAULT_FACTORS` · `validate_metric_dict` · `default_metric_registry` · `StageResult` · `RunRecord`
 

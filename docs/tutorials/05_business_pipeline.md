@@ -4,9 +4,9 @@
 
 15 分钟内：用合成订单 CSV 跑通 `BusinessPipeline`，看到各阶段状态与交付归档。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `BusinessPipeline` | `wanglaoshi.business` | D01–D12 总控 |
 | `StageResult` / `RunRecord` | `business` | 阶段状态与整次运行记录 |

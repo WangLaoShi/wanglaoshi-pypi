@@ -56,7 +56,7 @@ DOC_COPIES = {
     "ANALYSIS_COVERAGE.md": "analysis-coverage.md",
 }
 
-# 门面教程：docs/tutorials → book/tutorials
+# 公开接口教程：docs/tutorials → book/tutorials
 TUTORIAL_COPIES = [
     "README.md",
     "01_ready_and_eda.md",

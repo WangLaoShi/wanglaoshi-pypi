@@ -13,5 +13,5 @@ PYTHONPATH=. python scripts/smoke_docs_examples.py
 | `02_feature_engineer.py` | AdvancedFeatureEngineer |
 | `03_compete_toolkit.py` | compete 工具箱 |
 | `04_analytics_toolkit.py` | analytics 工具箱 |
-| `05_ml_guide.py` | ml 门面 |
+| `05_ml_guide.py` | ml 公开接口 |
 | `06_business_guide.py` | business 业务分析 |

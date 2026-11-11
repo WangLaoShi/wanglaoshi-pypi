@@ -30,7 +30,7 @@ import wanglaoshi
 print(sorted(wanglaoshi.__all__))
 ```
 
-推荐导入（门面优先，详见 [ARCHITECTURE.md](ARCHITECTURE.md)）：
+推荐导入（公开接口优先，详见 [ARCHITECTURE.md](ARCHITECTURE.md)）：
 
 | 写法 | 用途 |
 | --- | --- |
@@ -814,7 +814,7 @@ _ = MLModel("logistic")
 
 ## 9. 与 README / 教材的关系
 
-> 进阶 Notebook（`examples/advanced/`）与 `book/` 教材仍大量使用兼容导入（`CompetitionTools as CT` 等），**有意保留**以免打断课堂旧代码；新示例与本说明书优先门面。
+> 进阶 Notebook（`examples/advanced/`）与 `book/` 教材仍大量使用兼容导入（`CompetitionTools as CT` 等），**有意保留**以免打断课堂旧代码；新示例与本说明书优先公开接口。
 
 | 文档 | 角色 |
 | --- | --- |

@@ -8,11 +8,11 @@
 
 # 公开 API（教材入口）
 
-本站教的就是包 **`wanglaoshi`**（仓库 `wanglaoshi-pypi`）。自 **1.15.1** 起只教**门面导入**。查签名请以说明书为准。
+本站教的就是包 **`wanglaoshi`**（仓库 `wanglaoshi-pypi`）。自 **1.15.1** 起只教**公开接口导入**。查签名请以说明书为准。
 
-## 门面速查
+## 公开接口速查
 
-| 门面 | 用途 | 常见入口 |
+| 接口模块 | 用途 | 常见入口 |
 | --- | --- | --- |
 | `wanglaoshi.runtime` | Notebook 就绪 / 环境 / 下载 | `ready`, `VERSIONS`, `JupyterEnv`, `WebGetter` |
 | `wanglaoshi.analyze` | EDA 与报告 | `DataAnalyzer`, `analyze_data`, `analyze_notebook` |

@@ -4,9 +4,9 @@
 
 15 分钟内：用 seaborn Titanic 跑 `QuickBaseline`，再用 `SubmissionGenerator` 写出并校验提交文件。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `ready` | `runtime` | 环境就绪 |
 | `QuickBaseline` | `compete` | 多模型快速对比 |

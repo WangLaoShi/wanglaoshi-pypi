@@ -4,9 +4,9 @@
 
 15 分钟内：用 `LeakageDetector` 抓出目标泄漏列，再用 `CrossValidator.stratified_cv` 做可信验证。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `LeakageDetector` | `compete` | 目标 / 时间 / 分布泄漏提示 |
 | `CrossValidator` | `compete` | 分层 / 分组 / 时序 CV |

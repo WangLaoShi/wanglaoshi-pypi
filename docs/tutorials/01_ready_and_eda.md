@@ -4,9 +4,9 @@
 
 10 分钟内：用 `runtime.ready` 准备环境，用 `analyze.DataAnalyzer` 对公开表做基础画像。
 
-## 用到的门面 API
+## 本节公开接口
 
-| 符号 | 门面 | 作用 |
+| 符号 | 接口模块 | 作用 |
 | --- | --- | --- |
 | `ready` | `wanglaoshi.runtime` | 关警告、打环境、设种子 |
 | `DataAnalyzer` | `wanglaoshi.analyze` | 描述统计、缺失、报告 |

@@ -6,11 +6,11 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 > **详尽签名 + 已校验可运行示例** 见 **[API_REFERENCE.md](API_REFERENCE.md)**（`python scripts/verify_api_reference.py`）。  
 > 本文件只做短盘点；有冲突以 `API_REFERENCE.md` 与源码为准。
 
-## 推荐门面（稳定公开）
+## 推荐公开接口（稳定公开）
 
 见 [`ARCHITECTURE.md`](ARCHITECTURE.md)。新代码优先：
 
-| 门面 | 示例 |
+| 接口模块 | 示例 |
 | --- | --- |
 | `wanglaoshi.compete` | `SubmissionGenerator`, `QuickBaseline` |
 | `wanglaoshi.analyze` | `DataAnalyzer`, `analyze_data` |
@@ -23,15 +23,15 @@ Skill 映射见 [SKILL_API_MAPPING.md](SKILL_API_MAPPING.md)。
 
 ## 顶层导出说明（1.15.1+）
 
-`__all__` 仍分 `_STABLE_PUBLIC` / `_COMPAT_EXPORTS`，但 **文档与示例只教门面**。  
+`__all__` 仍分 `_STABLE_PUBLIC` / `_COMPAT_EXPORTS`，但 **文档与示例只教公开接口**。  
 `_COMPAT_EXPORTS` 与根 shim 为过渡保留，**新代码请勿依赖**。
 
 | 名称 | 类型 | 依赖 | 备注 |
 | --- | --- | --- | --- |
-| `compete` / `analyze` / `features` / `analytics` / `ml` / `runtime` / `_testing` | 子包门面 | — | **稳定公开**；见 `docs/ARCHITECTURE.md` |
+| `compete` / `analyze` / `features` / `analytics` / `ml` / `runtime` / `_testing` | 子包公开接口 | — | **稳定公开**；见 `docs/ARCHITECTURE.md` |
 | `business` / `BusinessPipeline` / … | 模块/类/函数 | pandas | **稳定**；`from wanglaoshi.business import …` |
 | `ready`（捷径） | 函数 | 标准库 (+ 可选 numpy) | 等价 `runtime.ready`；示例请写 `runtime` |
-| `DataAnalyzer` / `analyze_*`（捷径） | 类/函数 | pandas/sklearn/matplotlib | 等价 `analyze`；示例请写门面 |
+| `DataAnalyzer` / `analyze_*`（捷径） | 类/函数 | pandas/sklearn/matplotlib | 等价 `analyze`；示例请写公开接口 |
 | `StatsToolkit` / `TimeSeriesTools` 等（捷径） | 类 | 视功能而定 | 等价 `analytics` |
 | `assert_close` / `DataRegistry` / …（捷径） | 函数/类 | 视功能而定 | 等价 `_testing` |
 | `Analyzer` / `CompetitionTools` / `FeatureEngineering` / `MLDL` / runtime 旧模块 | shim | — | **已放弃推荐**；仅过渡 |

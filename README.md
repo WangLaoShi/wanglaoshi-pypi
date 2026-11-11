@@ -12,7 +12,7 @@
 - **业务流水线**：`business` / `BusinessPipeline` 固化接收→清洗→指标→六视角→结论→归档（无需 AI Key）
 - **环境辅助**：`wanglaoshi.runtime`（`ready` / `VERSIONS` / `JupyterEnv` 等）
 - **可选深度学习**：`wanglaoshi.ml`（需自行安装 `torch`；未安装不影响 sklearn 部分）
-- **架构说明**：门面分层与迁移见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- **架构说明**：公开接口分层与迁移见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 适用人群：数据分析初学者、Kaggle 选手、需要可追溯业务分析模板的同学。
 
@@ -21,12 +21,12 @@
 | 入口 | 说明 |
 | --- | --- |
 | [book/](book/) | **基线工坊** 公开教材站（Notebook + 练习 + 学习路径） |
-| **[docs/tutorials/](docs/tutorials/)** | **门面教程**（公开/内置数据，10–20 分钟上手） |
+| **[docs/tutorials/](docs/tutorials/)** | **公开接口教程**（公开/内置数据，10–20 分钟上手） |
 | **[docs/handbook/](docs/handbook/)** | **使用手册**（类/方法介绍 + 可跑案例） |
 | **[docs/API_REFERENCE.md](docs/API_REFERENCE.md)** | **详尽 API 说明书**（签名 + 已校验可运行示例；与源码冲突时以它为准） |
 | **[docs/RELEASE.md](docs/RELEASE.md)** | **发布只记三句**（`./scripts/release_check.sh`） |
 | [PROJECT_STATUS.md](PROJECT_STATUS.md) | 功能点数量与完成率 |
-| [examples/README.md](examples/README.md) | 示例总览（门面教程 / Analyzer / 业务 / E01–E22） |
+| [examples/README.md](examples/README.md) | 示例总览（公开接口教程 / Analyzer / 业务 / E01–E22） |
 | [examples/advanced/README.md](examples/advanced/README.md) | 进阶 Notebook **E01–E22** 学习顺序 |
 | [docs/ANALYSIS_COVERAGE.md](docs/ANALYSIS_COVERAGE.md) | 常见分析方法覆盖矩阵与包优化缺口 |
 | [docs/README.md](docs/README.md) | 开发文档索引（API、Skill 映射、依赖、证据） |
@@ -45,20 +45,20 @@ wanglaoshi-pypi
 ├── DEVELOPMENT_ROADMAP.md
 ├── docs/                         # API / Skill / 依赖 / 跑通证据
 ├── examples/                     # 可运行示例
-│   ├── tutorials/                # 门面教程脚本（对应 docs/tutorials）
+│   ├── tutorials/                # 公开接口教程脚本（对应 docs/tutorials）
 │   ├── handbook/                 # 使用手册脚本（对应 docs/handbook）
 │   ├── analyzer_demo.py
 │   ├── business_intake_demo.ipynb
 │   └── advanced/                 # 进阶 Jupyter 案例 E01–E22
-├── docs/tutorials/               # 门面短教程（公开数据集）
+├── docs/tutorials/               # 公开接口短教程（公开数据集）
 ├── docs/handbook/                # 类与方法使用手册（带案例）
 ├── scripts/                      # 测试 / 证据 / 构建手册
 ├── tests/                        # pytest
 └── wanglaoshi/
-    ├── compete/ analyze/ features/ analytics/ runtime/ _testing/  # 门面（实现所在）
+    ├── compete/ analyze/ features/ analytics/ runtime/ _testing/  # 公开接口（实现所在）
     ├── business/                 # 业务 Skill 流水线
     ├── Analyzer.py / stats/ 等   # 旧路径 shim（1.15+ 不再推荐）
-    ├── ml/                       # ML/DL 门面（torch 可选）
+    ├── ml/                       # ML/DL 公开接口（torch 可选）
     ├── Analyzer_Plain.py / wqe.py / MLDL.py  # legacy shim
     └── __init__.py               # 详见 docs/ARCHITECTURE.md
 ```
@@ -67,7 +67,7 @@ wanglaoshi-pypi
 
 完整历史见下方「版本历史」；近期：
 
-- **1.15.1** 架构门面优先（`compete` / `analyze` / `features` / `analytics` / `ml` / `runtime`）；文档、examples、book 案例全面切换；旧顶层导入不再作为推荐写法
+- **1.15.1** 架构公开接口优先（`compete` / `analyze` / `features` / `analytics` / `ml` / `runtime`）；文档、examples、book 案例全面切换；旧顶层导入不再作为推荐写法
 - 0.14.0 业务流水线 `wanglaoshi.business`（D01–D12 主链）、进阶 12 案例与跑通证据、提交生成加固、文档与 CI 更新
 - 0.13.1 `MLDL`/torch 改为可选导入，避免未装 torch 时整包失败
 - 0.13.0 FeatureEngineering + CompetitionTools 增强
@@ -186,7 +186,7 @@ gen.create_submission(pred, 'sample_submission.csv', 'submission.csv', predictio
 print(gen.validate_submission('submission.csv', 'sample_submission.csv'))
 ```
 
-> 课堂旧写法 `from wanglaoshi import compete as CT` 仍然可用；新代码优先门面导入。
+> 课堂旧写法 `from wanglaoshi import compete as CT` 仍然可用；新代码优先公开接口导入。
 
 完整竞赛流程（读 `train.csv` / 特征工程 / 提交）见下文各章节与 `examples/advanced/`。
 
@@ -1227,9 +1227,9 @@ selected_features = engineer.select_features_by_mutual_info(
 
 这一节汇总了常用的对外 API，方便你快速找到「应该从哪里导入什么」。
 
-### 门面导入（推荐）
+### 公开接口导入（推荐）
 
-新代码优先走子包门面（详见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)）：
+新代码优先走子包公开接口（详见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)）：
 
 | 类型         | 说明                         | 导入方式 / 示例 |
 |--------------|------------------------------|-----------------|
@@ -1247,16 +1247,16 @@ selected_features = engineer.select_features_by_mutual_info(
 
 | 模块名              | 主要内容 / 用途                                             | 常见入口 / 示例 |
 |---------------------|--------------------------------------------------------------|-----------------|
-| `analyze`           | EDA 门面：缺失值、异常值、相关性、PCA、HTML 报告            | `from wanglaoshi.analyze import DataAnalyzer` |
-| `compete`           | 比赛门面：提交、基线、集成、调参、实验追踪                  | `from wanglaoshi.compete import QuickBaseline` |
-| `features`          | 特征工程门面                                                | `from wanglaoshi.features import AdvancedFeatureEngineer` |
+| `analyze`           | EDA 公开接口：缺失值、异常值、相关性、PCA、HTML 报告            | `from wanglaoshi.analyze import DataAnalyzer` |
+| `compete`           | 比赛公开接口：提交、基线、集成、调参、实验追踪                  | `from wanglaoshi.compete import QuickBaseline` |
+| `features`          | 特征工程公开接口                                                | `from wanglaoshi.features import AdvancedFeatureEngineer` |
 | `analytics`         | 时序 / 统计 / 校准 / 公平 / 异常 / 排序 / 生存              | `from wanglaoshi.analytics import StatsToolkit` |
 | `runtime`           | 环境 / 字体 / 下载                                          | `from wanglaoshi.runtime import ready, VERSIONS` |
 | `business`          | 业务 Skill 流水线：intake/清洗/指标/六视角/结论/交付归档   | `from wanglaoshi.business import BusinessPipeline` |
-| `ml`                | ML/DL 门面（实现 `ml.core`；torch 可选）                    | `from wanglaoshi.ml import DataPreprocessor, MLModel` |
+| `ml`                | ML/DL 公开接口（实现 `ml.core`；torch 可选）                    | `from wanglaoshi.ml import DataPreprocessor, MLModel` |
 | `Analyzer_Plain` / `wqe` | **Legacy**（导入警告；`WANGLAOSHI_SILENCE_LEGACY=1` 可关） | 请用 `wanglaoshi.analyze` |
 
-> 1.15.1 起教材与示例只教门面；根上旧模块名为过渡 shim，勿再写入新代码。
+> 1.15.1 起教材与示例只教公开接口；根上旧模块名为过渡 shim，勿再写入新代码。
 
 ## 建议的版本对照关系
 

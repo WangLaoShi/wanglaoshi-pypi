@@ -1,7 +1,7 @@
 """
 wanglaoshi 顶层导出 (API)
 
-自 1.15.1 起，公开写法以架构门面为准（见 docs/ARCHITECTURE.md）::
+自 1.15.1 起，公开写法以稳定公开接口为准（见 docs/ARCHITECTURE.md）::
 
     from wanglaoshi.runtime import ready
     from wanglaoshi.analyze import DataAnalyzer
@@ -72,7 +72,7 @@ from .score_floors import SCORE_FLOORS, assert_above_floor
 from .report_meta import ChartMeta, assert_report_ok, write_chart_sidecar
 from .regression_summary import RegressionSummary, from_junit_xml
 
-# 架构门面（实现所在；根上旧模块为过渡 shim）
+# 稳定公开接口（实现所在；根上旧模块为过渡 shim）
 from . import compete, analyze, features, analytics, runtime, ml
 from . import _testing  # noqa: F401
 
@@ -81,11 +81,11 @@ from . import _testing  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Phase 2：公开面分层
-# - _STABLE_PUBLIC：推荐对外稳定入口（门面 + 常用捷径）
-# - _COMPAT_EXPORTS：课堂/历史兼容，仍可 import，新代码请优先门面
+# - _STABLE_PUBLIC：推荐对外稳定入口（公开接口 + 常用捷径）
+# - _COMPAT_EXPORTS：课堂/历史兼容，仍可 import，新代码请优先公开接口
 # ---------------------------------------------------------------------------
 _STABLE_PUBLIC = [
-    # 架构门面
+    # 稳定公开接口
     "compete",
     "analyze",
     "features",
@@ -147,7 +147,7 @@ _STABLE_PUBLIC = [
 ]
 
 _COMPAT_EXPORTS = [
-    # 历史模块级导入（等价于门面 / 子模块）
+    # 历史模块级导入（等价于公开接口 / 子模块）
     "JupyterEnv",
     "VERSIONS",
     "Analyzer",

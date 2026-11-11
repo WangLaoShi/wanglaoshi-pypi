@@ -1,4 +1,4 @@
-"""架构门面：Phase 1 双轨兼容 + Phase 2 公开面分层。"""
+"""稳定公开接口：Phase 1 双轨兼容 + Phase 2 公开面分层。"""
 
 from __future__ import annotations
 
@@ -56,7 +56,7 @@ def test_public_surface_split_stable_vs_compat() -> None:
     compat = set(wl._COMPAT_EXPORTS)
     assert stable.isdisjoint(compat)
     assert set(wl.__all__) == stable | compat
-    # 门面必须在稳定面
+    # 公开接口必须在稳定面
     for name in ("compete", "analyze", "features", "analytics", "runtime", "ml", "_testing", "business"):
         assert name in stable
     # legacy / 兼容模块留在兼容面

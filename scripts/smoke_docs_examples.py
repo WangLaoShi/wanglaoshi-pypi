@@ -1,10 +1,10 @@
 """文档与示例可用性烟测（不依赖外部竞赛数据）。
 
 覆盖：
-- 门面导入与关键 API
+- 公开接口导入与关键 API
 - analyzer_demo 核心路径（不写完整 HTML 也可）
 - BusinessPipeline 最小 CSV 主链
-- examples/tutorials/* 门面教程脚本
+- examples/tutorials/* 公开接口教程脚本
 - examples/handbook/* 使用手册脚本
 - advanced/01_iris 进程内执行（代表进阶案例）
 

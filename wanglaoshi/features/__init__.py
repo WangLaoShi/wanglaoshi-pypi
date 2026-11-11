@@ -1,4 +1,4 @@
-"""特征工程门面。"""
+"""特征工程公开接口。"""
 
 from __future__ import annotations
 

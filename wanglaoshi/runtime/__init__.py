@@ -1,4 +1,4 @@
-"""运行时 / 环境辅助门面（Notebook 引导、版本、字体、下载）。"""
+"""运行时 / 环境辅助公开接口（Notebook 引导、版本、字体、下载）。"""
 
 from __future__ import annotations
 

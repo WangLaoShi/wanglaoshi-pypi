@@ -2,7 +2,7 @@
 """架构兼容性验收（docs/ARCHITECTURE.md §4）。
 
 检查：
-1. 门面 / 根 shim / 顶层导入均可加载，且关键符号 identity 一致
+1. 公开接口 / 根 shim / 顶层导入均可加载，且关键符号 identity 一致
 2. 可选：检测 site-packages 里是否残留旧版 wanglaoshi 目录（易抢先）
 
 用法::

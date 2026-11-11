@@ -1,6 +1,6 @@
-# 门面教程（1.15.1+）
+# 公开接口教程（1.15.1+）
 
-按 **门面公开符号** 拆开的短教程：公开/内置数据，10–20 分钟跑通调用方式。
+按各子包的 **稳定公开接口**（软件设计中的 Facade：对外统一入口，隐藏内部实现）拆开的短教程：公开/内置数据，10–20 分钟跑通调用方式。
 
 - 详尽签名：[`docs/API_REFERENCE.md`](../API_REFERENCE.md)
 - 类与方法手册：[`docs/handbook/`](../handbook/)
@@ -22,7 +22,7 @@
 
 ### 第一批（上手）
 
-| 课 | 文档 | 门面重点 |
+| 课 | 文档 | 接口模块 |
 | --- | --- | --- |
 | 01 | [01_ready_and_eda.md](01_ready_and_eda.md) | `ready` · `DataAnalyzer` |
 | 02 | [02_compete_baseline.md](02_compete_baseline.md) | `QuickBaseline` · `SubmissionGenerator` |
@@ -31,9 +31,9 @@
 | 05 | [05_business_pipeline.md](05_business_pipeline.md) | `BusinessPipeline` |
 | 06 | [06_ml_preprocess.md](06_ml_preprocess.md) | `DataPreprocessor` · `MLModel` |
 
-### 第二批（进阶门面）
+### 第二批（进阶公开接口）
 
-| 课 | 文档 | 门面重点 |
+| 课 | 文档 | 接口模块 |
 | --- | --- | --- |
 | 07 | [07_leakage_and_cv.md](07_leakage_and_cv.md) | `LeakageDetector` · `CrossValidator` |
 | 08 | [08_timeseries_tools.md](08_timeseries_tools.md) | `TimeSeriesTools` |
@@ -42,7 +42,7 @@
 
 ### 第三批（公开符号补齐）
 
-| 课 | 文档 | 门面重点 |
+| 课 | 文档 | 接口模块 |
 | --- | --- | --- |
 | 11 | [11_runtime_toolkit.md](11_runtime_toolkit.md) | `VERSIONS` · `JupyterEnv` · `JupyterFont` · `Useful` · `WebGetter` |
 | 12 | [12_analyze_helpers.md](12_analyze_helpers.md) | `load_data` · `analyze_*` · `DataProcessor` · `Visualizer` · `ReportGenerator` |
@@ -60,6 +60,6 @@ PYTHONPATH=. python scripts/smoke_docs_examples.py
 
 ## 约定
 
-- 只教门面导入
+- 只教公开接口导入
 - 优先离线可跑；Optuna / torch 为可选增强
 - 深水区仍以 E01–E22 为准
