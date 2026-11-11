@@ -58,9 +58,9 @@ def test_insights_highlight_and_anomaly_paths() -> None:
         },
     )
     types = {f["type"] for f in result.data["findings"]}
-    assert {"status", "highlight", "problem"} <= types
+    assert {"status", "observation", "problem"} <= types
     rec_ids = {r["id"] for r in result.data["recommendations"]}
-    assert "rec_focus_head" in rec_ids
+    assert "rec_review_concentration" in rec_ids
     assert "rec_investigate_anomaly" in rec_ids
 
 

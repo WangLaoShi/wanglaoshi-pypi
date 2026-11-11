@@ -126,11 +126,18 @@ def test_c09_missing_target_blocks_pipeline(tmp_path: Path) -> None:
 def test_c09_privacy_redact(tmp_path: Path) -> None:
     record = RunRecord(run_id="priv1", config={"customer_phone": "13800000001", "ok": 1})
     record.add_stage(StageResult(stage_id="D01_intake", status="passed", data={"x": 1}))
-    out = archive_delivery(record, tmp_path / "delivery", redact_fields=["customer_phone"])
-    assert out.status == "passed"
+    # 脱敏能力用 diagnostic 模式验证；正式交付另测阶段门槛
+    out = archive_delivery(
+        record,
+        tmp_path / "delivery",
+        redact_fields=["customer_phone"],
+        mode="diagnostic",
+    )
+    assert out.status in {"passed", "warning"}
     blob = "\n".join(Path(p).read_text(encoding="utf-8") for p in out.output_paths)
     assert "13800000001" not in blob
     assert "***REDACTED***" in blob
+    assert out.data["delivery_index"]["deliverable"] is False
     # 内存中的原始 record 仍可保留明文（脱敏只作用于交付物）
     assert record.config["customer_phone"] == "13800000001"
 

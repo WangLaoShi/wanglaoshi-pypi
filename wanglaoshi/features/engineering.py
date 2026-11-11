@@ -214,11 +214,13 @@ class AdvancedFeatureEngineer:
                      smoothing: float = 1.0,
                      min_samples_leaf: int = 1) -> pd.DataFrame:
         """
-        目标编码（Target Encoding）
-        
-        目标编码是一种强大的类别编码方法，用目标变量的统计量（通常是均值）来编码类别。
-        为了避免过拟合，通常需要平滑处理。
-        
+        目标编码（Target Encoding）——仅适合「同一张带标签表」的演示/探索。
+
+        限制（重要）：
+        - 在传入的 df 上直接用目标列统计并写回，**不能**安全用于无标签测试集
+        - 训练集自身编码含标签信息；生产请用 ``fit_target_encoder`` + ``transform_target_encoder``，
+          并在交叉验证折内分别 fit
+
         参数:
             df: 输入数据框
             categorical_col: 要编码的类别列名
@@ -228,10 +230,6 @@ class AdvancedFeatureEngineer:
             
         返回:
             添加了目标编码特征的数据框
-            
-        示例:
-            engineer = AdvancedFeatureEngineer()
-            df = engineer.target_encode(df, 'category_col', 'target', smoothing=1.0)
         """
         df_result = df.copy()
         
@@ -263,6 +261,47 @@ class AdvancedFeatureEngineer:
         logger.info(f"对 {categorical_col} 进行了目标编码")
         
         return df_result
+
+    def fit_target_encoder(
+        self,
+        df: pd.DataFrame,
+        categorical_col: str,
+        target_col: str,
+        *,
+        smoothing: float = 1.0,
+        min_samples_leaf: int = 1,
+    ) -> Dict[str, Any]:
+        """仅在训练集上拟合目标编码映射，供 transform 复用。
+
+        返回字典含 ``mapping`` / ``global_mean`` / ``col_name``。
+        注意：本方法不做折外编码；K-fold 场景请在折内分别 fit。
+        """
+        global_mean = float(df[target_col].mean())
+        category_stats = df.groupby(categorical_col)[target_col].agg(["mean", "count"])
+        encoded = (
+            category_stats["count"] * category_stats["mean"] + smoothing * global_mean
+        ) / (category_stats["count"] + smoothing)
+        encoded = encoded.copy()
+        encoded.loc[category_stats["count"] < min_samples_leaf] = global_mean
+        return {
+            "mapping": encoded.to_dict(),
+            "global_mean": global_mean,
+            "col_name": f"{categorical_col}_target_encoded",
+            "categorical_col": categorical_col,
+        }
+
+    def transform_target_encoder(
+        self,
+        df: pd.DataFrame,
+        encoder: Dict[str, Any],
+    ) -> pd.DataFrame:
+        """用已拟合映射编码；未见类别回落到 global_mean。"""
+        out = df.copy()
+        col = encoder["categorical_col"]
+        out[encoder["col_name"]] = (
+            out[col].map(encoder["mapping"]).fillna(encoder["global_mean"])
+        )
+        return out
     
     def frequency_encode(self,
                         df: pd.DataFrame,

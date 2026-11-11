@@ -119,11 +119,16 @@ def test_pipeline_missing_value_col_metrics_warn(tmp_path: Path) -> None:
         date_col="order_date",
         value_col="amount",  # 故意配错
         dim_cols=["channel"],
+        required_metrics=["gmv"],
     ).run(src, run_id="badcfg")
+    assert rec.blocked()
+    # 衍生或指标阶段应阻断；正式交付不可用
+    d10 = _stage(rec, "D10_report_archive")
+    assert d10.data["delivery_index"]["deliverable"] is False
     met = _stage(rec, "D06_metrics")
-    assert met.status in {"warning", "blocked"}
-    assert np.isnan(met.data["metrics"]["gmv"])
-    assert any("amount" in w for w in met.warnings)
+    if met.status != "skipped":
+        assert met.status == "blocked"
+        assert np.isnan(met.data["metrics"]["gmv"])
 
 
 @pytest.mark.quick

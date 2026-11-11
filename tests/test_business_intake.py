@@ -258,6 +258,13 @@ def test_insights_and_recommendations() -> None:
 def test_archive_delivery_and_block_on_upstream(tmp_path: Path) -> None:
     record = RunRecord(run_id="demo123", random_seed=42)
     record.add_stage(StageResult(stage_id="D01_intake", status="passed"))
+    record.add_stage(
+        StageResult(
+            stage_id="D06_metrics",
+            status="passed",
+            data={"metrics": {"gmv": 10.0, "orders": 1.0, "aov": 10.0}},
+        )
+    )
     insights = generate_insights(
         metrics_data={
             "metrics": {"gmv": 10.0, "orders": 1.0, "aov": 10.0},
@@ -269,6 +276,7 @@ def test_archive_delivery_and_block_on_upstream(tmp_path: Path) -> None:
         tmp_path / "delivery",
         insights_data=insights.data,
         metrics_data={"metrics": {"gmv": 10.0}},
+        mode="formal",
     )
     assert result.status == "passed"
     assert (tmp_path / "delivery" / "report.md").exists()
@@ -278,7 +286,7 @@ def test_archive_delivery_and_block_on_upstream(tmp_path: Path) -> None:
     blocked.add_stage(
         StageResult(stage_id="D01_intake", status="blocked", block_reasons=["missing file"])
     )
-    bad = archive_delivery(blocked, tmp_path / "delivery_bad")
+    bad = archive_delivery(blocked, tmp_path / "delivery_bad", mode="formal")
     assert bad.status == "blocked"
     assert bad.data["delivery_index"]["deliverable"] is False
 

@@ -44,7 +44,11 @@ def add_period_change(
     periods: int = 1,
     out_col: str = "wow",
 ) -> pd.DataFrame:
-    """按日期排序后做简单 shift 环比（单序列）；分组场景请先聚合。"""
+    """对**已按周期聚合**的序列做 shift 环比。
+
+    警告：直接对订单明细行调用会得到「相邻订单变化」，不是日/周环比。
+    流水线应先按日聚合再调用；行级变化请用 ``row_pct_change`` 命名。
+    """
     work = df.copy()
     work = work.sort_values(date_col)
     prev = work[value_col].shift(periods)
@@ -152,8 +156,22 @@ def derive_metrics(
             created.append("share")
 
     if add_wow and date_col and value_col and value_col in work.columns:
-        rules.append("D04.wow")
-        work = add_period_change(work, value_col, date_col=date_col, periods=1, out_col="wow")
+        # 先按自然日聚合，再算环比；禁止把订单行 shift 冒充 wow
+        rules.append("D04.wow_daily")
+        period = pd.to_datetime(work[date_col], errors="coerce").dt.floor("D")
+        daily = (
+            pd.DataFrame({"_period": period, value_col: pd.to_numeric(work[value_col], errors="coerce")})
+            .dropna(subset=["_period"])
+            .groupby("_period", dropna=False)[value_col]
+            .sum()
+            .sort_index()
+            .reset_index()
+        )
+        daily = add_period_change(daily, value_col, date_col="_period", periods=1, out_col="wow")
+        work = work.copy()
+        work["_period"] = period
+        work = work.merge(daily[["_period", "wow"]], on="_period", how="left")
+        work = work.drop(columns=["_period"])
         created.append("wow")
 
     if add_tiers and value_col:

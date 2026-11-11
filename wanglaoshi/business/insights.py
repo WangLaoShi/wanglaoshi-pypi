@@ -61,18 +61,18 @@ def generate_insights(
         )
         warnings.append("gmv missing; status insight downgraded")
 
-    # --- 亮点：头部贡献（二八）---
+    # --- 中性观察：头部贡献（二八）；是否亮点/风险由业务另行配置 ---
     pareto = views.get("pareto") or {}
     if pareto.get("status") == "ok" and pareto.get("head_keys"):
         eid = "view:pareto"
         evidence_ids.append(eid)
         findings.append(
             {
-                "type": "highlight",
+                "type": "observation",
                 "title": "头部贡献集中",
                 "statement": (
                     f"约 {pareto.get('head_share'):.0%} 贡献来自前 {pareto.get('n_head')} 个维度键"
-                    f"（阈值 {pareto.get('threshold')}）"
+                    f"（阈值 {pareto.get('threshold')}）；集中既可能是优势也可能是依赖风险"
                 ),
                 "evidence_ids": [eid],
                 "support": {"head_keys": pareto.get("head_keys"), "note": pareto.get("note")},
@@ -80,10 +80,10 @@ def generate_insights(
         )
         recommendations.append(
             {
-                "id": "rec_focus_head",
-                "problem_ref": "highlight:头部贡献集中",
-                "action": "优先复盘头部渠道/品类的增长动作，并设定对照实验",
-                "steps": ["锁定头部键名单", "对比头部 vs 腰尾转化", "设计可验证的运营动作"],
+                "id": "rec_review_concentration",
+                "problem_ref": "observation:头部贡献集中",
+                "action": "复核头部依赖是否可接受，并决定强化头部或分散风险",
+                "steps": ["锁定头部键名单", "对比头部 vs 腰尾转化", "按业务目标选择加码或分散"],
                 "verify_metric": "gmv_share_head",
                 "owner_role": "growth",
                 "window": "14d",

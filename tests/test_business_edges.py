@@ -174,11 +174,19 @@ def test_archive_redacts_sensitive_fields(tmp_path: Path) -> None:
             data={"customer_email": "a@b.com", "sha256": "abc"},
         )
     )
+    record.add_stage(
+        StageResult(
+            stage_id="D06_metrics",
+            status="passed",
+            data={"metrics": {"gmv": 1.0}},
+        )
+    )
     result = archive_delivery(
         record,
         tmp_path / "delivery",
         redact_fields=["phone", "customer_email"],
         metrics_data={"metrics": {"gmv": 1.0}},
+        mode="formal",
     )
     assert result.status == "passed"
     full = json.loads((tmp_path / "delivery" / "run_record.json").read_text(encoding="utf-8"))
@@ -193,10 +201,15 @@ def test_archive_redacts_sensitive_fields(tmp_path: Path) -> None:
 def test_archive_missing_required_blocks(tmp_path: Path) -> None:
     record = RunRecord(run_id="req1")
     record.add_stage(StageResult(stage_id="D01_intake", status="passed"))
+    record.add_stage(
+        StageResult(stage_id="D06_metrics", status="passed", data={"metrics": {"gmv": 1.0}})
+    )
     result = archive_delivery(
         record,
         tmp_path / "delivery",
         required=["report.md", "delivery_index.json", "extra_must_exist.txt"],
+        metrics_data={"metrics": {"gmv": 1.0}},
+        mode="formal",
     )
     assert result.status == "blocked"
     assert result.data["delivery_index"]["deliverable"] is False

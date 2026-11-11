@@ -68,10 +68,26 @@ def clean_dataframe(
                 warnings.append(f"clip skip missing column: {col}")
                 continue
             lo, hi = bounds[0], bounds[1]
-            s = pd.to_numeric(work[col], errors="coerce")
-            before_out = int(((s < lo) | (s > hi)).sum())
+            raw = work[col]
+            na_before = int(pd.isna(raw).sum())
+            s = pd.to_numeric(raw, errors="coerce")
+            na_after = int(s.isna().sum())
+            coerce_failed = max(0, na_after - na_before)
+            before_out = int(((s < lo) | (s > hi)).fillna(False).sum())
             work[col] = s.clip(lo, hi)
-            clipped[col] = {"low": lo, "high": hi, "n_clipped": before_out}
+            clipped[col] = {
+                "low": lo,
+                "high": hi,
+                "n_clipped": before_out,
+                "n_coerce_failed": int(coerce_failed),
+                "n_na_before": na_before,
+                "n_na_after": na_after,
+            }
+            if coerce_failed:
+                warnings.append(f"clip {col}: {coerce_failed} values became NaN after to_numeric")
+                sample = raw[s.isna() & raw.notna()].astype(str).head(3).tolist()
+                if sample:
+                    clipped[col]["coerce_examples"] = sample
         impacts.append({"rule": "clip_bounds", "clipped": clipped})
 
     outputs: List[str] = []

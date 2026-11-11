@@ -85,8 +85,12 @@ def calculate_metrics(
     group_cols: Optional[Sequence[str]] = None,
     share_of: Optional[str] = None,
     tol: float = 1e-6,
+    required_metrics: Optional[Sequence[str]] = None,
 ) -> StageResult:
-    """计算指标并做占比一致性校验（各组 share 之和 ≈ 1）。"""
+    """计算指标并做占比一致性校验（各组 share 之和 ≈ 1）。
+
+    ``required_metrics`` 中任一项缺失或为 NaN → ``blocked``（正式交付不可用）。
+    """
     rules = ["D06.metric_dict", "D06.workbook"]
     warnings: List[str] = []
     block_reasons: List[str] = []
@@ -154,6 +158,12 @@ def calculate_metrics(
         else:
             warnings.append("cannot build grouped workbook: value column missing")
 
+    for req in required_metrics or ():
+        val = base_metrics.get(req)
+        if val is None or (isinstance(val, float) and np.isnan(val)):
+            block_reasons.append(f"required metric {req!r} missing or NaN")
+            rules.append("D06.required_metrics")
+
     status = "blocked" if block_reasons else ("warning" if warnings else "passed")
     return StageResult(
         stage_id="D06_metrics",
@@ -164,6 +174,7 @@ def calculate_metrics(
             "workbook": workbook_rows,
             "share_check": share_check,
             "group_cols": groups,
+            "required_metrics": list(required_metrics or ()),
         },
         rules=rules,
         warnings=warnings,

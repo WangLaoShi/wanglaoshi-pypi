@@ -1,7 +1,7 @@
 """D02 data-structuring：列名标准化与基础类型规整（MVP）。
 
 常见痛点：Excel/业务导出的列名带空格、括号、中英文混杂。
-本模块会把列名尽量变成 snake_case，并支持按配置做类型转换。
+本模块会把列名尽量变成稳定标识，并支持按配置做类型转换。
 注意：单位换算、多表关联膨胀检查仍属后续增强项。
 """
 
@@ -9,19 +9,34 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional, Set
 
 import pandas as pd
 
 from .contracts import StageResult
 
+_SUPPORTED_TABULAR = {".csv", ".txt", ".tsv", ".xlsx", ".xls"}
+
 
 def _normalize_column(name: str) -> str:
+    """保留 Unicode 字母数字；空白与符号压成下划线。"""
     s = str(name).strip().lower()
-    s = re.sub(r"[\s\-]+", "_", s)
-    s = re.sub(r"[^0-9a-z_]+", "", s)
+    s = re.sub(r"[\s\-]+", "_", s, flags=re.UNICODE)
+    s = re.sub(r"[^\w]+", "_", s, flags=re.UNICODE)
     s = re.sub(r"_+", "_", s).strip("_")
     return s or "col"
+
+
+def _unique_name(base: str, used: Set[str]) -> str:
+    if base not in used:
+        used.add(base)
+        return base
+    i = 1
+    while f"{base}_{i}" in used:
+        i += 1
+    name = f"{base}_{i}"
+    used.add(name)
+    return name
 
 
 def structure_dataframe(
@@ -49,18 +64,15 @@ def structure_dataframe(
             warnings.append(f"column_map keys not found: {missing}")
         work = work.rename(columns={k: v for k, v in column_map.items() if k in work.columns})
 
-    new_cols = []
-    seen: Dict[str, int] = {}
+    used: Set[str] = set()
+    new_cols: List[str] = []
     for c in work.columns:
-        base = _normalize_column(c)
-        if base in seen:
-            seen[base] += 1
-            base = f"{base}_{seen[base]}"
-        else:
-            seen[base] = 0
-        new_cols.append(base)
-    mapping = dict(zip(original_columns, new_cols)) if not column_map else dict(zip(list(df.columns), new_cols))
+        new_cols.append(_unique_name(_normalize_column(c), used))
+    # mapping：原始输入列 → 最终列名（若有 column_map，以 rename 后的列为中间态）
+    mapping = dict(zip(original_columns, new_cols))
     work.columns = new_cols
+    if len(set(new_cols)) != len(new_cols):
+        block_reasons.append(f"duplicate columns after normalize: {new_cols}")
 
     converted: Dict[str, str] = {}
     failed: Dict[str, str] = {}
@@ -106,9 +118,24 @@ def structure_dataframe(
         block_reasons=block_reasons,
         output_paths=outputs,
     )
-    # DataFrame 挂在结果对象上，避免塞进可序列化 data
     result.frame = work  # type: ignore[attr-defined]
     return result
+
+
+def _load_tabular(path: Path) -> pd.DataFrame:
+    suffix = path.suffix.lower()
+    if suffix in {".csv", ".txt"}:
+        return pd.read_csv(path)
+    if suffix == ".tsv":
+        return pd.read_csv(path, sep="\t")
+    if suffix in {".xlsx", ".xls"}:
+        try:
+            return pd.read_excel(path)
+        except ImportError as e:
+            raise ImportError(
+                "reading Excel requires openpyxl; pip install 'wanglaoshi[business]' or openpyxl"
+            ) from e
+    raise ValueError(f"unsupported file format: {suffix or '(none)'}; supported={sorted(_SUPPORTED_TABULAR)}")
 
 
 def structure_file(
@@ -124,8 +151,27 @@ def structure_file(
             block_reasons=[f"file not found: {path}"],
             input_paths=[str(path)],
         )
-    df = pd.read_csv(path)
+    suffix = path.suffix.lower()
+    if suffix not in _SUPPORTED_TABULAR:
+        return StageResult(
+            stage_id="D02_structuring",
+            status="blocked",
+            block_reasons=[
+                f"unsupported file format: {suffix or '(none)'}; supported={sorted(_SUPPORTED_TABULAR)}"
+            ],
+            input_paths=[str(path)],
+            rules=["D02.format_gate"],
+        )
+    try:
+        df = _load_tabular(path)
+    except Exception as e:  # noqa: BLE001
+        return StageResult(
+            stage_id="D02_structuring",
+            status="blocked",
+            block_reasons=[f"failed to read {path.name}: {type(e).__name__}: {e}"],
+            input_paths=[str(path)],
+            rules=["D02.load_tabular"],
+        )
     result = structure_dataframe(df, output_path=output_path, **kwargs)
     result.input_paths = [str(path)]
-    # 去掉不可 JSON 序列化的 frame 再写 sidecar 时由调用方处理
     return result
