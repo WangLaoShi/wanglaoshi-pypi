@@ -29,7 +29,8 @@ Skill 来源与 API 映射：{doc}`../reference/skill-mapping`。
 ## 3. 最小可运行用法
 
 ```python
-from wanglaoshi.runtime import ready, BusinessPipeline
+from wanglaoshi.runtime import ready
+from wanglaoshi.business import BusinessPipeline
 
 ready()
 pipe = BusinessPipeline(
@@ -43,7 +44,6 @@ pipe = BusinessPipeline(
 record = pipe.run("orders.csv")
 print(record.summary())
 ```
-
 配置样例：`wanglaoshi/business/config_sales_example.yaml`（关键字段缺失不得静默瞎猜）。
 
 ## 4. 课堂任务设计（建议 60–90 分钟）

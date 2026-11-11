@@ -1,9 +1,10 @@
 """文档与示例可用性烟测（不依赖外部竞赛数据）。
 
 覆盖：
-- 顶层导入与 README 中声明的关键 API
+- 门面导入与关键 API
 - analyzer_demo 核心路径（不写完整 HTML 也可）
 - BusinessPipeline 最小 CSV 主链
+- examples/tutorials/* 门面教程脚本
 - advanced/01_iris 进程内执行（代表进阶案例）
 
 退出码：0 全过；1 有失败。
@@ -32,11 +33,11 @@ def _fail(name: str, err: BaseException) -> None:
 
 
 def check_imports() -> None:
-    from wanglaoshi import (
-        VERSIONS as V,
-        DataAnalyzer,
-        CompetitionTools as CT,
-        FeatureEngineering as FE,
+    from wanglaoshi.runtime import VERSIONS as V, ready
+    from wanglaoshi.analyze import DataAnalyzer
+    from wanglaoshi.compete import SubmissionGenerator, QuickBaseline
+    from wanglaoshi.features import AdvancedFeatureEngineer
+    from wanglaoshi.business import (
         BusinessPipeline,
         intake_file,
         generate_insights,
@@ -47,16 +48,18 @@ def check_imports() -> None:
 
     assert hasattr(V, "show_env_info")
     assert hasattr(V, "check_all_versions")
-    assert hasattr(CT, "SubmissionGenerator")
-    assert hasattr(CT, "QuickBaseline")
-    assert hasattr(FE, "AdvancedFeatureEngineer")
+    assert callable(ready)
+    assert callable(DataAnalyzer)
+    assert callable(SubmissionGenerator)
+    assert callable(QuickBaseline)
+    assert callable(AdvancedFeatureEngineer)
     assert callable(BusinessPipeline)
     assert callable(intake_file)
     assert callable(generate_insights)
     assert callable(archive_delivery)
     assert callable(archive_charts)
     assert callable(run_eda_profile)
-    _ok("top-level imports")
+    _ok("facade imports")
 
 
 def check_competition_min() -> None:
@@ -106,9 +109,24 @@ def check_analyzer_demo_core() -> None:
     _ok("analyzer_demo core")
 
 
+def check_tutorials() -> None:
+    import importlib.util
+
+    tutorial_dir = ROOT / "examples" / "tutorials"
+    scripts = sorted(tutorial_dir.glob("[0-9][0-9]_*.py"))
+    assert scripts, "missing examples/tutorials/NN_*.py"
+    for path in scripts:
+        spec = importlib.util.spec_from_file_location(path.stem, path)
+        assert spec and spec.loader
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        mod.main()
+        _ok(f"tutorial {path.name}")
+
+
 def check_business_pipeline() -> None:
     import pandas as pd
-    from wanglaoshi import BusinessPipeline
+    from wanglaoshi.business import BusinessPipeline
 
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
@@ -168,6 +186,7 @@ def main() -> int:
         check_competition_min,
         check_analyzer_demo_core,
         check_business_pipeline,
+        check_tutorials,
         check_iris_notebook,
     ]
     failed = 0

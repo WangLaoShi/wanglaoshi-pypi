@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 from wanglaoshi.runtime import ready
-from wanglaoshi.CompetitionTools import SubmissionGenerator
+from wanglaoshi.compete import SubmissionGenerator
 
 ready()  # 关警告 + 打印环境（不要再叠 JE.no_warning / filterwarnings）
 
@@ -39,6 +39,7 @@ print(gen.validate_submission("submission.csv", sample_path))
 
 ## 2. 下一步
 
+- 门面短教程（公开数据）：{doc}`../tutorials/README`  
 - 完整课：{doc}`../cases/01_iris`  
 - 要做 EDA 报告：{doc}`../tracks/analyzer`  
 - 要做业务交付：{doc}`../tracks/business`  

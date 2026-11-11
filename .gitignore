@@ -32,6 +32,9 @@ book/reference/api-inventory.md
 book/reference/skill-mapping.md
 book/reference/dependencies.md
 book/reference/evidence.md
+book/reference/analysis-coverage.md
+# prepare_book 从 docs/tutorials 同步
+book/tutorials/
 .coverage
 artifacts/
 coverage.xml

@@ -4,6 +4,7 @@
 
 | 文档 | 内容 |
 | --- | --- |
+| **[tutorials/](tutorials/)** | **门面教程**（公开/内置数据，10–20 分钟上手） |
 | **[RELEASE.md](RELEASE.md)** | **发布只记三句命令**（`release_check.sh`） |
 | **[API_REFERENCE.md](API_REFERENCE.md)** | **详尽 API 说明书**（签名 + 已校验【可运行】示例） |
 | [API_INVENTORY.md](API_INVENTORY.md) | 公开 API / 可选依赖短盘点（A01） |

@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BOOK = ROOT / "book"
 CASES = BOOK / "cases"
 REF = BOOK / "reference"
+TUTORIALS = BOOK / "tutorials"
 
 NOTEBOOKS = [
     "01_iris",
@@ -54,10 +55,26 @@ DOC_COPIES = {
     "ANALYSIS_COVERAGE.md": "analysis-coverage.md",
 }
 
+# 门面教程：docs/tutorials → book/tutorials
+TUTORIAL_COPIES = [
+    "README.md",
+    "01_ready_and_eda.md",
+    "02_compete_baseline.md",
+    "03_features_encode.md",
+    "04_analytics_stats.md",
+    "05_business_pipeline.md",
+    "06_ml_preprocess.md",
+    "07_leakage_and_cv.md",
+    "08_timeseries_tools.md",
+    "09_calibration_fairness.md",
+    "10_testing_repro.md",
+]
+
 
 def main() -> None:
     CASES.mkdir(parents=True, exist_ok=True)
     REF.mkdir(parents=True, exist_ok=True)
+    TUTORIALS.mkdir(parents=True, exist_ok=True)
 
     src_dir = ROOT / "examples" / "advanced"
     for name in NOTEBOOKS:
@@ -96,6 +113,28 @@ def main() -> None:
             text = banner + text
         dst.write_text(text, encoding="utf-8")
         print(f"synced ref  {dst.relative_to(ROOT)}")
+
+    tut_src = ROOT / "docs" / "tutorials"
+    for name in TUTORIAL_COPIES:
+        src = tut_src / name
+        if not src.exists():
+            raise FileNotFoundError(f"missing tutorial: {src}")
+        dst = TUTORIALS / name
+        text = src.read_text(encoding="utf-8")
+        # book 内相对链接：指向仓库路径的 scripts/examples 保留；docs 互链改相对
+        text = text.replace("](../API_REFERENCE.md)", "](../reference/api)")
+        text = text.replace("](../ARCHITECTURE.md)", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/ARCHITECTURE.md)")
+        text = text.replace("](../../examples/tutorials/", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/tutorials/")
+        text = text.replace("](../../examples/advanced/", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/advanced/")
+        banner = (
+            "```{note}\n"
+            f"本页从仓库 `docs/tutorials/{name}` 同步生成；请以仓库文件为编辑源。\n"
+            "```\n\n"
+        )
+        if not text.lstrip().startswith("```{note}"):
+            text = banner + text
+        dst.write_text(text, encoding="utf-8")
+        print(f"synced tut  {dst.relative_to(ROOT)}")
 
     print("prepare_book: done")
 

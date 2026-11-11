@@ -8,6 +8,20 @@ parts:
       - file: start/first-hour
       - file: start/binder
 
+  - caption: 门面教程
+    chapters:
+      - file: tutorials/README
+      - file: tutorials/01_ready_and_eda
+      - file: tutorials/02_compete_baseline
+      - file: tutorials/03_features_encode
+      - file: tutorials/04_analytics_stats
+      - file: tutorials/05_business_pipeline
+      - file: tutorials/06_ml_preprocess
+      - file: tutorials/07_leakage_and_cv
+      - file: tutorials/08_timeseries_tools
+      - file: tutorials/09_calibration_fairness
+      - file: tutorials/10_testing_repro
+
   - caption: 精讲课（先于案例）
     chapters:
       - file: lessons/overview

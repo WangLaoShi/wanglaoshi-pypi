@@ -1,10 +1,10 @@
 # 示例入口
 
-新代码优先门面导入（`wanglaoshi.analyze` / `compete` / `features` / `ml` 等），见 [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)。  
-`advanced/` 进阶 Notebook 与 `book/` 教材仍多用兼容写法（`CompetitionTools as CT`），有意保留课堂旧路径。
+新代码只教门面导入（`wanglaoshi.analyze` / `compete` / `features` / `ml` / `runtime` / `business` 等），见 [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)。
 
 | 示例 | 类型 | 说明 | 是否可离线跑 |
 | --- | --- | --- | --- |
+| [tutorials/](tutorials/) | 脚本 | **门面短教程**（对应 [docs/tutorials/](../docs/tutorials/)） | 是（sklearn / seaborn / 合成） |
 | [analyzer_demo.py](analyzer_demo.py) | 脚本 | `DataAnalyzer` EDA 与报告 | 是（合成数据） |
 | [business_intake_demo.ipynb](business_intake_demo.ipynb) | Notebook | 业务流水线短 demo | 是（合成订单） |
 | [business_pipeline_course.ipynb](business_pipeline_course.ipynb) | Notebook | 业务流水线**教材专章**（阻断/交付/脱敏） | 是（合成订单） |
@@ -12,10 +12,11 @@
 
 ## 建议学习顺序
 
-1. `analyzer_demo.py` — 熟悉 EDA
-2. `advanced/01_iris.ipynb` → `02_titanic.ipynb` → `04_breast_cancer.ipynb`
-3. `business_intake_demo.ipynb` — 业务 Skill 主链
-4. 其余 advanced 案例按 [advanced/README.md](advanced/README.md)
+1. [docs/tutorials/](../docs/tutorials/) — 按门面 + 公开数据上手  
+2. `analyzer_demo.py` — 熟悉 EDA  
+3. `advanced/01_iris.ipynb` → `02_titanic.ipynb` → `04_breast_cancer.ipynb`  
+4. `business_intake_demo.ipynb` — 业务 Skill 主链  
+5. 其余 advanced 案例按 [advanced/README.md](advanced/README.md)
 
 ## 一键验证
 

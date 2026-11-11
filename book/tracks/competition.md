@@ -18,13 +18,13 @@
 
 ```python
 from wanglaoshi.runtime import ready
-from wanglaoshi.CompetitionTools import (
+from wanglaoshi.compete import (
     SubmissionGenerator,
     QuickBaseline,
     LeakageDetector,
     CrossValidator,
 )
-from wanglaoshi.FeatureEngineering import AdvancedFeatureEngineer
+from wanglaoshi.features import AdvancedFeatureEngineer
 
 ready()
 ```
@@ -45,17 +45,16 @@ ready()
 ```python
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
-from wanglaoshi.CompetitionTools import QuickBaseline
+from wanglaoshi.compete import QuickBaseline
 
 X, y = load_breast_cancer(return_X_y=True, as_frame=True)
 X_tr, X_va, y_tr, y_va = train_test_split(
     X, y, test_size=0.25, random_state=42, stratify=y
 )
 
-qb = QuickBaseline(random_state=42)
-# 具体方法名以当前版本为准，常见模式：
-# result = qb.compare(X_tr, y_tr, X_va, y_va)
-# print(result)
+qb = QuickBaseline()
+results = qb.run_all_models(X_tr, y_tr, X_va, y_va, task_type="classification")
+print(qb.compare_models(results, top_n=3))
 ```
 
 **教学重点：** 基线表是为了「先有可复现参照」，不是为了选一个去过拟合验证集。

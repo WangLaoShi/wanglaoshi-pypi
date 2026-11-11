@@ -10,7 +10,7 @@
 教材源：`book/`（`python scripts/build_book.py`）。  
 批量证据：`docs/evidence/ADVANCED_EVIDENCE.md`（最近 **22/22 passed**）。
 
-> 导入说明：Notebook 里常见 `from wanglaoshi import compete as CT` / `FeatureEngineering as FE` 为**兼容导入**（仍可用）。新脚本请优先 `wanglaoshi.compete` / `wanglaoshi.features` / `wanglaoshi.analyze`（见 `docs/ARCHITECTURE.md`、`docs/API_REFERENCE.md`）。
+> 导入说明：本目录 Notebook 使用门面写法（`wanglaoshi.runtime` / `analyze` / `compete as CT` / `features as FE`）。上手短教程见 [`docs/tutorials/`](../../docs/tutorials/)。
 
 ## 学习顺序
 
