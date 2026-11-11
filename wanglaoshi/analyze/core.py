@@ -402,50 +402,59 @@ class DataAnalyzer:
         """
         # 如果缓存为空，进行计算
         if self._multicollinearity_cache is None:
-            # 只使用数值型列（VIF只能计算数值型变量）
             numeric_df = self.df[self.numeric_cols].copy()
-            
-            # 处理无穷大和NaN值
-            # 无穷大值（inf）会导致计算错误，需要先处理
-            # replace() 将无穷大值替换为NaN
             numeric_df = numeric_df.replace([np.inf, -np.inf], np.nan)
-            # fillna() 用均值填充NaN值（缺失值）
-            # mean() 计算每列的平均值
-            numeric_df = numeric_df.fillna(numeric_df.mean())
-            
-            # 标准化数据（将数据转换为均值为0、标准差为1的分布）
-            # 为什么要标准化？
-            # - VIF计算需要标准化后的数据
-            # - 标准化可以消除不同量纲的影响（比如身高用米，体重用公斤）
-            scaler = StandardScaler()
-            # fit_transform() 先学习数据的均值和标准差，然后进行转换
-            scaled_data = scaler.fit_transform(numeric_df)
-            
-            # 计算VIF（方差膨胀因子）
-            # 创建一个空的DataFrame来存储结果
-            vif_data = pd.DataFrame()
-            # 添加列名
-            vif_data["列名"] = self.numeric_cols
-            # 计算每列的VIF值
-            # variance_inflation_factor() 计算VIF
-            # 参数：scaled_data（标准化后的数据），i（列的索引）
-            # 列表推导式：对每列都计算一次VIF
-            vif_data["VIF"] = [variance_inflation_factor(scaled_data, i) 
-                              for i in range(len(self.numeric_cols))]
-            
-            # 添加解释（根据VIF值判断多重共线性的严重程度）
-            # apply() 对每行的VIF值应用一个函数
-            # lambda 是匿名函数（没有名字的函数），用于简单的转换
-            vif_data["解释"] = vif_data["VIF"].apply(
-                lambda x: "严重多重共线性" if x > 10 else  # 如果VIF > 10
-                         "中等多重共线性" if x > 5 else      # 如果VIF > 5
-                         "轻微多重共线性" if x > 2 else      # 如果VIF > 2
-                         "无显著多重共线性"                  # 否则
-            )
-            
-            # 保存到缓存
-            self._multicollinearity_cache = vif_data
-        # 返回缓存的结果
+            all_null = [c for c in numeric_df.columns if bool(numeric_df[c].isna().all())]
+            usable = numeric_df.drop(columns=all_null, errors="ignore")
+            usable = usable.fillna(usable.mean(numeric_only=True))
+            still_bad = [c for c in usable.columns if bool(usable[c].isna().any())]
+            usable = usable.drop(columns=still_bad, errors="ignore")
+
+            rows = []
+            for col in all_null + still_bad:
+                rows.append(
+                    {
+                        "列名": col,
+                        "VIF": np.nan,
+                        "解释": "列全空或填充后仍含 NaN，跳过 VIF",
+                    }
+                )
+
+            if usable.shape[1] >= 2:
+                scaler = StandardScaler()
+                scaled_data = scaler.fit_transform(usable)
+                cols = list(usable.columns)
+                for i, col in enumerate(cols):
+                    try:
+                        vif = float(variance_inflation_factor(scaled_data, i))
+                    except Exception as exc:  # noqa: BLE001
+                        rows.append(
+                            {
+                                "列名": col,
+                                "VIF": np.nan,
+                                "解释": f"VIF 计算失败: {exc}",
+                            }
+                        )
+                        continue
+                    if vif > 10:
+                        explain = "严重多重共线性"
+                    elif vif > 5:
+                        explain = "中等多重共线性"
+                    elif vif > 2:
+                        explain = "轻微多重共线性"
+                    else:
+                        explain = "无显著多重共线性"
+                    rows.append({"列名": col, "VIF": vif, "解释": explain})
+            elif usable.shape[1] == 1:
+                rows.append(
+                    {
+                        "列名": list(usable.columns)[0],
+                        "VIF": np.nan,
+                        "解释": "有效数值列少于 2，无法计算 VIF",
+                    }
+                )
+
+            self._multicollinearity_cache = pd.DataFrame(rows)
         return self._multicollinearity_cache
     
     def plot_distribution(self, column: str) -> str:
@@ -581,55 +590,62 @@ class DataAnalyzer:
 
     def normality_test(self) -> pd.DataFrame:
         """
-        正态性检验
-        
-        什么是正态分布？
-        - 正态分布（也叫高斯分布）是一种常见的概率分布
-        - 它的图形是钟形曲线，左右对称
-        - 很多统计方法（如t检验、方差分析）都要求数据符合正态分布
-        
-        为什么要进行正态性检验？
-        - 如果数据不符合正态分布，需要使用非参数检验方法
-        - 参数检验（如t检验）要求数据正态分布，否则结果可能不准确
-        
-        检验方法：
-        1. Shapiro-Wilk检验：适合小样本（n < 50）
-        2. D'Agostino-Pearson检验：适合大样本
-        
-        如何判断？
-        - p值 > 0.05：数据符合正态分布（接受原假设）
-        - p值 ≤ 0.05：数据不符合正态分布（拒绝原假设）
-        
-        返回:
-            一个DataFrame，包含每列的正态性检验结果
+        正态性检验（按方法分别判断样本量适用性）。
+
+        - Shapiro–Wilk：约 ``n >= 3``
+        - D'Agostino–Pearson（``normaltest``）：约 ``n >= 8``
+        - 结论：``未拒绝正态假设`` / ``拒绝正态假设`` / ``检验不适用（样本量不足）``
         """
-        # 存储所有列的检验结果
         results = []
-        # 遍历每个数值型列
         for col in self.numeric_cols:
-            # 删除缺失值（NaN值会影响检验结果）
             data = self.df[col].dropna()
-            # 至少需要3个样本才能进行正态性检验
-            if len(data) > 3:
-                # Shapiro-Wilk检验
-                # 返回两个值：统计量（statistic）和p值（p-value）
-                # p值：如果p > 0.05，说明数据符合正态分布
-                shapiro_stat, shapiro_p = shapiro(data)
-                # D'Agostino-Pearson检验（另一种正态性检验方法）
-                # 使用两种方法可以互相验证，提高准确性
-                norm_stat, norm_p = normaltest(data)
-                
-                # 将结果添加到列表中
-                results.append({
-                    '列名': col,  # 列名
-                    'Shapiro-Wilk统计量': shapiro_stat,  # 统计量（用于计算p值）
-                    'Shapiro-Wilk p值': shapiro_p,  # p值（判断依据）
-                    'D-Agostino-Pearson统计量': norm_stat,  # 另一种方法的统计量
-                    'D-Agostino-Pearson p值': norm_p,  # 另一种方法的p值
-                    # 如果两种方法的p值都 > 0.05，则认为数据符合正态分布
-                    '是否正态分布': '是' if shapiro_p > 0.05 and norm_p > 0.05 else '否'
-                })
-        # 将结果列表转换为DataFrame并返回
+            n = int(len(data))
+            shapiro_stat = shapiro_p = np.nan
+            norm_stat = norm_p = np.nan
+            notes: List[str] = []
+            applicable_ps: List[float] = []
+
+            if n >= 3:
+                try:
+                    shapiro_stat, shapiro_p = shapiro(data)
+                    applicable_ps.append(float(shapiro_p))
+                except Exception as exc:  # noqa: BLE001
+                    notes.append(f"Shapiro-Wilk 不适用: {exc}")
+            else:
+                notes.append("Shapiro-Wilk 需要至少 3 个有效样本")
+
+            if n >= 8:
+                try:
+                    norm_stat, norm_p = normaltest(data)
+                    applicable_ps.append(float(norm_p))
+                except Exception as exc:  # noqa: BLE001
+                    notes.append(f"D-Agostino-Pearson 不适用: {exc}")
+            else:
+                notes.append("D-Agostino-Pearson 需要至少 8 个有效样本")
+
+            if not applicable_ps:
+                conclusion = "检验不适用（样本量不足）"
+                is_normal = "不适用"
+            elif all(p > 0.05 for p in applicable_ps):
+                conclusion = "未拒绝正态假设"
+                is_normal = "是"
+            else:
+                conclusion = "拒绝正态假设"
+                is_normal = "否"
+
+            results.append(
+                {
+                    "列名": col,
+                    "n": n,
+                    "Shapiro-Wilk统计量": shapiro_stat,
+                    "Shapiro-Wilk p值": shapiro_p,
+                    "D-Agostino-Pearson统计量": norm_stat,
+                    "D-Agostino-Pearson p值": norm_p,
+                    "结论": conclusion,
+                    "是否正态分布": is_normal,
+                    "备注": "; ".join(notes) if notes else "",
+                }
+            )
         return pd.DataFrame(results)
 
     # ==================== 数据质量分析 ====================
@@ -837,99 +853,93 @@ class DataAnalyzer:
         """
         # 只使用数值型列（PCA只能处理数值数据）
         numeric_df = self.df[self.numeric_cols].copy()
-        
-        # 处理无穷大值（会导致计算错误）
         numeric_df = numeric_df.replace([np.inf, -np.inf], np.nan)
-        
-        # 检查是否有缺失值
-        # isna() 检查是否为NaN，any() 检查是否有任何True值
-        if numeric_df.isna().any().any():
+
+        # 全空列均值仍为 NaN，会直接让 PCA 失败：排除并记录
+        all_null_cols = [c for c in numeric_df.columns if bool(numeric_df[c].isna().all())]
+        usable = numeric_df.drop(columns=all_null_cols, errors="ignore")
+        if usable.isna().any().any():
             logger.warning("数据中存在缺失值，将使用均值填充")
-            # 用每列的均值填充缺失值
-            numeric_df = numeric_df.fillna(numeric_df.mean())
-        
-        # 标准化数据（PCA要求数据标准化）
-        # 标准化可以消除不同量纲的影响
+            usable = usable.fillna(usable.mean(numeric_only=True))
+        # 填充后仍全 NaN / 零方差列再排除
+        still_bad = [c for c in usable.columns if bool(usable[c].isna().any())]
+        zero_var = [c for c in usable.columns if float(usable[c].std(ddof=0) or 0.0) == 0.0]
+        excluded = list(dict.fromkeys(all_null_cols + still_bad + zero_var))
+        usable = usable.drop(columns=excluded, errors="ignore")
+
+        n_samples, n_features = usable.shape
+        if n_features < 1 or n_samples < 2:
+            reason = (
+                "PCA 不适用：有效数值列不足或样本过少 "
+                f"(n_samples={n_samples}, n_features={n_features}, excluded={excluded})"
+            )
+            logger.warning(reason)
+            return {
+                "applicable": False,
+                "reason": reason,
+                "excluded_columns": excluded,
+                "n_components": 0,
+                "variance_ratio": np.asarray([]),
+                "cumulative_variance": np.asarray([]),
+                "components": pd.DataFrame(),
+                "scores": pd.DataFrame(),
+                "feature_names": list(usable.columns),
+            }
+
         scaler = StandardScaler()
-        # fit_transform() 先学习参数，然后转换数据
-        scaled_data = scaler.fit_transform(numeric_df)
-        
-        # 执行PCA
-        # PCA() 创建PCA对象，不指定n_components会保留所有主成分
+        scaled_data = scaler.fit_transform(usable)
+
+        # 主成分数最多 min(n_samples, n_features)
         pca = PCA()
-        # fit() 学习主成分（计算主成分的方向）
         pca.fit(scaled_data)
-        
-        # 计算累计方差贡献率
-        # explained_variance_ratio_ 是每个主成分的方差贡献率
-        # np.cumsum() 计算累计和（第1个、前2个、前3个...的累计贡献率）
-        cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
-        
-        # 计算每个主成分的方差贡献率
-        # 例如：[0.5, 0.3, 0.2] 表示PC1解释50%方差，PC2解释30%，PC3解释20%
+        n_pc = int(pca.components_.shape[0])
+        pc_names = [f"PC{i+1}" for i in range(n_pc)]
+
         variance_ratio = pca.explained_variance_ratio_
-        
-        # 计算特征向量（主成分的系数）
-        # components_ 是主成分的系数矩阵，表示每个原始变量对主成分的贡献
-        # 例如：PC1 = 0.5*变量1 + 0.3*变量2 + 0.2*变量3
+        cumulative_variance = np.cumsum(variance_ratio)
         components = pd.DataFrame(
-            pca.components_,  # 主成分系数矩阵
-            columns=self.numeric_cols,  # 列名是原始变量名
-            index=[f'PC{i+1}' for i in range(len(self.numeric_cols))]  # 行名是主成分名（PC1, PC2, ...）
+            pca.components_,
+            columns=list(usable.columns),
+            index=pc_names,
         )
-        
-        # 计算主成分得分
-        # transform() 将原始数据转换为主成分空间
-        # 得到每个样本在主成分上的得分
         scores = pd.DataFrame(
-            pca.transform(scaled_data),  # 转换后的数据
-            columns=[f'PC{i+1}' for i in range(len(self.numeric_cols))]  # 列名是主成分名
+            pca.transform(scaled_data),
+            columns=pc_names,
+            index=usable.index,
         )
-        
-        # 确定主成分数量（解释95%方差所需的主成分数）
-        # np.argmax() 返回第一个满足条件的索引
-        # cumulative_variance >= 0.95 返回布尔数组，True表示累计贡献率>=95%
-        # +1 因为索引从0开始，但主成分编号从1开始
-        n_components = np.argmax(cumulative_variance >= 0.95) + 1
-        
-        # ========== 可视化结果 ==========
-        # 创建图表，大小12x6英寸
+
+        if len(cumulative_variance) == 0:
+            n_components = 0
+        elif bool(np.any(cumulative_variance >= 0.95)):
+            n_components = int(np.argmax(cumulative_variance >= 0.95) + 1)
+        else:
+            n_components = int(len(cumulative_variance))
+
         plt.figure(figsize=(12, 6))
-        
-        # 绘制碎石图（Scree Plot）
-        # 碎石图显示累计方差贡献率随主成分数量的变化
-        plt.subplot(1, 2, 1)  # 1行2列的第1个子图
-        # 绘制累计方差贡献率曲线
-        plt.plot(range(1, len(variance_ratio) + 1), 
-                cumulative_variance, 'bo-')  # 'bo-' 表示蓝色圆点连线
-        # 画一条水平参考线（95%阈值）
-        plt.axhline(y=0.95, color='r', linestyle='--')  # 红色虚线
-        plt.xlabel('主成分数量')
-        plt.ylabel('累计方差贡献率')
-        plt.title('碎石图')
-        
-        # 绘制主成分方差贡献率柱状图
-        plt.subplot(1, 2, 2)  # 1行2列的第2个子图
-        # 绘制每个主成分的方差贡献率
-        plt.bar(range(1, len(variance_ratio) + 1), 
-                variance_ratio)
-        plt.xlabel('主成分')
-        plt.ylabel('方差贡献率')
-        plt.title('主成分方差贡献率')
-        
-        # 调整子图间距，避免重叠
+        plt.subplot(1, 2, 1)
+        plt.plot(range(1, len(variance_ratio) + 1), cumulative_variance, "bo-")
+        plt.axhline(y=0.95, color="r", linestyle="--")
+        plt.xlabel("主成分数量")
+        plt.ylabel("累计方差贡献率")
+        plt.title("碎石图")
+        plt.subplot(1, 2, 2)
+        plt.bar(range(1, len(variance_ratio) + 1), variance_ratio)
+        plt.xlabel("主成分")
+        plt.ylabel("方差贡献率")
+        plt.title("主成分方差贡献率")
         plt.tight_layout()
-        # 显示图表
-        plt.show()
-        
-        # 返回所有结果
+        plt.close()
+
         return {
-            'n_components': n_components,  # 建议保留的主成分数量
-            'variance_ratio': variance_ratio,  # 每个主成分的方差贡献率
-            'cumulative_variance': cumulative_variance,  # 累计方差贡献率
-            'components': components,  # 主成分系数矩阵
-            'scores': scores,  # 主成分得分
-            'feature_names': self.numeric_cols  # 原始变量名
+            "applicable": True,
+            "reason": "",
+            "excluded_columns": excluded,
+            "n_components": n_components,
+            "variance_ratio": variance_ratio,
+            "cumulative_variance": cumulative_variance,
+            "components": components,
+            "scores": scores,
+            "feature_names": list(usable.columns),
         }
 
     # ==================== 结果解读 ====================
@@ -1054,10 +1064,19 @@ class DataAnalyzer:
         }
 
         for _, row in normality_stats.iterrows():
+            flag = row.get("是否正态分布", "")
+            conclusion = row.get("结论", flag)
+            if flag == "是":
+                explanation = "未拒绝正态假设，可考虑参数检验（仍需结合业务与图形诊断）。"
+            elif flag == "否":
+                explanation = "拒绝正态假设，建议使用非参数检验或先做变换。"
+            else:
+                explanation = "有效样本量不足，对应检验方法不适用，结论暂缺。"
             normality_interpretation["details"].append({
-                "变量": row['列名'],
-                "是否正态分布": row['是否正态分布'],
-                "解释": "该变量服从正态分布，可以使用参数检验方法。" if row['是否正态分布'] == '是' else "该变量不服从正态分布，建议使用非参数检验方法。"
+                "变量": row["列名"],
+                "是否正态分布": flag,
+                "结论": conclusion,
+                "解释": explanation,
             })
 
         # 峰度和偏度解读
@@ -1128,11 +1147,23 @@ class DataAnalyzer:
 
         # PCA分析解读
         pca_stats = self.pca_analysis()
-        pca_interpretation = {
-            "总体情况": f"主成分分析结果显示，数据集中有 {pca_stats['n_components']} 个主成分。",
-            "建议保留主成分数": f"建议保留 {pca_stats['n_components']} 个主成分，可以解释 {pca_stats['cumulative_variance'][pca_stats['n_components']-1]*100:.2f}% 的方差。",
-            "解释": "主成分分析可以帮助降维，减少变量间的相关性。"
-        }
+        if not pca_stats.get("applicable", True):
+            pca_interpretation = {
+                "总体情况": "主成分分析不适用。",
+                "原因": pca_stats.get("reason", ""),
+                "排除列": pca_stats.get("excluded_columns", []),
+                "解释": "有效数值特征不足或样本过少时无法进行 PCA；其余章节不受影响。",
+            }
+        else:
+            cum = np.asarray(pca_stats["cumulative_variance"])
+            n_keep = int(pca_stats["n_components"])
+            explained = float(cum[n_keep - 1] * 100) if n_keep > 0 and len(cum) >= n_keep else 0.0
+            pca_interpretation = {
+                "总体情况": f"主成分分析得到 {len(cum)} 个主成分（按实际可计算维数）。",
+                "建议保留主成分数": f"建议保留 {n_keep} 个主成分，可以解释 {explained:.2f}% 的方差。",
+                "排除列": pca_stats.get("excluded_columns", []),
+                "解释": "主成分分析可以帮助降维，减少变量间的相关性。",
+            }
 
         return {
             "正态性检验": normality_interpretation,
@@ -1203,7 +1234,7 @@ class DataAnalyzer:
         # 统计分析建议
         normality_stats = self.normality_test()
         for _, row in normality_stats.iterrows():
-            if row['是否正态分布'] == '否':
+            if row.get("是否正态分布") == "否":
                 recommendations.append({
                     "类型": "统计分析",
                     "问题": f"变量 {row['列名']} 不服从正态分布",
@@ -1556,6 +1587,23 @@ def analyze_data(file_path: str, output_html: str = "analysis_report.html") -> N
     # 步骤3：生成报告
     analyzer.generate_report(output_html)
 
+def _batch_report_html_path(output_dir: str, filename: str) -> str:
+    """批量报告路径：保留来源扩展名，避免 sales.csv / sales.json 互相覆盖。"""
+    stem, ext = os.path.splitext(filename)
+    ext_tag = (ext.lstrip(".") or "data").lower()
+    base = f"{stem}_{ext_tag}_report.html"
+    path = os.path.join(output_dir, base)
+    if not os.path.exists(path):
+        return path
+    # 极端情况下仍冲突时追加序号
+    idx = 2
+    while True:
+        candidate = os.path.join(output_dir, f"{stem}_{ext_tag}_report_{idx}.html")
+        if not os.path.exists(candidate):
+            return candidate
+        idx += 1
+
+
 def analyze_multiple_files(folder_path: str, output_dir: str = "reports") -> None:
     """
     批量分析文件夹中的所有数据文件
@@ -1563,7 +1611,7 @@ def analyze_multiple_files(folder_path: str, output_dir: str = "reports") -> Non
     这个函数会：
     1. 遍历指定文件夹中的所有文件
     2. 对每个支持的数据文件进行分析
-    3. 将报告保存到指定目录
+    3. 将报告保存到指定目录（文件名含来源扩展名，避免同名冲突）
     
     参数:
         folder_path: 包含数据文件的文件夹路径
@@ -1572,26 +1620,16 @@ def analyze_multiple_files(folder_path: str, output_dir: str = "reports") -> Non
     示例:
         analyze_multiple_files("data_folder", "reports")
     """
-    # 创建输出目录（如果不存在）
-    # exist_ok=True 表示如果目录已存在也不报错
     os.makedirs(output_dir, exist_ok=True)
-    
-    # 遍历文件夹中的所有文件
+
     for file in os.listdir(folder_path):
-        # 检查文件扩展名，只处理支持的数据文件
         if file.endswith(('.csv', '.xls', '.xlsx', '.json')):
-            # 构建完整的文件路径
             file_path = os.path.join(folder_path, file)
-            # 构建输出HTML文件路径
-            # os.path.splitext(file)[0] 获取文件名（不含扩展名）
-            # 例如："data.csv" -> "data"
-            output_html = os.path.join(output_dir, f"{os.path.splitext(file)[0]}_report.html")
+            output_html = _batch_report_html_path(output_dir, file)
             try:
-                # 分析文件并生成报告
                 analyze_data(file_path, output_html)
-                print(f"已分析文件: {file}")
+                print(f"已分析文件: {file} -> {os.path.basename(output_html)}")
             except Exception as e:
-                # 如果分析失败，打印错误信息但继续处理其他文件
                 print(f"分析文件 {file} 时出错: {str(e)}")
 
 def analyze_notebook(df: pd.DataFrame, show_plots: bool = True) -> Dict[str, Any]:

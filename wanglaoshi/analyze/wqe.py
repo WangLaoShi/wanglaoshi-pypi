@@ -1003,16 +1003,18 @@ def analyze_data(file_path: str, output_html: str = "analysis_report.html") -> N
     analyzer.generate_report(output_html)
 
 def analyze_multiple_files(folder_path: str, output_dir: str = "reports") -> None:
-    """分析文件夹中的所有数据文件"""
+    """分析文件夹中的所有数据文件（报告名保留来源扩展名，避免同名覆盖）。"""
+    from wanglaoshi.analyze.core import _batch_report_html_path
+
     os.makedirs(output_dir, exist_ok=True)
 
     for file in os.listdir(folder_path):
         if file.endswith(('.csv', '.xls', '.xlsx', '.json')):
             file_path = os.path.join(folder_path, file)
-            output_html = os.path.join(output_dir, f"{os.path.splitext(file)[0]}_report.html")
+            output_html = _batch_report_html_path(output_dir, file)
             try:
                 analyze_data(file_path, output_html)
-                print(f"已分析文件: {file}")
+                print(f"已分析文件: {file} -> {os.path.basename(output_html)}")
             except Exception as e:
                 print(f"分析文件 {file} 时出错: {str(e)}")
 
