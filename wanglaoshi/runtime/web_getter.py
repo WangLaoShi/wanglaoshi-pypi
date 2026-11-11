@@ -96,29 +96,40 @@ class Wget:
                 )
                 return False
 
-            output_path = self._safe_output_path()
+            output_path = Path(self._safe_output_path())
+            partial_path = output_path.with_name(output_path.name + ".partial")
 
             response = requests.get(self.url, stream=True, timeout=self.timeout)
             response.raise_for_status()
 
             written = 0
-            with open(output_path, "wb") as f, tqdm(
-                desc=Path(output_path).name,
-                total=total_size,
-                unit="iB",
-                unit_scale=True,
-                unit_divisor=1024,
-            ) as pbar:
-                for data in response.iter_content(chunk_size=1024):
-                    if not data:
-                        continue
-                    written += len(data)
-                    if written > self.max_bytes:
-                        raise ValueError(
-                            f"下载超过上限 {self.max_bytes} bytes，已中止"
-                        )
-                    size = f.write(data)
-                    pbar.update(size)
+            try:
+                with open(partial_path, "wb") as f, tqdm(
+                    desc=output_path.name,
+                    total=total_size,
+                    unit="iB",
+                    unit_scale=True,
+                    unit_divisor=1024,
+                ) as pbar:
+                    for data in response.iter_content(chunk_size=1024):
+                        if not data:
+                            continue
+                        written += len(data)
+                        if written > self.max_bytes:
+                            raise ValueError(
+                                f"下载超过上限 {self.max_bytes} bytes，已中止"
+                            )
+                        size = f.write(data)
+                        pbar.update(size)
+                # 成功后原子替换；失败保留原正式文件
+                partial_path.replace(output_path)
+            except Exception:
+                if partial_path.exists():
+                    try:
+                        partial_path.unlink()
+                    except OSError:
+                        pass
+                raise
 
             print(f"\n下载完成: {output_path}")
             return True

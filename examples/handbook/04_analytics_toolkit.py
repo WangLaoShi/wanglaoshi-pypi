@@ -36,8 +36,8 @@ def main() -> None:
     t = np.arange(56)
     s = 10 + 0.1 * t + 3 * np.sin(2 * np.pi * t / 7)
     df = pd.DataFrame({"y": s})
-    assert "y_lag1" in TimeSeriesTools.safe_lag(df, "y", lags=(1, 2)).columns
-    assert TimeSeriesTools.safe_rolling_mean(df, "y", window=3) is not None
+    assert "y_lag1" in TimeSeriesTools.safe_lag(df, "y", lags=(1, 2), assume_row_order=True).columns
+    assert TimeSeriesTools.safe_rolling_mean(df, "y", window=3, assume_row_order=True) is not None
     assert "pvalue" in TimeSeriesTools.adf_report(df["y"])
     assert "resid_std" in TimeSeriesTools.decompose_summary(df["y"], period=7)
 

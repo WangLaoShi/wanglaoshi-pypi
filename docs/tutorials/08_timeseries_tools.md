@@ -29,8 +29,8 @@ t = np.arange(56)
 y = 10 + 0.1 * t + 3 * np.sin(2 * np.pi * t / 7)
 df = pd.DataFrame({"y": y})
 
-lagged = TimeSeriesTools.safe_lag(df, "y", lags=(1, 2))
-rolled = TimeSeriesTools.safe_rolling_mean(lagged, "y", window=3)
+lagged = TimeSeriesTools.safe_lag(df, "y", lags=(1, 2), assume_row_order=True)
+rolled = TimeSeriesTools.safe_rolling_mean(lagged, "y", window=3, assume_row_order=True)
 adf = TimeSeriesTools.adf_report(df["y"])
 dec = TimeSeriesTools.decompose_summary(df["y"], period=7)
 print(lagged.head())
@@ -42,7 +42,7 @@ print({k: dec[k] for k in ("period", "resid_std") if k in dec})
 
 ## 常见坑
 
-- `safe_lag` 禁止负滞后（前瞻）；不要手写 `shift(-1)` 当特征
+- `safe_lag` 禁止负滞后；请传 `time_col=` 或在行已按时间排好时用 `assume_row_order=True`
 - 滚动窗口只使用「当时可得」历史
 - ADF 显著 ≠ 业务可预测；还要看季节与结构突变
 

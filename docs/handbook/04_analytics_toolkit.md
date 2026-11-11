@@ -44,8 +44,8 @@ print(ExperimentDesign.two_proportion_test(20, 200, 30, 200))
 t = np.arange(56)
 s = 10 + 0.1 * t + 3 * np.sin(2 * np.pi * t / 7)
 df = pd.DataFrame({"y": s})
-print(TimeSeriesTools.safe_lag(df, "y", lags=(1, 2)).head(2))
-print(TimeSeriesTools.safe_rolling_mean(df, "y", window=3).tail(2))
+print(TimeSeriesTools.safe_lag(df, "y", lags=(1, 2), assume_row_order=True).head(2))
+print(TimeSeriesTools.safe_rolling_mean(df, "y", window=3, assume_row_order=True).tail(2))
 print(TimeSeriesTools.adf_report(df["y"])["pvalue"])
 print(TimeSeriesTools.decompose_summary(df["y"], period=7)["resid_std"])
 
@@ -74,7 +74,7 @@ print(list(SurvivalAnalyzer.km_by_group(surv, "t", "e", "g")["groups"]))
 ## 使用建议
 
 1. 统计结论写「效应量 + 适用条件」，不要只贴 p 值  
-2. 时序特征只用 `safe_lag` / `safe_rolling_*`，禁止未来函数  
+2. 时序特征只用 `safe_lag` / `safe_rolling_*`（须 `time_col` 或 `assume_row_order=True`），禁止未来函数  
 3. 校准差时先别调业务阈值；公平指标要结合样本量解读
 
 ## 相关文档

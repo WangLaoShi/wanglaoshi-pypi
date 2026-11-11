@@ -87,6 +87,15 @@ def test_ensemble_submissions_error_paths(tmp_path: Path) -> None:
             output_path=str(tmp_path / "o.csv"),
         )
 
+    zero_out = tmp_path / "zero.csv"
+    with pytest.raises(ValueError, match="positive"):
+        gen.ensemble_submissions(
+            [s1, _write_csv(tmp_path / "f.csv", pd.DataFrame({"id": [1, 2], "y": [0.3, 0.4]}))],
+            weights=[0.0, 0.0],
+            output_path=str(zero_out),
+        )
+    assert not zero_out.exists()
+
 
 @pytest.mark.quick
 def test_create_submission_input_types_and_proba_multicol(tmp_path: Path) -> None:

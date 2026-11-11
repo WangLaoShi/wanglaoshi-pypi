@@ -18,11 +18,13 @@ from wanglaoshi import (
 @pytest.mark.quick
 def test_timeseries_safe_lag_and_adf() -> None:
     df = pd.DataFrame({"y": np.arange(30, dtype=float)})
-    out = TimeSeriesTools.safe_lag(df, "y", lags=(1, 2))
+    out = TimeSeriesTools.safe_lag(df, "y", lags=(1, 2), assume_row_order=True)
     assert "y_lag1" in out.columns and out["y_lag1"].iloc[1] == 0
     with pytest.raises(ValueError):
-        TimeSeriesTools.safe_lag(df, "y", lags=(-1,))
-    rolled = TimeSeriesTools.safe_rolling_mean(df, "y", window=3)
+        TimeSeriesTools.safe_lag(df, "y", lags=(-1,), assume_row_order=True)
+    with pytest.raises(ValueError, match="time_col"):
+        TimeSeriesTools.safe_lag(df, "y", lags=(1,))
+    rolled = TimeSeriesTools.safe_rolling_mean(df, "y", window=3, assume_row_order=True)
     assert "y_roll3" in rolled.columns
     adf = TimeSeriesTools.adf_report(df["y"])
     assert "pvalue" in adf
@@ -31,6 +33,33 @@ def test_timeseries_safe_lag_and_adf() -> None:
     s = 10 + 0.1 * t + 3 * np.sin(2 * np.pi * t / 7)
     dec = TimeSeriesTools.decompose_summary(s, period=7)
     assert dec["period"] == 7 and "resid_std" in dec
+
+
+@pytest.mark.quick
+def test_timeseries_lag_sorts_by_time_col() -> None:
+    # 故意乱序：若按行序 shift，day1 会吃到 day2（未来）
+    df = pd.DataFrame(
+        {
+            "day": pd.to_datetime(["2024-01-02", "2024-01-01", "2024-01-03"]),
+            "y": [20.0, 10.0, 30.0],
+        },
+        index=[10, 11, 12],
+    )
+    out = TimeSeriesTools.safe_lag(df, "y", lags=(1,), time_col="day")
+    # 恢复原行序后：索引 11 = day1，lag 应为 NaN；索引 10 = day2，lag=10
+    assert pd.isna(out.loc[11, "y_lag1"])
+    assert out.loc[10, "y_lag1"] == pytest.approx(10.0)
+    assert out.loc[12, "y_lag1"] == pytest.approx(20.0)
+
+
+@pytest.mark.quick
+def test_group_metrics_noncontiguous_index() -> None:
+    y = pd.Series([0, 1], index=[10, 11])
+    pred = pd.Series([0, 1], index=[10, 11])
+    g = pd.Series(["A", "B"], index=[10, 11])
+    audit = GroupMetricsReport.audit(y, pred, g)
+    assert len(audit) == 2
+    assert set(audit["group"]) == {"A", "B"}
 
 
 @pytest.mark.quick

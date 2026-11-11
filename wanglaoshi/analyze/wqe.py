@@ -1092,20 +1092,17 @@ class ReportGenerator:
                 output_dir = os.getcwd()
             logger.info(f"输出目录: {output_dir}")
 
-            # 计算静态文件的相对路径
-            static_url = os.path.relpath(self.static_dir, output_dir)
-            if static_url.startswith('..'):
-                static_url = os.path.join('..', static_url)
+            # 计算静态文件的相对路径（勿额外 prepend '..'）
+            static_url = os.path.relpath(self.static_dir, output_dir).replace("\\", "/")
             logger.info(f"静态文件URL: {static_url}")
 
-            # 处理数据并转换为JSON
+            # 传入对象，由模板 tojson 安全嵌入 <script>
             processed_data = DataProcessor.process_data(analysis_results)
-            json_data = json.dumps(processed_data, ensure_ascii=False)
 
             # 渲染模板
             logger.info("开始渲染模板...")
             rendered_html = template.render(
-                data=json_data,
+                data=processed_data,
                 timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 static_url=static_url
             )

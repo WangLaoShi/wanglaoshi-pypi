@@ -285,7 +285,8 @@
         // 初始化全局变量
         try {
             console.log('开始加载数据...');
-            const rawData = {{ data | safe }};
+            {# tojson 会转义 </script> 等，禁止对预序列化字符串使用 |safe #}
+            const rawData = {{ data | tojson }};
             console.log('原始数据:', rawData);
             
             // 验证数据结构

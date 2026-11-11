@@ -1754,23 +1754,20 @@ class ReportGenerator:
             # 计算静态文件的相对路径（用于HTML中的引用）
             # os.path.relpath() 计算相对路径
             # 例如：如果静态文件在 "../static"，HTML中引用时使用 "../static/js/analyzer.js"
-            static_url = os.path.relpath(self.static_dir, output_dir)
-            if static_url.startswith('..'):
-                static_url = os.path.join('..', static_url)
+            # relpath 已给出相对路径；勿再额外 prepend '..'（会把合法路径改坏）
+            static_url = os.path.relpath(self.static_dir, output_dir).replace("\\", "/")
             logger.info(f"静态文件URL: {static_url}")
             
             # ========== 步骤4：处理数据 ==========
             # 将分析结果转换为可序列化的格式（处理numpy数组、日期等）
+            # 传入模板对象，由 Jinja ``tojson`` 做脚本上下文安全转义（防 </script> 注入）
             processed_data = DataProcessor.process_data(analysis_results)
-            # 转换为JSON字符串（用于在HTML中嵌入数据）
-            # ensure_ascii=False 允许使用中文字符
-            json_data = json.dumps(processed_data, ensure_ascii=False)
             
             # ========== 步骤5：渲染模板 ==========
             logger.info("开始渲染模板...")
             # render() 将数据填充到模板中，生成最终的HTML
             rendered_html = template.render(
-                data=json_data,  # 分析结果数据（JSON格式）
+                data=processed_data,
                 timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),  # 当前时间戳
                 static_url=static_url  # 静态文件的路径
             )

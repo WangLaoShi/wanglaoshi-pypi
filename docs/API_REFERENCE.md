@@ -674,7 +674,7 @@ from wanglaoshi.analytics import (
 )
 
 df = pd.DataFrame({"y": np.arange(20, dtype=float)})
-lagged = TimeSeriesTools.safe_lag(df, "y", lags=(1,))
+lagged = TimeSeriesTools.safe_lag(df, "y", lags=(1,), assume_row_order=True)
 assert "y_lag1" in lagged.columns
 y = np.array([0, 1, 0, 1, 1, 0, 1, 0])
 p = np.array([0.1, 0.8, 0.2, 0.7, 0.6, 0.3, 0.9, 0.4])

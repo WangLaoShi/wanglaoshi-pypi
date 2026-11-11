@@ -1,5 +1,9 @@
 # Advanced Notebook 跑通证据
 
+> **验收边界：** 下表 `passed` 只证明 Notebook **按 `inprocess` 执行未抛错**，**不**证明每个案例都用了指定真实数据集。  
+> 允许 DEMO/合成回退的案例（如房价、欺诈、部分 OpenML 下载失败路径）在回退时仍可能记为 passed。  
+> 发布级「真实数据验收」须另附：数据模式、来源、哈希、行数与业务断言；见 [`DATA_ACCEPTANCE.md`](DATA_ACCEPTANCE.md)。
+
 - 生成时间(UTC): `2026-11-11T00:58:50.657993+00:00`
 - Python: `/opt/anaconda3/bin/python`
 - 汇总: passed=22, failed=0, total=22

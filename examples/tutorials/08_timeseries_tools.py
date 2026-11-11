@@ -15,9 +15,9 @@ def main() -> None:
     y = 10 + 0.1 * t + 3 * np.sin(2 * np.pi * t / 7)
     df = pd.DataFrame({"y": y})
 
-    lagged = TimeSeriesTools.safe_lag(df, "y", lags=(1, 2))
+    lagged = TimeSeriesTools.safe_lag(df, "y", lags=(1, 2), assume_row_order=True)
     assert "y_lag1" in lagged.columns
-    rolled = TimeSeriesTools.safe_rolling_mean(lagged, "y", window=3)
+    rolled = TimeSeriesTools.safe_rolling_mean(lagged, "y", window=3, assume_row_order=True)
     assert "y_roll3" in rolled.columns
     adf = TimeSeriesTools.adf_report(df["y"])
     assert "pvalue" in adf

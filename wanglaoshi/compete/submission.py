@@ -328,16 +328,24 @@ class SubmissionGenerator:
                 if method == 'weighted_average':
                     # 加权平均
                     if weights is None:
-                        weights = [1.0 / len(submissions)] * len(submissions)
+                        w = np.full(len(submissions), 1.0 / len(submissions), dtype=float)
                     else:
                         if len(weights) != len(submissions):
-                            raise ValueError(f"权重数量 ({len(weights)}) 与提交文件数量 ({len(submissions)}) 不匹配")
-                        # 归一化权重
-                        weights = np.array(weights)
-                        weights = weights / weights.sum()
-                    
-                    ensemble_pred = np.average(predictions, axis=0, weights=weights)
-                    logger.info(f"使用加权平均融合 {target_col}，权重: {weights}")
+                            raise ValueError(
+                                f"权重数量 ({len(weights)}) 与提交文件数量 ({len(submissions)}) 不匹配"
+                            )
+                        w = np.asarray(weights, dtype=float)
+                        if not np.all(np.isfinite(w)):
+                            raise ValueError("weights must be finite numbers")
+                        if np.any(w < 0):
+                            raise ValueError("weights must be non-negative")
+                        wsum = float(w.sum())
+                        if wsum <= 0:
+                            raise ValueError("weights must sum to a positive value")
+                        w = w / wsum
+
+                    ensemble_pred = np.average(predictions, axis=0, weights=w)
+                    logger.info(f"使用加权平均融合 {target_col}，权重: {w}")
                     
                 elif method == 'simple_average':
                     # 简单平均
@@ -363,10 +371,15 @@ class SubmissionGenerator:
                     
                 else:
                     raise ValueError(f"不支持的融合方法: {method}")
-                
+
+                ensemble_pred = np.asarray(ensemble_pred, dtype=float)
+                if ensemble_pred.size == 0 or not np.all(np.isfinite(ensemble_pred)):
+                    raise ValueError(
+                        f"ensemble predictions for {target_col!r} contain non-finite values; refuse to write"
+                    )
                 ensemble_df[target_col] = ensemble_pred
             
-            # 保存融合后的提交文件
+            # 校验通过后再落盘，避免失败时留下空/损坏提交
             ensemble_df.to_csv(output_path, index=False)
             logger.info(f"融合提交文件已生成: {output_path}")
             logger.info(f"融合了 {len(submissions)} 个提交文件")
