@@ -68,6 +68,13 @@ TUTORIAL_COPIES = [
     "08_timeseries_tools.md",
     "09_calibration_fairness.md",
     "10_testing_repro.md",
+    "11_runtime_toolkit.md",
+    "12_analyze_helpers.md",
+    "13_compete_advanced.md",
+    "14_analytics_extra.md",
+    "15_ml_toolkit.md",
+    "16_business_stages.md",
+    "17_testing_extra.md",
 ]
 
 

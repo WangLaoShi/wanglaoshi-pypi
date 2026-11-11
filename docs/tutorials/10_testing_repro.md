@@ -75,6 +75,6 @@ with tempfile.TemporaryDirectory() as td:
 
 ## 下一步
 
-- 回到索引 → [README.md](README.md)
+- runtime 工具箱 → [11_runtime_toolkit.md](11_runtime_toolkit.md)
+- `_testing` 其余 → [17_testing_extra.md](17_testing_extra.md)
 - 进阶案例 → `examples/advanced/`
-- API → [`docs/API_REFERENCE.md`](../API_REFERENCE.md)

@@ -21,6 +21,13 @@ parts:
       - file: tutorials/08_timeseries_tools
       - file: tutorials/09_calibration_fairness
       - file: tutorials/10_testing_repro
+      - file: tutorials/11_runtime_toolkit
+      - file: tutorials/12_analyze_helpers
+      - file: tutorials/13_compete_advanced
+      - file: tutorials/14_analytics_extra
+      - file: tutorials/15_ml_toolkit
+      - file: tutorials/16_business_stages
+      - file: tutorials/17_testing_extra
 
   - caption: 精讲课（先于案例）
     chapters:

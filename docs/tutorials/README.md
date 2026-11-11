@@ -1,6 +1,6 @@
 # 门面教程（1.15.1+）
 
-这是相对 E01–E22 **进阶案例**的第二学习路径：按 **门面 API** 拆开，用公开/内置数据在 10–20 分钟内跑通「怎么调用」。
+按 **门面公开符号** 拆开的短教程：公开/内置数据，10–20 分钟跑通调用方式。
 
 - 详尽签名：[`docs/API_REFERENCE.md`](../API_REFERENCE.md)
 - 架构分层：[`docs/ARCHITECTURE.md`](../ARCHITECTURE.md)
@@ -10,53 +10,55 @@
 ## 学习顺序
 
 ```text
-安装 wanglaoshi==1.15.1+
-        │
-        ▼
-  01 ready + EDA  ──►  02 compete 基线/提交  ──►  03 features 编码
-        │                      │
-        │                      ├──►  07 泄漏 + CV
-        │                      └──►  06 ml 预处理/建模
-        │
-        ├─► 04 analytics 统计 ──► 08 时序 ──► 09 校准/公平
-        ├─► 05 business 流水线
-        └─► 10 _testing 复现治理
-                          │
-                          ▼
-                   E01–E22 进阶案例
+01 ready+EDA → 02 compete 基线 → 03 features → 06 ml
+        │              └→ 07 泄漏+CV → 13 集成/重要性/追踪
+        ├→ 04 统计 → 08 时序 → 09 校准/公平 → 14 异常/排序/生存
+        ├→ 05 / 16 business
+        ├→ 10 / 17 _testing
+        ├→ 11 runtime 工具箱
+        └→ 12 analyze 辅助
 ```
 
 ### 第一批（上手）
 
-| 课 | 文档 | 脚本 | 数据 | 门面 |
-| --- | --- | --- | --- | --- |
-| 01 | [01_ready_and_eda.md](01_ready_and_eda.md) | `examples/tutorials/01_ready_and_eda.py` | sklearn Iris + seaborn tips | `runtime` + `analyze` |
-| 02 | [02_compete_baseline.md](02_compete_baseline.md) | `examples/tutorials/02_compete_baseline.py` | seaborn Titanic | `compete` |
-| 03 | [03_features_encode.md](03_features_encode.md) | `examples/tutorials/03_features_encode.py` | 合成高基数表 | `features` |
-| 04 | [04_analytics_stats.md](04_analytics_stats.md) | `examples/tutorials/04_analytics_stats.py` | 合成两组样本 | `analytics` |
-| 05 | [05_business_pipeline.md](05_business_pipeline.md) | `examples/tutorials/05_business_pipeline.py` | 合成订单 CSV | `business` |
-| 06 | [06_ml_preprocess.md](06_ml_preprocess.md) | `examples/tutorials/06_ml_preprocess.py` | sklearn Breast cancer | `ml` |
+| 课 | 文档 | 门面重点 |
+| --- | --- | --- |
+| 01 | [01_ready_and_eda.md](01_ready_and_eda.md) | `ready` · `DataAnalyzer` |
+| 02 | [02_compete_baseline.md](02_compete_baseline.md) | `QuickBaseline` · `SubmissionGenerator` |
+| 03 | [03_features_encode.md](03_features_encode.md) | `AdvancedFeatureEngineer` |
+| 04 | [04_analytics_stats.md](04_analytics_stats.md) | `StatsToolkit` · `ExperimentDesign` |
+| 05 | [05_business_pipeline.md](05_business_pipeline.md) | `BusinessPipeline` |
+| 06 | [06_ml_preprocess.md](06_ml_preprocess.md) | `DataPreprocessor` · `MLModel` |
 
 ### 第二批（进阶门面）
 
-| 课 | 文档 | 脚本 | 数据 | 门面 |
-| --- | --- | --- | --- | --- |
-| 07 | [07_leakage_and_cv.md](07_leakage_and_cv.md) | `examples/tutorials/07_leakage_and_cv.py` | seaborn Titanic | `compete` |
-| 08 | [08_timeseries_tools.md](08_timeseries_tools.md) | `examples/tutorials/08_timeseries_tools.py` | 合成季节序列 | `analytics` |
-| 09 | [09_calibration_fairness.md](09_calibration_fairness.md) | `examples/tutorials/09_calibration_fairness.py` | Breast cancer + 合成分组 | `analytics` |
-| 10 | [10_testing_repro.md](10_testing_repro.md) | `examples/tutorials/10_testing_repro.py` | Iris + 临时台账 | `_testing` |
+| 课 | 文档 | 门面重点 |
+| --- | --- | --- |
+| 07 | [07_leakage_and_cv.md](07_leakage_and_cv.md) | `LeakageDetector` · `CrossValidator` |
+| 08 | [08_timeseries_tools.md](08_timeseries_tools.md) | `TimeSeriesTools` |
+| 09 | [09_calibration_fairness.md](09_calibration_fairness.md) | `CalibrationReport` · `GroupMetricsReport` |
+| 10 | [10_testing_repro.md](10_testing_repro.md) | `DataRegistry` · `ExperimentContext` · 分数下限 |
+
+### 第三批（公开符号补齐）
+
+| 课 | 文档 | 门面重点 |
+| --- | --- | --- |
+| 11 | [11_runtime_toolkit.md](11_runtime_toolkit.md) | `VERSIONS` · `JupyterEnv` · `JupyterFont` · `Useful` · `WebGetter` |
+| 12 | [12_analyze_helpers.md](12_analyze_helpers.md) | `load_data` · `analyze_*` · `DataProcessor` · `Visualizer` · `ReportGenerator` |
+| 13 | [13_compete_advanced.md](13_compete_advanced.md) | `ModelEnsemble` · `FeatureImportanceAnalyzer` · `ExperimentTracker` · `HyperparameterOptimizer` |
+| 14 | [14_analytics_extra.md](14_analytics_extra.md) | `AnomalyDetector` · `RankingMetrics` · `SurvivalAnalyzer` |
+| 15 | [15_ml_toolkit.md](15_ml_toolkit.md) | `FeatureEngineer` · `ModelEvaluator` · `DLModel` · `NeuralNetwork` · `example_usage` |
+| 16 | [16_business_stages.md](16_business_stages.md) | business 阶段函数与常量 |
+| 17 | [17_testing_extra.md](17_testing_extra.md) | `_testing` 其余公开入口 |
 
 ## 一键烟测
 
 ```bash
-# 仓库根目录
 PYTHONPATH=. python scripts/smoke_docs_examples.py
-# 或只跑教程脚本
-PYTHONPATH=. python examples/tutorials/01_ready_and_eda.py
 ```
 
 ## 约定
 
-- 只教门面导入：`from wanglaoshi.analyze import DataAnalyzer` 等
-- 优先离线可跑（sklearn / seaborn 内置；业务用合成表）
-- 教程讲「最短可用路径」；竞赛纪律与深水区仍以 E0x / 精讲课为准
+- 只教门面导入
+- 优先离线可跑；Optuna / torch 为可选增强
+- 深水区仍以 E01–E22 为准
