@@ -22,6 +22,7 @@
 | --- | --- |
 | [book/](book/) | **基线工坊** 公开教材站（Notebook + 练习 + 学习路径） |
 | **[docs/tutorials/](docs/tutorials/)** | **门面教程**（公开/内置数据，10–20 分钟上手） |
+| **[docs/handbook/](docs/handbook/)** | **使用手册**（类/方法介绍 + 可跑案例） |
 | **[docs/API_REFERENCE.md](docs/API_REFERENCE.md)** | **详尽 API 说明书**（签名 + 已校验可运行示例；与源码冲突时以它为准） |
 | **[docs/RELEASE.md](docs/RELEASE.md)** | **发布只记三句**（`./scripts/release_check.sh`） |
 | [PROJECT_STATUS.md](PROJECT_STATUS.md) | 功能点数量与完成率 |
@@ -45,10 +46,12 @@ wanglaoshi-pypi
 ├── docs/                         # API / Skill / 依赖 / 跑通证据
 ├── examples/                     # 可运行示例
 │   ├── tutorials/                # 门面教程脚本（对应 docs/tutorials）
+│   ├── handbook/                 # 使用手册脚本（对应 docs/handbook）
 │   ├── analyzer_demo.py
 │   ├── business_intake_demo.ipynb
-│   └── advanced/                 # 进阶 Jupyter 案例 E01–E22（手册内容源）
+│   └── advanced/                 # 进阶 Jupyter 案例 E01–E22
 ├── docs/tutorials/               # 门面短教程（公开数据集）
+├── docs/handbook/                # 类与方法使用手册（带案例）
 ├── scripts/                      # 测试 / 证据 / 构建手册
 ├── tests/                        # pytest
 └── wanglaoshi/

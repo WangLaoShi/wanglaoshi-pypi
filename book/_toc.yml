@@ -29,6 +29,16 @@ parts:
       - file: tutorials/16_business_stages
       - file: tutorials/17_testing_extra
 
+  - caption: 使用手册（类与方法）
+    chapters:
+      - file: handbook/README
+      - file: handbook/01_data_analyzer
+      - file: handbook/02_feature_engineer
+      - file: handbook/03_compete_toolkit
+      - file: handbook/04_analytics_toolkit
+      - file: handbook/05_ml_guide
+      - file: handbook/06_business_guide
+
   - caption: 精讲课（先于案例）
     chapters:
       - file: lessons/overview

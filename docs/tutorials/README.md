@@ -3,6 +3,7 @@
 按 **门面公开符号** 拆开的短教程：公开/内置数据，10–20 分钟跑通调用方式。
 
 - 详尽签名：[`docs/API_REFERENCE.md`](../API_REFERENCE.md)
+- 类与方法手册：[`docs/handbook/`](../handbook/)
 - 架构分层：[`docs/ARCHITECTURE.md`](../ARCHITECTURE.md)
 - 深案例：[`examples/advanced/`](../../examples/advanced/)
 - 可执行烟测脚本：[`examples/tutorials/`](../../examples/tutorials/)

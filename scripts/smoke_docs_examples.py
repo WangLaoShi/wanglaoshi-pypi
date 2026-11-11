@@ -5,6 +5,7 @@
 - analyzer_demo 核心路径（不写完整 HTML 也可）
 - BusinessPipeline 最小 CSV 主链
 - examples/tutorials/* 门面教程脚本
+- examples/handbook/* 使用手册脚本
 - advanced/01_iris 进程内执行（代表进阶案例）
 
 退出码：0 全过；1 有失败。
@@ -109,19 +110,27 @@ def check_analyzer_demo_core() -> None:
     _ok("analyzer_demo core")
 
 
-def check_tutorials() -> None:
+def _run_numbered_scripts(rel_dir: str, label: str) -> None:
     import importlib.util
 
-    tutorial_dir = ROOT / "examples" / "tutorials"
-    scripts = sorted(tutorial_dir.glob("[0-9][0-9]_*.py"))
-    assert scripts, "missing examples/tutorials/NN_*.py"
+    script_dir = ROOT / rel_dir
+    scripts = sorted(script_dir.glob("[0-9][0-9]_*.py"))
+    assert scripts, f"missing {rel_dir}/NN_*.py"
     for path in scripts:
         spec = importlib.util.spec_from_file_location(path.stem, path)
         assert spec and spec.loader
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         mod.main()
-        _ok(f"tutorial {path.name}")
+        _ok(f"{label} {path.name}")
+
+
+def check_tutorials() -> None:
+    _run_numbered_scripts("examples/tutorials", "tutorial")
+
+
+def check_handbooks() -> None:
+    _run_numbered_scripts("examples/handbook", "handbook")
 
 
 def check_business_pipeline() -> None:
@@ -187,6 +196,7 @@ def main() -> int:
         check_analyzer_demo_core,
         check_business_pipeline,
         check_tutorials,
+        check_handbooks,
         check_iris_notebook,
     ]
     failed = 0

@@ -15,6 +15,7 @@ BOOK = ROOT / "book"
 CASES = BOOK / "cases"
 REF = BOOK / "reference"
 TUTORIALS = BOOK / "tutorials"
+HANDBOOK = BOOK / "handbook"
 
 NOTEBOOKS = [
     "01_iris",
@@ -77,11 +78,23 @@ TUTORIAL_COPIES = [
     "17_testing_extra.md",
 ]
 
+# 使用手册：docs/handbook → book/handbook
+HANDBOOK_COPIES = [
+    "README.md",
+    "01_data_analyzer.md",
+    "02_feature_engineer.md",
+    "03_compete_toolkit.md",
+    "04_analytics_toolkit.md",
+    "05_ml_guide.md",
+    "06_business_guide.md",
+]
+
 
 def main() -> None:
     CASES.mkdir(parents=True, exist_ok=True)
     REF.mkdir(parents=True, exist_ok=True)
     TUTORIALS.mkdir(parents=True, exist_ok=True)
+    HANDBOOK.mkdir(parents=True, exist_ok=True)
 
     src_dir = ROOT / "examples" / "advanced"
     for name in NOTEBOOKS:
@@ -133,6 +146,7 @@ def main() -> None:
         text = text.replace("](../ARCHITECTURE.md)", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/ARCHITECTURE.md)")
         text = text.replace("](../../examples/tutorials/", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/tutorials/")
         text = text.replace("](../../examples/advanced/", "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/advanced/")
+        text = text.replace("](../handbook/", "](../handbook/")
         banner = (
             "```{note}\n"
             f"本页从仓库 `docs/tutorials/{name}` 同步生成；请以仓库文件为编辑源。\n"
@@ -142,6 +156,33 @@ def main() -> None:
             text = banner + text
         dst.write_text(text, encoding="utf-8")
         print(f"synced tut  {dst.relative_to(ROOT)}")
+
+    hb_src = ROOT / "docs" / "handbook"
+    for name in HANDBOOK_COPIES:
+        src = hb_src / name
+        if not src.exists():
+            raise FileNotFoundError(f"missing handbook: {src}")
+        dst = HANDBOOK / name
+        text = src.read_text(encoding="utf-8")
+        text = text.replace("](../API_REFERENCE.md)", "](../reference/api)")
+        text = text.replace("](../tutorials/", "](../tutorials/")
+        text = text.replace(
+            "](../../examples/handbook/",
+            "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/handbook/",
+        )
+        text = text.replace(
+            "](../../examples/advanced/",
+            "](https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/examples/advanced/",
+        )
+        banner = (
+            "```{note}\n"
+            f"本页从仓库 `docs/handbook/{name}` 同步生成；请以仓库文件为编辑源。\n"
+            "```\n\n"
+        )
+        if not text.lstrip().startswith("```{note}"):
+            text = banner + text
+        dst.write_text(text, encoding="utf-8")
+        print(f"synced hb   {dst.relative_to(ROOT)}")
 
     print("prepare_book: done")
 
