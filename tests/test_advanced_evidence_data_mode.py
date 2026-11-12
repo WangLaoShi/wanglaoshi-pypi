@@ -102,3 +102,17 @@ def test_release_verdict_real_with_full_evidence_ok(evidence_mod) -> None:
         )
         == "ok"
     )
+
+
+@pytest.mark.quick
+def test_release_evidence_gaps_empty_when_complete(evidence_mod) -> None:
+    assert (
+        evidence_mod._release_evidence_gaps(
+            {
+                "data_source": "data/x.csv",
+                "n_rows": 10,
+                "data_sha256": "b" * 64,
+            }
+        )
+        == []
+    )

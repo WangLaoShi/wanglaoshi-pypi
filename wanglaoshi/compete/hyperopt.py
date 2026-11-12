@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 from typing import Any, Dict, Optional
 
 import numpy as np
@@ -11,6 +12,8 @@ import pandas as pd
 from wanglaoshi.compete.cv import resolve_cv_scoring
 
 logger = logging.getLogger(__name__)
+
+_SEARCH_TYPES = {"categorical", "int", "float"}
 
 
 def _task_type_from_estimator(model_class: Any) -> Optional[str]:
@@ -35,6 +38,50 @@ def _task_type_from_estimator(model_class: Any) -> Optional[str]:
     return None
 
 
+def _validate_param_space(param_space: Dict[str, Any]) -> None:
+    """拒绝易误用的非标量固定值（如 (low, high) 元组被当成 C=）。"""
+    for name, cfg in param_space.items():
+        if isinstance(cfg, dict):
+            t = cfg.get("type")
+            if t not in _SEARCH_TYPES:
+                raise ValueError(
+                    f"param_space[{name!r}] dict 需含 type in {_SEARCH_TYPES}, got {t!r}"
+                )
+            continue
+        if isinstance(cfg, (list, tuple, set, dict)):
+            raise ValueError(
+                f"param_space[{name!r}]={cfg!r} 不能直接作为模型参数；"
+                f"请用 {{'type': 'float'|'int'|'categorical', ...}} 描述搜索空间"
+            )
+
+
+def _sample_params(trial: Any, param_space: Dict[str, Any]) -> Dict[str, Any]:
+    params: Dict[str, Any] = {}
+    for param_name, param_config in param_space.items():
+        if isinstance(param_config, dict):
+            if param_config["type"] == "categorical":
+                params[param_name] = trial.suggest_categorical(
+                    param_name, param_config["choices"]
+                )
+            elif param_config["type"] == "int":
+                params[param_name] = trial.suggest_int(
+                    param_name,
+                    param_config["low"],
+                    param_config["high"],
+                    log=param_config.get("log", False),
+                )
+            elif param_config["type"] == "float":
+                params[param_name] = trial.suggest_float(
+                    param_name,
+                    param_config["low"],
+                    param_config["high"],
+                    log=param_config.get("log", False),
+                )
+        else:
+            params[param_name] = param_config
+    return params
+
+
 class HyperparameterOptimizer:
     """超参数优化器（贝叶斯 / 自动调参）。"""
 
@@ -52,6 +99,7 @@ class HyperparameterOptimizer:
         scoring: Optional[str] = None,
         task_type: str = "auto",
         n_jobs: int = -1,
+        show_progress_bar: Optional[bool] = None,
     ) -> Dict[str, Any]:
         """
         贝叶斯优化超参数（Optuna）。
@@ -62,10 +110,13 @@ class HyperparameterOptimizer:
         """
         try:
             import optuna
-            from sklearn.model_selection import cross_val_score
         except ImportError:
             logger.warning("Optuna未安装，无法使用贝叶斯优化")
             raise ImportError("需要安装Optuna: pip install optuna") from None
+
+        from sklearn.model_selection import cross_val_score
+
+        _validate_param_space(param_space)
 
         y_s = y if isinstance(y, pd.Series) else pd.Series(y)
         resolved_task = task_type
@@ -78,48 +129,39 @@ class HyperparameterOptimizer:
             y_s, scoring=scoring, task_type=resolved_task
         )
 
-        def objective(trial):
-            params = {}
-            for param_name, param_config in param_space.items():
-                if isinstance(param_config, dict):
-                    if param_config["type"] == "categorical":
-                        params[param_name] = trial.suggest_categorical(
-                            param_name, param_config["choices"]
-                        )
-                    elif param_config["type"] == "int":
-                        params[param_name] = trial.suggest_int(
-                            param_name,
-                            param_config["low"],
-                            param_config["high"],
-                            log=param_config.get("log", False),
-                        )
-                    elif param_config["type"] == "float":
-                        params[param_name] = trial.suggest_float(
-                            param_name,
-                            param_config["low"],
-                            param_config["high"],
-                            log=param_config.get("log", False),
-                        )
-                else:
-                    params[param_name] = param_config
+        if show_progress_bar is None:
+            show_progress_bar = bool(getattr(sys.stderr, "isatty", lambda: False)())
 
+        def objective(trial):
+            params = _sample_params(trial, param_space)
             model = model_class(**params)
-            scores = cross_val_score(
-                model,
-                X,
-                y_s,
-                cv=cv,
-                scoring=sklearn_scoring,
-                n_jobs=n_jobs,
-                error_score=np.nan,
-            )
-            mean = float(np.nanmean(scores))
+            try:
+                scores = cross_val_score(
+                    model,
+                    X,
+                    y_s,
+                    cv=cv,
+                    scoring=sklearn_scoring,
+                    n_jobs=n_jobs,
+                    error_score=np.nan,
+                )
+            except ValueError as exc:
+                # sklearn：全部折失败时即使 error_score=nan 仍可能抛 ValueError
+                msg = str(exc).lower()
+                if "fits failed" in msg or "all the" in msg:
+                    raise optuna.TrialPruned() from exc
+                raise
+            mean = float(np.nanmean(np.asarray(scores, dtype=float)))
             if not np.isfinite(mean):
                 raise optuna.TrialPruned()
             return mean
 
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
+        study.optimize(
+            objective,
+            n_trials=n_trials,
+            show_progress_bar=show_progress_bar,
+        )
 
         completed = [
             t
@@ -168,7 +210,15 @@ class HyperparameterOptimizer:
         task_type: str = "auto",
         n_trials: int = 50,
     ) -> Dict[str, Any]:
-        """基于模型类型选择默认参数空间并优化。"""
+        """基于模型类型选择默认参数空间并优化。
+
+        ``model_type`` 为 ``regression`` / ``classification`` 时同时作为默认
+        ``task_type``（若调用方未显式传入 task_type）。
+        """
+        resolved_task = task_type
+        if resolved_task == "auto" and model_type in {"regression", "classification"}:
+            resolved_task = model_type
+
         if "RandomForest" in str(model_class):
             param_space = {
                 "n_estimators": {"type": "int", "low": 50, "high": 500},
@@ -199,5 +249,5 @@ class HyperparameterOptimizer:
             y,
             n_trials=n_trials,
             scoring=scoring,
-            task_type=task_type,
+            task_type=resolved_task,
         )

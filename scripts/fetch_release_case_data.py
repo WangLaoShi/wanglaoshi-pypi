@@ -2,7 +2,7 @@
 """为发布案例拉取/校验真实数据（欺诈检测 / 共享单车 / Mall Customers）。
 
 - 共享单车：优先本地 data/bike_sharing_hour.csv；否则尝试 OpenML Bike_Sharing_Demand
-- Mall：优先本地 data/Mall_Customers.csv；否则尝试公开镜像下载
+- Mall：优先本地；否则仅当哈希匹配钉扎镜像时才写入
 - 信用卡欺诈：仅校验本地 data/creditcard.csv（Kaggle 授权数据，不自动下载）
 
 写出 docs/evidence/RELEASE_CASE_DATA.md 与 JSON 指纹。
@@ -23,6 +23,18 @@ DATA = ROOT / "data"
 OUT_MD = ROOT / "docs" / "evidence" / "RELEASE_CASE_DATA.md"
 OUT_JSON = ROOT / "docs" / "evidence" / "release_case_data.json"
 
+# 下载硬限制，防止镜像返回超大文件撑爆磁盘
+_MAX_DOWNLOAD_BYTES = 5 * 1024 * 1024
+
+# Mall：钉扎内容哈希（与仓库已验收的 data/Mall_Customers.csv 一致）
+_MALL_PINNED = {
+    "sha256": "416a4f62a8f33841a16e1db5297f0e05d3b65b05e73632cedae58e739e1e1f77",
+    "n_rows": 200,
+    "urls": [
+        "https://raw.githubusercontent.com/tirthajyoti/Machine-Learning-with-Python/master/Datasets/Mall_Customers.csv",
+    ],
+}
+
 
 def _sha256_file(path: Path, chunk: int = 1 << 20) -> str:
     h = hashlib.sha256()
@@ -35,9 +47,28 @@ def _sha256_file(path: Path, chunk: int = 1 << 20) -> str:
     return h.hexdigest()
 
 
+def _sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _download_limited(url: str, max_bytes: int = _MAX_DOWNLOAD_BYTES) -> bytes:
+    req = urllib.request.Request(url, headers={"User-Agent": "wanglaoshi-release-fetch/1.0"})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        chunks: list[bytes] = []
+        total = 0
+        while True:
+            block = resp.read(64 * 1024)
+            if not block:
+                break
+            total += len(block)
+            if total > max_bytes:
+                raise ValueError(f"download exceeds {max_bytes} bytes from {url}")
+            chunks.append(block)
+    return b"".join(chunks)
+
+
 def _record(slug: str, **kwargs) -> dict:
-    row = {"slug": slug, **kwargs}
-    return row
+    return {"slug": slug, **kwargs}
 
 
 def fraud_case() -> dict:
@@ -80,7 +111,6 @@ def bike_case() -> dict:
     try:
         from sklearn.datasets import fetch_openml
 
-        # OpenML 上该数据集当前活跃版本为 2/3（v1 已不可用）
         raw = fetch_openml("Bike_Sharing_Demand", version=2, as_frame=True, parser="auto")
         df = raw.frame.copy()
         DATA.mkdir(parents=True, exist_ok=True)
@@ -105,37 +135,49 @@ def bike_case() -> dict:
 
 def mall_case() -> dict:
     path = DATA / "Mall_Customers.csv"
+    pinned = _MALL_PINNED["sha256"]
     if path.exists():
+        digest = _sha256_file(path)
         df = pd.read_csv(path)
+        if digest != pinned:
+            return _record(
+                "09_mall_customers",
+                data_mode="real",
+                source=str(path.relative_to(ROOT)),
+                n_rows=int(len(df)),
+                sha256=digest,
+                status="blocked",
+                note=f"local file sha256 mismatch pinned={pinned[:16]}…",
+            )
         return _record(
             "09_mall_customers",
             data_mode="real",
             source=str(path.relative_to(ROOT)),
             n_rows=int(len(df)),
-            sha256=_sha256_file(path),
+            sha256=digest,
             status="ready",
         )
 
-    # 教学常用公开镜像（非 Kaggle 授权墙）；失败则 blocked
-    mirrors = [
-        "https://raw.githubusercontent.com/tirthajyoti/Machine-Learning-with-Python/master/Datasets/Mall_Customers.csv",
-        "https://raw.githubusercontent.com/SteffiPeTaffy/machineLearning-/master/Mall_Customers.csv",
-    ]
     last_err = ""
-    for url in mirrors:
+    for url in _MALL_PINNED["urls"]:
         try:
             DATA.mkdir(parents=True, exist_ok=True)
-            with urllib.request.urlopen(url, timeout=30) as resp:
-                path.write_bytes(resp.read())
+            raw = _download_limited(url)
+            digest = _sha256_bytes(raw)
+            if digest != pinned:
+                raise ValueError(
+                    f"mirror sha mismatch got={digest} expected={pinned} url={url}"
+                )
+            path.write_bytes(raw)
             df = pd.read_csv(path)
-            if len(df) < 50:
-                raise ValueError(f"too few rows: {len(df)}")
+            if int(len(df)) != int(_MALL_PINNED["n_rows"]):
+                raise ValueError(f"unexpected n_rows={len(df)}")
             return _record(
                 "09_mall_customers",
                 data_mode="real",
-                source=f"{url} → data/Mall_Customers.csv",
+                source=f"{url} → data/Mall_Customers.csv (pinned)",
                 n_rows=int(len(df)),
-                sha256=_sha256_file(path),
+                sha256=digest,
                 status="ready",
             )
         except Exception as e:  # noqa: BLE001
@@ -145,7 +187,7 @@ def mall_case() -> dict:
     return _record(
         "09_mall_customers",
         data_mode="missing",
-        source="expected:data/Mall_Customers.csv",
+        source="expected:data/Mall_Customers.csv (pinned sha)",
         status="blocked",
         note=last_err or "download failed",
     )
@@ -157,6 +199,7 @@ def main() -> int:
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "cases": rows,
+        "mall_pinned_sha256": _MALL_PINNED["sha256"],
     }
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -166,6 +209,7 @@ def main() -> int:
         "",
         f"- 生成时间(UTC): `{payload['generated_at_utc']}`",
         "- 口径见 [`DATA_ACCEPTANCE.md`](DATA_ACCEPTANCE.md)",
+        f"- Mall 钉扎 sha256: `{_MALL_PINNED['sha256']}`",
         "",
         "| Case | status | data_mode | n_rows | source |",
         "| --- | --- | --- | --- | --- |",

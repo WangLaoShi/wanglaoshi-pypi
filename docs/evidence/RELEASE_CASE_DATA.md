@@ -1,7 +1,8 @@
 # 发布案例真实数据验收
 
-- 生成时间(UTC): `2026-11-12T00:25:31.594655+00:00`
+- 生成时间(UTC): `2026-11-12T06:19:59.728627+00:00`
 - 口径见 [`DATA_ACCEPTANCE.md`](DATA_ACCEPTANCE.md)
+- Mall 钉扎 sha256: `416a4f62a8f33841a16e1db5297f0e05d3b65b05e73632cedae58e739e1e1f77`
 
 | Case | status | data_mode | n_rows | source |
 | --- | --- | --- | --- | --- |

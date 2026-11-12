@@ -115,6 +115,69 @@ def test_optuna_live_small_continuous_uses_mse(monkeypatch: pytest.MonkeyPatch) 
 
 
 @pytest.mark.quick
+def test_param_space_rejects_range_tuple() -> None:
+    X = pd.DataFrame({"x": np.arange(12, dtype=float)})
+    y = pd.Series(np.linspace(0.0, 1.0, 12))
+    with pytest.raises(ValueError, match="搜索空间"):
+        HyperparameterOptimizer().bayesian_optimize(
+            _BiasRegressor,
+            {"bias": (0.0, 1.0)},
+            X,
+            y,
+            n_trials=1,
+            cv=2,
+            n_jobs=1,
+            show_progress_bar=False,
+        )
+
+
+@pytest.mark.quick
+def test_all_fits_failed_prunes_instead_of_abort(monkeypatch: pytest.MonkeyPatch) -> None:
+    """全部折失败应剪枝该 trial，合法候选仍能完成优化。"""
+    optuna.logging.set_verbosity(optuna.logging.WARNING)
+    _orig_create = optuna.create_study
+
+    def _create_study(direction: str = "maximize", **kwargs):
+        return _orig_create(
+            direction=direction,
+            sampler=optuna.samplers.GridSampler({"bias": [0.0, 1.0]}),
+        )
+
+    monkeypatch.setattr(optuna, "create_study", _create_study)
+
+    import sklearn.model_selection as sms
+
+    _cv = sms.cross_val_score
+    calls = {"n": 0}
+
+    def _cv_flaky(*args, **kwargs):
+        kwargs["n_jobs"] = 1
+        calls["n"] += 1
+        model = args[0]
+        if float(getattr(model, "bias", 0.0)) == 0.0:
+            raise ValueError("All the 2 fits failed. It is very likely that your model is misconfigured.")
+        return _cv(*args, **kwargs)
+
+    monkeypatch.setattr(sms, "cross_val_score", _cv_flaky)
+
+    X = pd.DataFrame({"x": np.arange(12, dtype=float)})
+    y = pd.Series(np.linspace(0.0, 1.0, 12))
+    result = HyperparameterOptimizer().bayesian_optimize(
+        _BiasRegressor,
+        {"bias": {"type": "categorical", "choices": [0.0, 1.0]}},
+        X,
+        y,
+        n_trials=2,
+        cv=2,
+        n_jobs=1,
+        show_progress_bar=False,
+    )
+    assert result["best_params"]["bias"] == pytest.approx(1.0)
+    assert result["n_completed"] >= 1
+    assert calls["n"] >= 2
+
+
+@pytest.mark.quick
 def test_bayesian_optimize_explicit_scoring_overrides(monkeypatch: pytest.MonkeyPatch) -> None:
     """显式 scoring 优先于估计器/目标推断。"""
     from types import ModuleType, SimpleNamespace

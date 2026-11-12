@@ -54,5 +54,6 @@
 | `scripts/verify_wheel_chinese_report.py` | 构建 wheel → 源码外 venv 安装 → 中文完整报告 |
 | `scripts/fetch_release_case_data.py` | Fraud/Bike/Mall 真实数据指纹（见 RELEASE_CASE_DATA.md） |
 | `scripts/run_advanced_evidence.py --release-data` | 必填真实数据须 real + source/n_rows/sha256（退出码 2） |
+| `WANGLAOSHI_SKIP_RELEASE_DATA=1` + `release_check full` | 无 Fraud CSV 时跳过发布数据门槛（不得记为发版真实验收） |
 
 默认验收入口：**`./scripts/release_check.sh`**。干净环境证据入口：**`./scripts/verify_clean_env.sh`**。

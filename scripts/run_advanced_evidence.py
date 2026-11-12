@@ -380,10 +380,17 @@ def main() -> int:
     passed = sum(1 for r in evidence["results"] if r["status"] == "passed")
     failed = sum(1 for r in evidence["results"] if r["status"] in {"failed", "error", "missing"})
     demo_n = sum(1 for r in evidence["results"] if r.get("data_mode") == "demo")
-    real_n = sum(
+    real_mode_n = sum(
         1
         for r in evidence["results"]
         if r["status"] == "passed" and str(r.get("data_mode", "")).startswith("real")
+    )
+    real_verified_n = sum(
+        1
+        for r in evidence["results"]
+        if r["status"] == "passed"
+        and str(r.get("data_mode", "")).startswith("real")
+        and not _release_evidence_gaps(r)
     )
     data_fail_n = sum(1 for r in evidence["results"] if r.get("release_data_verdict") == "data_fail")
     evidence["summary"] = {
@@ -391,9 +398,17 @@ def main() -> int:
         "failed": failed,
         "total": len(evidence["results"]),
         "demo_or_synthetic": demo_n,
-        "real_or_local_claimed": real_n,
+        # 仅 data_mode 声称 real（可能缺 source/n_rows/sha）
+        "real_mode_claimed_unverified": real_mode_n,
+        # data_mode=real* 且具备完整证据字段
+        "real_with_evidence": real_verified_n,
+        # 兼容旧字段名：语义改为「带完整证据的 real」
+        "real_or_local_claimed": real_verified_n,
         "release_data_fail": data_fail_n,
-        "note": "passed≠真实数据验收；--release-data 时 REQUIRE_REAL_DATA 单独判定",
+        "note": (
+            "passed≠真实数据验收；real_or_local_claimed=real_with_evidence；"
+            "--release-data 时 REQUIRE_REAL_DATA 单独判定"
+        ),
     }
 
     out = OUT_DIR / "evidence.json"
@@ -415,7 +430,8 @@ def main() -> int:
         f"- Python: `{evidence['python']}`",
         f"- release_data 模式: `{args.release_data}`",
         f"- 汇总: passed={passed}, failed={failed}, total={evidence['summary']['total']}, "
-        f"demo={demo_n}, real_or_local_claimed={real_n}, release_data_fail={data_fail_n}",
+        f"demo={demo_n}, real_with_evidence={real_verified_n}, "
+        f"real_mode_claimed_unverified={real_mode_n}, release_data_fail={data_fail_n}",
         "",
         "| Notebook | Status | Cells | data_mode | release_data | Note |",
         "| --- | --- | --- | --- | --- | --- |",

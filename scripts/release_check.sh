@@ -5,6 +5,9 @@
 #   ./scripts/release_check.sh quick    # 日常改代码后
 #   ./scripts/release_check.sh full     # 最全：含案例证据 + 教材构建
 #
+# full 默认启用 --release-data（需 data/creditcard.csv 等）。
+# 无授权 Fraud CSV 时：WANGLAOSHI_SKIP_RELEASE_DATA=1 ./scripts/release_check.sh full
+#
 # 不用背一长串脚本名。失败即停，最后打印清单。
 
 set -euo pipefail
@@ -96,7 +99,16 @@ if [[ "$MODE" == "full" ]]; then
   step "发布案例数据台账（Fraud/Bike/Mall）" bash -c '
     python scripts/fetch_release_case_data.py || true
   '
-  step "22 进阶 Notebook + 发布数据验收" python scripts/run_advanced_evidence.py --release-data
+  if [[ "${WANGLAOSHI_SKIP_RELEASE_DATA:-}" == "1" ]]; then
+    echo "⚠ WANGLAOSHI_SKIP_RELEASE_DATA=1：跳过 --release-data（结果不得记为发布真实验收）"
+    step "22 进阶 Notebook 证据（教学/可 DEMO）" python scripts/run_advanced_evidence.py
+  else
+    if [[ ! -f data/creditcard.csv ]]; then
+      echo "提示: 缺少 data/creditcard.csv 时 --release-data 会对 Fraud 判 data_fail。" >&2
+      echo "      放入 Kaggle CSV，或 WANGLAOSHI_SKIP_RELEASE_DATA=1 跳过发布数据门槛。" >&2
+    fi
+    step "22 进阶 Notebook + 发布数据验收" python scripts/run_advanced_evidence.py --release-data
+  fi
   step "构建 Jupyter Book 教材" python scripts/build_book.py
 fi
 

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-11-12T00:25:31.594655+00:00",
+  "generated_at_utc": "2026-11-12T06:19:59.728627+00:00",
   "cases": [
     {
       "slug": "05_credit_card_fraud",
@@ -24,5 +24,6 @@
       "sha256": "416a4f62a8f33841a16e1db5297f0e05d3b65b05e73632cedae58e739e1e1f77",
       "status": "ready"
     }
-  ]
+  ],
+  "mall_pinned_sha256": "416a4f62a8f33841a16e1db5297f0e05d3b65b05e73632cedae58e739e1e1f77"
 }

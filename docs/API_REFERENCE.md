@@ -431,11 +431,12 @@ print(tr.compare_experiments())
 
 ```text
 bayesian_optimize(model_class, param_space, X, y, n_trials=100, cv=5,
-                  scoring=None, task_type='auto', n_jobs=-1)  # 需要 optuna
+                  scoring=None, task_type='auto', n_jobs=-1,
+                  show_progress_bar=None)  # 需要 optuna
 auto_tune(model_class, X, y, model_type='auto', scoring=None, task_type='auto')
 ```
 
-默认评分：**优先估计器类型**（`RegressorMixin` → MSE，`ClassifierMixin` → accuracy），再按目标列推断；连续浮点即使唯一值 &lt;20 也走回归。可用 `scoring=` / `task_type=` 显式覆盖。
+默认评分：**优先估计器类型**（`RegressorMixin` → MSE，`ClassifierMixin` → accuracy），再按目标列推断；连续浮点即使唯一值 &lt;20 也走回归。可用 `scoring=` / `task_type=` 显式覆盖。`param_space` 项须为搜索描述 dict（`type=float|int|categorical`）或**标量**固定值；禁止把 `(low, high)` 元组直接当参数。全部折失败的试验会被剪枝，而不是中断整次优化。`auto_tune(model_type='regression'|'classification')` 在未传 `task_type` 时会一并设定任务类型。
 
 未安装 Optuna 时会 `ImportError`（`pip install wanglaoshi[optuna]` 或 `pip install optuna`）。
 
@@ -453,7 +454,7 @@ else:
     from sklearn.linear_model import LogisticRegression
 
     X, y = load_iris(return_X_y=True, as_frame=True)
-    space = {"C": (0.1, 10.0)}
+    space = {"C": {"type": "float", "low": 0.1, "high": 10.0, "log": True}}
     # n_trials 取小，仅作 API 冒烟
     result = opt.bayesian_optimize(
         LogisticRegression, space, X, y, n_trials=3, cv=3
@@ -471,6 +472,10 @@ else:
 | --- | --- |
 | `extract_datetime_features` | `(df, datetime_col, features=None) -> DataFrame` |
 | `extract_text_features` | `(df, text_col, method='basic', max_features=100) -> DataFrame` |
+| `fit_text_vectorizer` | `(df, text_col, *, method='count', max_features=100, key=None) -> str` |
+| `transform_text_features` | `(df, *, key, text_col=None) -> DataFrame` |
+| `fit_target_encoder` | `(df, categorical_col, target_col, *, smoothing=1.0, min_samples_leaf=1) -> dict` |
+| `transform_target_encoder` | `(df, encoder) -> DataFrame` |
 | `one_hot_encode` | `(df, categorical_cols, drop_first=False) -> DataFrame` |
 | `frequency_encode` | `(df, categorical_col) -> DataFrame` |
 | `target_encode` | `(df, categorical_col, target_col, smoothing=1.0, min_samples_leaf=1) -> DataFrame` |
@@ -509,6 +514,24 @@ y = df["target"]
 feats = fe.select_features_by_importance(X, y, n_features=2)
 assert len(feats) == 2
 print("FeatureEngineering OK", feats)
+```
+
+文本转换复用训练词表，未见词不会新增特征列。目标编码转换无需标签，未见类别回落到训练标签均值。模型训练行的目标编码应在折外生成。
+
+```python
+# 【可运行】
+import pandas as pd
+from wanglaoshi.features import AdvancedFeatureEngineer
+
+train = pd.DataFrame({"note": ["apple", "pear"], "city": ["A", "B"], "y": [0, 1]})
+valid = pd.DataFrame({"note": ["unseen", None], "city": ["C", "A"]})
+engineer = AdvancedFeatureEngineer()
+key = engineer.fit_text_vectorizer(train, "note")
+encoder = engineer.fit_target_encoder(train, "city", "y")
+encoded = engineer.transform_text_features(valid, key=key)
+encoded = engineer.transform_target_encoder(encoded, encoder)
+assert encoded.filter(like="note_count_").to_numpy().sum() == 0
+assert encoded.loc[0, encoder["col_name"]] == train["y"].mean()
 ```
 
 ---
