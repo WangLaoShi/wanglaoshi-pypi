@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""为发布案例拉取/校验真实数据（欺诈检测 CSV、共享单车）。
+"""为发布案例拉取/校验真实数据（欺诈检测 / 共享单车 / Mall Customers）。
 
 - 共享单车：优先本地 data/bike_sharing_hour.csv；否则尝试 OpenML Bike_Sharing_Demand
+- Mall：优先本地 data/Mall_Customers.csv；否则尝试公开镜像下载
 - 信用卡欺诈：仅校验本地 data/creditcard.csv（Kaggle 授权数据，不自动下载）
 
 写出 docs/evidence/RELEASE_CASE_DATA.md 与 JSON 指纹。
@@ -11,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -101,9 +103,57 @@ def bike_case() -> dict:
         )
 
 
+def mall_case() -> dict:
+    path = DATA / "Mall_Customers.csv"
+    if path.exists():
+        df = pd.read_csv(path)
+        return _record(
+            "09_mall_customers",
+            data_mode="real",
+            source=str(path.relative_to(ROOT)),
+            n_rows=int(len(df)),
+            sha256=_sha256_file(path),
+            status="ready",
+        )
+
+    # 教学常用公开镜像（非 Kaggle 授权墙）；失败则 blocked
+    mirrors = [
+        "https://raw.githubusercontent.com/tirthajyoti/Machine-Learning-with-Python/master/Datasets/Mall_Customers.csv",
+        "https://raw.githubusercontent.com/SteffiPeTaffy/machineLearning-/master/Mall_Customers.csv",
+    ]
+    last_err = ""
+    for url in mirrors:
+        try:
+            DATA.mkdir(parents=True, exist_ok=True)
+            with urllib.request.urlopen(url, timeout=30) as resp:
+                path.write_bytes(resp.read())
+            df = pd.read_csv(path)
+            if len(df) < 50:
+                raise ValueError(f"too few rows: {len(df)}")
+            return _record(
+                "09_mall_customers",
+                data_mode="real",
+                source=f"{url} → data/Mall_Customers.csv",
+                n_rows=int(len(df)),
+                sha256=_sha256_file(path),
+                status="ready",
+            )
+        except Exception as e:  # noqa: BLE001
+            last_err = f"{type(e).__name__}: {e}"
+            if path.exists():
+                path.unlink(missing_ok=True)
+    return _record(
+        "09_mall_customers",
+        data_mode="missing",
+        source="expected:data/Mall_Customers.csv",
+        status="blocked",
+        note=last_err or "download failed",
+    )
+
+
 def main() -> int:
     DATA.mkdir(parents=True, exist_ok=True)
-    rows = [fraud_case(), bike_case()]
+    rows = [fraud_case(), bike_case(), mall_case()]
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "cases": rows,

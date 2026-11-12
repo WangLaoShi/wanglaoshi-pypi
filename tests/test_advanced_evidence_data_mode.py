@@ -50,15 +50,55 @@ def test_release_verdict_demo_is_data_fail(evidence_mod) -> None:
     )
     assert (
         evidence_mod._release_data_verdict(
-            "08_bike_sharing",
-            {"status": "passed", "data_mode": "real"},
-        )
-        == "ok"
-    )
-    assert (
-        evidence_mod._release_data_verdict(
             "01_iris",
             {"status": "passed", "data_mode": "demo"},
         )
         == "n/a"
+    )
+
+
+@pytest.mark.quick
+def test_release_verdict_claims_real_but_missing_evidence_fails(evidence_mod) -> None:
+    """声称 real 但缺 source/n_rows/sha256 → data_fail（对齐 DATA_ACCEPTANCE）。"""
+    assert (
+        evidence_mod._release_data_verdict(
+            "08_bike_sharing",
+            {"status": "passed", "data_mode": "real"},
+        )
+        == "data_fail"
+    )
+    assert evidence_mod._release_evidence_gaps(
+        {"status": "passed", "data_mode": "real"}
+    ) == ["data_source", "n_rows", "data_sha256"]
+
+    # 截断哈希也不够
+    assert (
+        evidence_mod._release_data_verdict(
+            "08_bike_sharing",
+            {
+                "status": "passed",
+                "data_mode": "real_or_local",
+                "data_source": "data/bike_sharing_hour.csv",
+                "n_rows": 17379,
+                "data_sha256": "375d870c6a8adb4c",  # 仅 16 位
+            },
+        )
+        == "data_fail"
+    )
+
+
+@pytest.mark.quick
+def test_release_verdict_real_with_full_evidence_ok(evidence_mod) -> None:
+    assert (
+        evidence_mod._release_data_verdict(
+            "08_bike_sharing",
+            {
+                "status": "passed",
+                "data_mode": "real",
+                "data_source": "data/bike_sharing_hour.csv",
+                "n_rows": 17379,
+                "data_sha256": "a" * 64,
+            },
+        )
+        == "ok"
     )

@@ -83,6 +83,7 @@ print('ok', wanglaoshi.__file__, ready, DataAnalyzer, SubmissionGenerator, Busin
   step "包内中文字体与报告资源" python scripts/verify_wheel_assets.py
   step "中文图表渲染烟测" python scripts/verify_chinese_plot.py
   step "中文完整报告（含 PCA）缺字检查" python scripts/verify_chinese_report.py
+  step "wheel 外装中文完整报告" python scripts/verify_wheel_chinese_report.py
   step "Optuna 调参方向专项" bash -c '
     python -m pip install -q "optuna>=3"
     python -m pytest -q tests/test_scoring_direction_metric_registry.py::test_hyperopt_regression_selects_lower_mse tests/test_hyperopt_optuna_live.py -q
@@ -91,7 +92,11 @@ fi
 
 # 5) 大版本：证据 + 教材（依赖已在步骤 0 安装）
 if [[ "$MODE" == "full" ]]; then
-  step "22 进阶 Notebook 证据（含 data_mode）" python scripts/run_advanced_evidence.py
+  # 尽量准备 Bike/Mall；Fraud 需人工 CSV。台账失败不阻断，由 --release-data 最终判定。
+  step "发布案例数据台账（Fraud/Bike/Mall）" bash -c '
+    python scripts/fetch_release_case_data.py || true
+  '
+  step "22 进阶 Notebook + 发布数据验收" python scripts/run_advanced_evidence.py --release-data
   step "构建 Jupyter Book 教材" python scripts/build_book.py
 fi
 

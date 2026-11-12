@@ -21,7 +21,13 @@
 
 ## 发布优先案例（`REQUIRE_REAL_DATA`）
 
-下列案例在 `python scripts/run_advanced_evidence.py --release-data` 下**不得**以 `demo` / `unspecified` 计为发布通过（执行 `passed` 仍可，但 `release_data_verdict=data_fail`，退出码 2）：
+下列案例在 `python scripts/run_advanced_evidence.py --release-data` 下须同时满足：
+
+1. 执行 `status=passed`
+2. `data_mode` 以 `real` 开头（不得 `demo` / `unspecified`）
+3. 具备 **`data_source`、`n_rows`、`data_sha256`（完整 64 位十六进制）**
+
+缺任一字段 → `release_data_verdict=data_fail`（退出码 2）。仅声称 `real` 而无证据不算通过。
 
 | 案例 | 真实数据入口 | 允许 DEMO（教学） |
 | --- | --- | --- |
@@ -40,6 +46,6 @@
 `run_advanced_evidence.py` 在每个案例结果里写入：
 
 - `data_mode`：若 Notebook 命名空间有 `DEMO=True` → `demo`；`DEMO=False` → `real_or_local`（或 Notebook 自设的 `data_mode`）；否则 `unspecified`
-- 可选透传：`data_source` / `n_rows` / `data_sha256`（需 Notebook 自行赋值）
+- 透传：`data_source` / `n_rows` / `data_sha256`（发布必验案例必须赋值完整哈希）
 
-汇总字段 `demo_or_synthetic` / `real_or_local_claimed` 仅作分类，**不得**把 `demo` 记进「真实数据通过」。发布级真实验收仍须按上表手填或单独流水线产出。
+`release_check.sh full` 会以 `--release-data` 跑证据。汇总字段 `demo_or_synthetic` / `real_or_local_claimed` 仅作分类，**不得**把 `demo` 或「缺证据的 real」记进发布通过。

@@ -124,8 +124,33 @@ def _data_mode_from_output_text(blob: str) -> dict:
     return meta
 
 
+def _release_evidence_gaps(result: dict) -> list[str]:
+    """按 DATA_ACCEPTANCE：真实数据通过须有 source / n_rows / sha256。"""
+    gaps: list[str] = []
+    source = result.get("data_source")
+    if source is None or not str(source).strip() or str(source).strip() in {
+        "unknown",
+        "None",
+        "null",
+    }:
+        gaps.append("data_source")
+    try:
+        if int(result.get("n_rows")) <= 0:  # type: ignore[arg-type]
+            gaps.append("n_rows")
+    except (TypeError, ValueError):
+        gaps.append("n_rows")
+    sha = str(result.get("data_sha256") or "").strip().lower()
+    if not re.fullmatch(r"[0-9a-f]{64}", sha):
+        gaps.append("data_sha256")
+    return gaps
+
+
 def _release_data_verdict(slug: str, result: dict) -> str:
-    """返回 ok | n/a | data_fail。"""
+    """返回 ok | n/a | data_fail。
+
+    对 REQUIRE_REAL_DATA：仅 data_mode 以 real 开头不够，还必须具备
+    data_source / n_rows / data_sha256（完整 64 位十六进制）。
+    """
     if slug not in REQUIRE_REAL_DATA:
         return "n/a"
     if result.get("status") != "passed":
@@ -133,9 +158,11 @@ def _release_data_verdict(slug: str, result: dict) -> str:
     mode = str(result.get("data_mode") or "unspecified")
     if mode in {"demo", "synthetic", "unspecified", "missing"}:
         return "data_fail"
-    if mode.startswith("real"):
-        return "ok"
-    return "data_fail"
+    if not mode.startswith("real"):
+        return "data_fail"
+    if _release_evidence_gaps(result):
+        return "data_fail"
+    return "ok"
 
 
 def _read_notebook(path: Path) -> dict:
@@ -284,7 +311,10 @@ def main() -> int:
     parser.add_argument(
         "--release-data",
         action="store_true",
-        help="发布数据验收：REQUIRE_REAL_DATA 案例不得为 demo/unspecified",
+        help=(
+            "发布数据验收：REQUIRE_REAL_DATA 须 data_mode=real* 且具备 "
+            "data_source / n_rows / data_sha256(64位)"
+        ),
     )
     args = parser.parse_args()
 
@@ -317,10 +347,18 @@ def main() -> int:
         print(f"[run] {slug} ...", flush=True)
         item = run_one_kernel(slug, args.timeout) if args.kernel else run_one_inprocess(slug)
         item["release_data_verdict"] = _release_data_verdict(slug, item)
+        if slug in REQUIRE_REAL_DATA and item["release_data_verdict"] == "data_fail":
+            mode = str(item.get("data_mode") or "unspecified")
+            if mode.startswith("real"):
+                item["release_data_gaps"] = _release_evidence_gaps(item)
+            else:
+                item["release_data_gaps"] = [f"data_mode={mode}"]
         by_slug[slug] = item
+        gaps = item.get("release_data_gaps")
+        gap_note = f" gaps={gaps}" if gaps else ""
         print(
             f"  -> {item['status']} data_mode={item.get('data_mode', '—')} "
-            f"release={item['release_data_verdict']}",
+            f"release={item['release_data_verdict']}{gap_note}",
             flush=True,
         )
         if args.stop_on_fail and item["status"] not in {"passed"}:
