@@ -1,0 +1,919 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>E13 A/B 试验：功效、效应量与两比例检验 &#8212; 基线工坊 · 从 EDA 到提交</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3ccecbf1" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=15296eb0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'cases/13_ab_testing';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="练习：E13 A/B 试验" href="../practice/13_ab_testing.html" />
+    <link rel="prev" title="练习：House Prices" href="../practice/11_house_prices.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">基线工坊 · 从 EDA 到提交</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">开始学习</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../start/learning-path.html">学习路径</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">安装环境</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/first-hour.html">第一小时：最小闭环</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/binder.html">一键云端运行（Binder）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">公开接口教程</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/README.html">公开接口教程（1.15.1+）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01_ready_and_eda.html">01 · ready + EDA（Iris / Tips）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02_compete_baseline.html">02 · compete 基线与提交（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03_features_encode.html">03 · features 编码（合成高基数表）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04_analytics_stats.html">04 · analytics 统计工具（合成 A/B）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/05_business_pipeline.html">05 · business 流水线（合成订单）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/06_ml_preprocess.html">06 · ml 预处理与建模（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07_leakage_and_cv.html">07 · 泄漏检测 + 分层 CV（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/08_timeseries_tools.html">08 · 时序工具（合成季节序列）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/09_calibration_fairness.html">09 · 校准 + 分组公平（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/10_testing_repro.html">10 · 测试与复现治理（Iris）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/11_runtime_toolkit.html">11 · runtime 工具箱（VERSIONS / Jupyter / 下载）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/12_analyze_helpers.html">12 · analyze 函数与辅助类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/13_compete_advanced.html">13 · compete 进阶（集成 / 重要性 / 追踪 / 调参）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/14_analytics_extra.html">14 · analytics 其余（异常 / 排序 / 生存）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/15_ml_toolkit.html">15 · ml 工具箱（特征 / 评估 / DL 入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/16_business_stages.html">16 · business 阶段函数（公开入口全扫）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/17_testing_extra.html">17 · _testing 其余（契约 / 图表元数据 / 回归汇总）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">使用手册（类与方法）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../handbook/README.html">使用手册（类与方法 · 带案例）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/01_data_analyzer.html">使用手册 01 · <code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/02_feature_engineer.html">使用手册 02 · <code class="docutils literal notranslate"><span class="pre">AdvancedFeatureEngineer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/03_compete_toolkit.html">使用手册 03 · <code class="docutils literal notranslate"><span class="pre">compete</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/04_analytics_toolkit.html">使用手册 04 · <code class="docutils literal notranslate"><span class="pre">analytics</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/05_ml_guide.html">使用手册 05 · <code class="docutils literal notranslate"><span class="pre">ml</span></code> 公开接口</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/06_business_guide.html">使用手册 06 · <code class="docutils literal notranslate"><span class="pre">business</span></code> 业务分析</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">精讲课（先于案例）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lessons/overview.html">精讲课总览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/leakage.html">精讲：三类数据泄露</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/cv_and_splits.html">精讲：交叉验证与划分策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/submission_contracts.html">精讲：提交文件契约</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/feature_fit_discipline.html">精讲：特征工程的拟合纪律</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/business_traceability.html">精讲：业务数字可追溯</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/common_mistakes.html">精讲：常见错误墙</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">三条主线</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tracks/analyzer.html">主线：Analyzer / EDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/competition.html">主线：竞赛工具链</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/business.html">主线：业务流水线</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">进阶案例（E01–E22）</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">进阶案例总览（E01–E22）</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="01_iris.html">E01 Iris（Fisher 1936）：多分类、决策边界与分层验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/01_iris.html">练习：Iris（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="02_titanic.html">E02 Titanic：缺失机制、特征工程与训练/验证隔离</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/02_titanic.html">练习：Titanic（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="04_breast_cancer.html">E04 Breast Cancer（Wisconsin）：量纲、PCA 与召回权衡</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/04_breast_cancer.html">练习：Breast Cancer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="12_digit_recognizer.html">E12 Digit Recognizer：高维向量、降维直觉与错分分析</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/12_digit_recognizer.html">练习：Digits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="06_california_housing.html">E06 California Housing：空间自相关与「虚高」的随机验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/06_california_housing.html">练习：California Housing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="03_wine_quality.html">E03 Wine Quality：有序评分、不均衡与双任务视角</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/03_wine_quality.html">练习：Wine Quality</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="07_abalone.html">E07 Abalone：混合类型、域知识年龄与泄漏安全编码</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/07_abalone.html">练习：Abalone</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="08_bike_sharing.html">E08 Bike Sharing：时间序列划分、滞后特征与泄漏检测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/08_bike_sharing.html">练习：Bike Sharing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="09_mall_customers.html">E09 Mall Customers：缩放、聚类数与稳定性</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/09_mall_customers.html">练习：Mall Customers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="10_adult_census.html">E10 Adult Census：折内目标编码与分组表现</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/10_adult_census.html">练习：Adult Census（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="05_credit_card_fraud.html">E05 Credit Card Fraud：时间划分、极端不均衡与 PR-AUC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/05_credit_card_fraud.html">练习：Credit Card Fraud</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="11_house_prices.html">E11 House Prices：高维混合、缺失含义与集成</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/11_house_prices.html">练习：House Prices</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">E13 A/B 试验：功效、效应量与两比例检验</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/13_ab_testing.html">练习：E13 A/B 试验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="14_hypothesis_testing.html">E14 假设检验：t / χ² / 单因素 ANOVA</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/14_hypothesis_testing.html">练习：E14 假设检验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="15_timeseries_forecast.html">E15 时间序列：分解、平稳性与基线预测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/15_timeseries_forecast.html">练习：E15 时序分解预测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="16_survival_churn.html">E16 生存 / 流失：Kaplan–Meier 与删失</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/16_survival_churn.html">练习：E16 生存流失</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="17_text_eda.html">E17 文本 EDA：浅特征、词袋与分类基线</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/17_text_eda.html">练习：E17 文本 EDA</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="18_anomaly_detection.html">E18 异常检测：IsolationForest（无标签场景）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/18_anomaly_detection.html">练习：E18 异常检测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="19_association_rules.html">E19 关联规则：购物篮支持度 / 置信度 / 提升度</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/19_association_rules.html">练习：E19 关联规则</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="20_causal_did.html">E20 因果入门：合成双重差分（DiD）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/20_causal_did.html">练习：E20 因果 DiD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="21_order_refund_reconciliation.html">E21 订单、明细与退款三表对账：防止连接后金额翻倍</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/21_order_refund_reconciliation.html">练习：E21 三表对账</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="22_movielens_ndcg.html">E22 MovieLens 电影推荐：用 NDCG@10 评估 Top‑K 排序</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/22_movielens_ndcg.html">练习：E22 MovieLens NDCG</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">业务专章</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="business_pipeline.html">业务流水线专章：从接收到可交付报告</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/business_pipeline.html">练习：业务流水线</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">练习与术语</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../practice/overview.html">练习总览（E01–E22）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">中文术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/analysis-coverage.html">数据分析能力覆盖矩阵</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">参考与证据</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../reference/api.html">公开 API（教材入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-inventory.html">A01 公开 API 盘点</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/project-status.html">项目进度（摘要）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/skill-mapping.html">A02 Skill → API / 配置 / 校验 / 测试映射</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/dependencies.html">依赖说明（核心 / 可选 / 文件怎么用）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/evidence.html">Advanced Notebook 跑通证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/contribute.html">如何贡献 / 如何改手册</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="下载此页面">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/cases/13_ab_testing.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="下载源文件"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="列印成 PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="全屏模式"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="亮色"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="暗色"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>E13 A/B 试验：功效、效应量与两比例检验</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目录 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">你将学到</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">包侧优化启示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#e13">课程研讨笔录（E13）</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">课堂问答题</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wanglaoshi">wanglaoshi 缺口</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataanalyzer">1. 合成试验日志 + DataAnalyzer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">2. 两比例检验与置信区间</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">3. 样本量与功效（正态近似）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">4. 多重比较陷阱（演示）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">5. 交付摘要</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-b-beta-binomial">6. 贝叶斯 A/B：Beta-Binomial 与先验敏感性</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">附录：深度阅读与作业</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="e13-a-b">
+<h1>E13 A/B 试验：功效、效应量与两比例检验<a class="headerlink" href="#e13-a-b" title="Link to this heading">#</a></h1>
+<blockquote>
+<div><p>覆盖矩阵：试验设计 · Issue #9 扩展 · 见 <code class="docutils literal notranslate"><span class="pre">docs/ANALYSIS_COVERAGE.md</span></code></p>
+</div></blockquote>
+<section id="id1">
+<h2>你将学到<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>随机分流假设</strong>：可交换性；偷看 / 多重比较如何毁掉结论。</p></li>
+<li><p><strong>效应量 vs p 值</strong>：提升百分点、相对提升、Cohen 类度量。</p></li>
+<li><p><strong>样本量 / 功效</strong>：给定基线转化率与 MDE，反推每臂需要多少人。</p></li>
+<li><p><strong>两比例 z / χ²</strong>：与 <code class="docutils literal notranslate"><span class="pre">scipy.stats</span></code> 对齐；<strong>wanglaoshi 尚无 <code class="docutils literal notranslate"><span class="pre">ExperimentDesign</span></code>（缺口 P0）</strong>。</p></li>
+<li><p>用 <code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code> 做试验日志表的结构体检。</p></li>
+</ol>
+</section>
+<section id="id2">
+<h2>包侧优化启示<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>缺统一 <code class="docutils literal notranslate"><span class="pre">ExperimentDesign.sample_size</span> <span class="pre">/</span> <span class="pre">two_proportion_test</span> <span class="pre">/</span> <span class="pre">report</span></code>。</p></li>
+<li><p>报告宜输出 <code class="docutils literal notranslate"><span class="pre">StageResult</span></code> 风格（效应、CI、功效、假设检查）。</p></li>
+</ul>
+<blockquote>
+<div><p><strong>本课增补：</strong> 贝叶斯 A/B（Beta-Binomial）与先验敏感性 / 业务门槛概率。</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">QUICK</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">RANDOM_STATE</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">ready</span>
+<span class="n">ready</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="e13">
+<h2>课程研讨笔录（E13）<a class="headerlink" href="#e13" title="Link to this heading">#</a></h2>
+<section id="id3">
+<h3>课堂问答题<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>基线转化率 10%，想检出绝对 +1pp（相对 +10%），α=0.05、功效 80%，每臂大约多少？</p></li>
+<li><p>为什么「边看边停」会抬高一类错误？</p></li>
+<li><p>若用户可重复进组，单位是会话还是用户？为何影响方差？</p></li>
+</ol>
+</section>
+<section id="wanglaoshi">
+<h3>wanglaoshi 缺口<a class="headerlink" href="#wanglaoshi" title="Link to this heading">#</a></h3>
+<p>当前课用 <code class="docutils literal notranslate"><span class="pre">scipy</span></code>/<code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> 手写；目标 API 草图：<code class="docutils literal notranslate"><span class="pre">wanglaoshi.stats.ExperimentDesign</span></code>。</p>
+</section>
+</section>
+<section id="dataanalyzer">
+<h2>1. 合成试验日志 + DataAnalyzer<a class="headerlink" href="#dataanalyzer" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.analyze</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataAnalyzer</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+<span class="n">n_a</span><span class="p">,</span> <span class="n">n_b</span> <span class="o">=</span> <span class="mi">8000</span><span class="p">,</span> <span class="mi">8000</span>
+<span class="n">p_a</span><span class="p">,</span> <span class="n">p_b</span> <span class="o">=</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.112</span>  <span class="c1"># 绝对 +1.2pp</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">'user_id'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_a</span> <span class="o">+</span> <span class="n">n_b</span><span class="p">),</span>
+    <span class="s1">'variant'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'A'</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_a</span> <span class="o">+</span> <span class="p">[</span><span class="s1">'B'</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_b</span><span class="p">,</span>
+    <span class="s1">'converted'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_a</span><span class="p">,</span> <span class="n">n_a</span><span class="p">),</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_b</span><span class="p">,</span> <span class="n">n_b</span><span class="p">),</span>
+    <span class="p">]),</span>
+    <span class="s1">'revenue'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">n_a</span><span class="p">)</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_a</span><span class="p">,</span> <span class="n">n_a</span><span class="p">),</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">n_b</span><span class="p">)</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_b</span><span class="p">,</span> <span class="n">n_b</span><span class="p">),</span>
+    <span class="p">]),</span>
+<span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'variant'</span><span class="p">)[</span><span class="s1">'converted'</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'count'</span><span class="p">]))</span>
+<span class="n">info</span> <span class="o">=</span> <span class="n">DataAnalyzer</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">get_basic_info</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">info</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]})</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>2. 两比例检验与置信区间<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">two_prop_z</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
+    <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">/</span> <span class="n">n1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">/</span> <span class="n">n2</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n1</span> <span class="o">+</span> <span class="n">n2</span><span class="p">)</span>
+    <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">n1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">n2</span><span class="p">))</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span> <span class="o">/</span> <span class="n">se</span>
+    <span class="n">pval</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)))</span>
+    <span class="n">se_unpooled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span> <span class="o">/</span> <span class="n">n1</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p2</span><span class="p">)</span> <span class="o">/</span> <span class="n">n2</span><span class="p">)</span>
+    <span class="n">ci</span> <span class="o">=</span> <span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1.96</span> <span class="o">*</span> <span class="n">se_unpooled</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">p1</span><span class="o">=</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="o">=</span><span class="n">p2</span><span class="p">,</span> <span class="n">lift_pp</span><span class="o">=</span><span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">pvalue</span><span class="o">=</span><span class="n">pval</span><span class="p">,</span> <span class="n">ci95</span><span class="o">=</span><span class="n">ci</span><span class="p">)</span>
+
+<span class="n">g</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'variant'</span><span class="p">)[</span><span class="s1">'converted'</span><span class="p">]</span>
+<span class="n">x_a</span><span class="p">,</span> <span class="n">n_a_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'A'</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'A'</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="n">x_b</span><span class="p">,</span> <span class="n">n_b_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'B'</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'B'</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">two_prop_z</span><span class="p">(</span><span class="n">x_a</span><span class="p">,</span> <span class="n">n_a_</span><span class="p">,</span> <span class="n">x_b</span><span class="p">,</span> <span class="n">n_b_</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1"># χ² 独立性（2x2）</span>
+<span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'variant'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">'converted'</span><span class="p">])</span>
+<span class="n">chi2</span><span class="p">,</span> <span class="n">p_chi</span><span class="p">,</span> <span class="n">dof</span><span class="p">,</span> <span class="n">exp</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2_contingency</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'chi2'</span><span class="p">,</span> <span class="n">chi2</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="n">p_chi</span><span class="p">,</span> <span class="s1">'dof'</span><span class="p">,</span> <span class="n">dof</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2>3. 样本量与功效（正态近似）<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">n_per_arm</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">mde_abs</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">'''两臂等权、双侧、正态近似下的每臂样本量。'''</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.power</span><span class="w"> </span><span class="kn">import</span> <span class="n">NormalIndPower</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.proportion</span><span class="w"> </span><span class="kn">import</span> <span class="n">proportion_effectsize</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">+</span> <span class="n">mde_abs</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">proportion_effectsize</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+    <span class="n">analysis</span> <span class="o">=</span> <span class="n">NormalIndPower</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">solve_power</span><span class="p">(</span><span class="n">effect_size</span><span class="o">=</span><span class="n">es</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="n">power</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s1">'two-sided'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span><span class="p">)),</span> <span class="n">es</span>
+
+<span class="n">n_need</span><span class="p">,</span> <span class="n">es</span> <span class="o">=</span> <span class="n">n_per_arm</span><span class="p">(</span><span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'每臂约需'</span><span class="p">,</span> <span class="n">n_need</span><span class="p">,</span> <span class="s1">'effectsize(h)='</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">es</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="c1"># 当前试验功效（事后）</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.proportion</span><span class="w"> </span><span class="kn">import</span> <span class="n">proportion_effectsize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.power</span><span class="w"> </span><span class="kn">import</span> <span class="n">NormalIndPower</span>
+<span class="n">es_obs</span> <span class="o">=</span> <span class="n">proportion_effectsize</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">'p1'</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">'p2'</span><span class="p">])</span>
+<span class="n">pow_obs</span> <span class="o">=</span> <span class="n">NormalIndPower</span><span class="p">()</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">es_obs</span><span class="p">,</span> <span class="n">nobs1</span><span class="o">=</span><span class="n">n_a_</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="n">n_b_</span> <span class="o">/</span> <span class="n">n_a_</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'观测效应 h='</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">es_obs</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">'事后功效≈'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">pow_obs</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h2>4. 多重比较陷阱（演示）<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 对 20 个无关指标做检验：在真 H0 下仍会看到「显著」</span>
+<span class="n">false_hits</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">fake</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'variant'</span><span class="p">],</span> <span class="n">fake</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2_contingency</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">false_hits</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'20 次无关检验中 p&lt;0.05 次数:'</span><span class="p">,</span> <span class="n">false_hits</span><span class="p">,</span> <span class="s1">'（期望≈1）'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'启示：预注册主指标；次指标用 FDR / Bonferroni。'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id7">
+<h2>5. 交付摘要<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'outputs/13_ab_testing'</span><span class="p">)</span>
+<span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span>
+    <span class="s1">'p_A'</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s1">'p1'</span><span class="p">],</span> <span class="s1">'p_B'</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s1">'p2'</span><span class="p">],</span> <span class="s1">'lift_pp'</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s1">'lift_pp'</span><span class="p">],</span>
+    <span class="s1">'z'</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s1">'z'</span><span class="p">],</span> <span class="s1">'pvalue'</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s1">'pvalue'</span><span class="p">],</span>
+    <span class="s1">'ci_low'</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s1">'ci95'</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s1">'ci_high'</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s1">'ci95'</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+    <span class="s1">'n_per_arm_for_1pp'</span><span class="p">:</span> <span class="n">n_need</span><span class="p">,</span>
+<span class="p">}])</span>
+<span class="n">summary</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s1">'ab_summary.csv'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'saved'</span><span class="p">,</span> <span class="n">out</span> <span class="o">/</span> <span class="s1">'ab_summary.csv'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="a-b-beta-binomial">
+<h2>6. 贝叶斯 A/B：Beta-Binomial 与先验敏感性<a class="headerlink" href="#a-b-beta-binomial" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><p>对照：<a class="reference external" href="https://www.pymc.io/projects/examples/en/2022.12.0/case_studies/bayesian_ab_testing_introduction.html">PyMC Bayesian A/B Testing</a></p>
+</div></blockquote>
+<p>用共轭解析解（不强制 PyMC）：后验为 Beta；估计「B 版转化率超过 A 且提升超过业务门槛 δ」的概率。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">beta</span> <span class="k">as</span> <span class="n">beta_dist</span>
+
+<span class="c1"># 沿用本节转化计数</span>
+<span class="n">x_a</span><span class="p">,</span> <span class="n">n_a_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'A'</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'A'</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="n">x_b</span><span class="p">,</span> <span class="n">n_b_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'B'</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'B'</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="mf">0.005</span>  <span class="c1"># 业务门槛：绝对提升至少 0.5pp</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">posterior_prob_b_beats_a</span><span class="p">(</span><span class="n">xa</span><span class="p">,</span> <span class="n">na</span><span class="p">,</span> <span class="n">xb</span><span class="p">,</span> <span class="n">nb</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">alpha0</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">beta0</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n_mc</span><span class="o">=</span><span class="mi">50000</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+    <span class="n">pa</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">alpha0</span> <span class="o">+</span> <span class="n">xa</span><span class="p">,</span> <span class="n">beta0</span> <span class="o">+</span> <span class="n">na</span> <span class="o">-</span> <span class="n">xa</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_mc</span><span class="p">)</span>
+    <span class="n">pb</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">alpha0</span> <span class="o">+</span> <span class="n">xb</span><span class="p">,</span> <span class="n">beta0</span> <span class="o">+</span> <span class="n">nb</span> <span class="o">-</span> <span class="n">xb</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_mc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">pb</span> <span class="o">&gt;</span> <span class="n">pa</span> <span class="o">+</span> <span class="n">delta</span><span class="p">))</span>
+
+<span class="n">priors</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'uniform(1,1)'</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="s1">'weak_center_10pct(2,18)'</span><span class="p">:</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">),</span>
+    <span class="s1">'strong_center_10pct(20,180)'</span><span class="p">:</span> <span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">),</span>
+<span class="p">}</span>
+<span class="n">bayes_rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">b0</span><span class="p">)</span> <span class="ow">in</span> <span class="n">priors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">posterior_prob_b_beats_a</span><span class="p">(</span><span class="n">x_a</span><span class="p">,</span> <span class="n">n_a_</span><span class="p">,</span> <span class="n">x_b</span><span class="p">,</span> <span class="n">n_b_</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span> <span class="n">alpha0</span><span class="o">=</span><span class="n">a0</span><span class="p">,</span> <span class="n">beta0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span>
+    <span class="n">bayes_rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">'prior'</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">'P(pB&gt;pA+delta)'</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s1">'delta'</span><span class="p">:</span> <span class="n">delta</span><span class="p">})</span>
+<span class="n">bayes_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">bayes_rows</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">bayes_df</span><span class="p">)</span>
+<span class="c1"># 后验均值</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'posterior mean A/B (uniform)'</span><span class="p">,</span>
+      <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x_a</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="n">n_a_</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x_b</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="n">n_b_</span><span class="p">))</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'outputs/13_ab_testing'</span><span class="p">);</span> <span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">bayes_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s1">'bayesian_ab.csv'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'saved bayesian_ab.csv'</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pymc</span>  <span class="c1"># noqa: F401</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'pymc available: 可用官方 Notebook 做 MCMC；本课解析解已覆盖教学点'</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'pymc 未安装：使用 Beta-Binomial 共轭解析 + Monte Carlo'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id8">
+<h2>附录：深度阅读与作业<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Kohavi et al. <em>Trustworthy Online Controlled Experiments</em></p></li>
+<li><p>作业：把主指标改成 <code class="docutils literal notranslate"><span class="pre">revenue</span></code>（连续），做均值差 t 检验 + bootstrap CI；讨论零膨胀。</p></li>
+<li><p>API 地图：<code class="docutils literal notranslate"><span class="pre">ready</span></code> / <code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code>；待建 <code class="docutils literal notranslate"><span class="pre">ExperimentDesign</span></code>。</p></li>
+</ul>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./cases"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../practice/11_house_prices.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">练习：House Prices</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../practice/13_ab_testing.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">练习：E13 A/B 试验</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目录
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">你将学到</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">包侧优化启示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#e13">课程研讨笔录（E13）</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">课堂问答题</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wanglaoshi">wanglaoshi 缺口</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataanalyzer">1. 合成试验日志 + DataAnalyzer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">2. 两比例检验与置信区间</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">3. 样本量与功效（正态近似）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">4. 多重比较陷阱（演示）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">5. 交付摘要</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-b-beta-binomial">6. 贝叶斯 A/B：Beta-Binomial 与先验敏感性</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">附录：深度阅读与作业</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+作者： WangLaoShi
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

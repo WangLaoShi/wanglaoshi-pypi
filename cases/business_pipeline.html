@@ -1,0 +1,802 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>业务流水线专章：从接收到可交付报告 &#8212; 基线工坊 · 从 EDA 到提交</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3ccecbf1" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=15296eb0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'cases/business_pipeline';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="练习：业务流水线" href="../practice/business_pipeline.html" />
+    <link rel="prev" title="练习：E22 MovieLens NDCG" href="../practice/22_movielens_ndcg.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">基线工坊 · 从 EDA 到提交</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">开始学习</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../start/learning-path.html">学习路径</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">安装环境</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/first-hour.html">第一小时：最小闭环</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/binder.html">一键云端运行（Binder）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">公开接口教程</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/README.html">公开接口教程（1.15.1+）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01_ready_and_eda.html">01 · ready + EDA（Iris / Tips）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02_compete_baseline.html">02 · compete 基线与提交（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03_features_encode.html">03 · features 编码（合成高基数表）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04_analytics_stats.html">04 · analytics 统计工具（合成 A/B）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/05_business_pipeline.html">05 · business 流水线（合成订单）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/06_ml_preprocess.html">06 · ml 预处理与建模（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07_leakage_and_cv.html">07 · 泄漏检测 + 分层 CV（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/08_timeseries_tools.html">08 · 时序工具（合成季节序列）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/09_calibration_fairness.html">09 · 校准 + 分组公平（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/10_testing_repro.html">10 · 测试与复现治理（Iris）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/11_runtime_toolkit.html">11 · runtime 工具箱（VERSIONS / Jupyter / 下载）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/12_analyze_helpers.html">12 · analyze 函数与辅助类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/13_compete_advanced.html">13 · compete 进阶（集成 / 重要性 / 追踪 / 调参）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/14_analytics_extra.html">14 · analytics 其余（异常 / 排序 / 生存）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/15_ml_toolkit.html">15 · ml 工具箱（特征 / 评估 / DL 入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/16_business_stages.html">16 · business 阶段函数（公开入口全扫）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/17_testing_extra.html">17 · _testing 其余（契约 / 图表元数据 / 回归汇总）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">使用手册（类与方法）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../handbook/README.html">使用手册（类与方法 · 带案例）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/01_data_analyzer.html">使用手册 01 · <code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/02_feature_engineer.html">使用手册 02 · <code class="docutils literal notranslate"><span class="pre">AdvancedFeatureEngineer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/03_compete_toolkit.html">使用手册 03 · <code class="docutils literal notranslate"><span class="pre">compete</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/04_analytics_toolkit.html">使用手册 04 · <code class="docutils literal notranslate"><span class="pre">analytics</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/05_ml_guide.html">使用手册 05 · <code class="docutils literal notranslate"><span class="pre">ml</span></code> 公开接口</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/06_business_guide.html">使用手册 06 · <code class="docutils literal notranslate"><span class="pre">business</span></code> 业务分析</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">精讲课（先于案例）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lessons/overview.html">精讲课总览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/leakage.html">精讲：三类数据泄露</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/cv_and_splits.html">精讲：交叉验证与划分策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/submission_contracts.html">精讲：提交文件契约</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/feature_fit_discipline.html">精讲：特征工程的拟合纪律</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/business_traceability.html">精讲：业务数字可追溯</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/common_mistakes.html">精讲：常见错误墙</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">三条主线</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tracks/analyzer.html">主线：Analyzer / EDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/competition.html">主线：竞赛工具链</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/business.html">主线：业务流水线</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">进阶案例（E01–E22）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">进阶案例总览（E01–E22）</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="01_iris.html">E01 Iris（Fisher 1936）：多分类、决策边界与分层验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/01_iris.html">练习：Iris（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="02_titanic.html">E02 Titanic：缺失机制、特征工程与训练/验证隔离</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/02_titanic.html">练习：Titanic（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="04_breast_cancer.html">E04 Breast Cancer（Wisconsin）：量纲、PCA 与召回权衡</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/04_breast_cancer.html">练习：Breast Cancer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="12_digit_recognizer.html">E12 Digit Recognizer：高维向量、降维直觉与错分分析</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/12_digit_recognizer.html">练习：Digits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="06_california_housing.html">E06 California Housing：空间自相关与「虚高」的随机验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/06_california_housing.html">练习：California Housing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="03_wine_quality.html">E03 Wine Quality：有序评分、不均衡与双任务视角</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/03_wine_quality.html">练习：Wine Quality</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="07_abalone.html">E07 Abalone：混合类型、域知识年龄与泄漏安全编码</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/07_abalone.html">练习：Abalone</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="08_bike_sharing.html">E08 Bike Sharing：时间序列划分、滞后特征与泄漏检测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/08_bike_sharing.html">练习：Bike Sharing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="09_mall_customers.html">E09 Mall Customers：缩放、聚类数与稳定性</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/09_mall_customers.html">练习：Mall Customers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="10_adult_census.html">E10 Adult Census：折内目标编码与分组表现</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/10_adult_census.html">练习：Adult Census（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="05_credit_card_fraud.html">E05 Credit Card Fraud：时间划分、极端不均衡与 PR-AUC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/05_credit_card_fraud.html">练习：Credit Card Fraud</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="11_house_prices.html">E11 House Prices：高维混合、缺失含义与集成</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/11_house_prices.html">练习：House Prices</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="13_ab_testing.html">E13 A/B 试验：功效、效应量与两比例检验</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/13_ab_testing.html">练习：E13 A/B 试验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="14_hypothesis_testing.html">E14 假设检验：t / χ² / 单因素 ANOVA</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/14_hypothesis_testing.html">练习：E14 假设检验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="15_timeseries_forecast.html">E15 时间序列：分解、平稳性与基线预测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/15_timeseries_forecast.html">练习：E15 时序分解预测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="16_survival_churn.html">E16 生存 / 流失：Kaplan–Meier 与删失</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/16_survival_churn.html">练习：E16 生存流失</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="17_text_eda.html">E17 文本 EDA：浅特征、词袋与分类基线</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/17_text_eda.html">练习：E17 文本 EDA</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="18_anomaly_detection.html">E18 异常检测：IsolationForest（无标签场景）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/18_anomaly_detection.html">练习：E18 异常检测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="19_association_rules.html">E19 关联规则：购物篮支持度 / 置信度 / 提升度</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/19_association_rules.html">练习：E19 关联规则</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="20_causal_did.html">E20 因果入门：合成双重差分（DiD）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/20_causal_did.html">练习：E20 因果 DiD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="21_order_refund_reconciliation.html">E21 订单、明细与退款三表对账：防止连接后金额翻倍</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/21_order_refund_reconciliation.html">练习：E21 三表对账</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="22_movielens_ndcg.html">E22 MovieLens 电影推荐：用 NDCG@10 评估 Top‑K 排序</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/22_movielens_ndcg.html">练习：E22 MovieLens NDCG</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">业务专章</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">业务流水线专章：从接收到可交付报告</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/business_pipeline.html">练习：业务流水线</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">练习与术语</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../practice/overview.html">练习总览（E01–E22）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">中文术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/analysis-coverage.html">数据分析能力覆盖矩阵</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">参考与证据</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../reference/api.html">公开 API（教材入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-inventory.html">A01 公开 API 盘点</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/project-status.html">项目进度（摘要）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/skill-mapping.html">A02 Skill → API / 配置 / 校验 / 测试映射</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/dependencies.html">依赖说明（核心 / 可选 / 文件怎么用）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/evidence.html">Advanced Notebook 跑通证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/contribute.html">如何贡献 / 如何改手册</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="下载此页面">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/cases/business_pipeline.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="下载源文件"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="列印成 PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="全屏模式"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="亮色"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="暗色"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>业务流水线专章：从接收到可交付报告</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目录 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#d01">1. 只跑接收（D01）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">2. 完整主链</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3. 打开交付物</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">4. 阻断实验</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">5. 检查清单（课后）</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1>业务流水线专章：从接收到可交付报告<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<blockquote>
+<div><p>对应主线 <code class="docutils literal notranslate"><span class="pre">book/tracks/business.md</span></code> · 练习 <code class="docutils literal notranslate"><span class="pre">book/practice/business_pipeline.md</span></code></p>
+</div></blockquote>
+<p>本课把 <code class="docutils literal notranslate"><span class="pre">BusinessPipeline</span></code> 当成「可教的教材」，不只是 demo：</p>
+<ol class="arabic simple">
+<li><p>合成订单数据并跑通主链</p></li>
+<li><p>读懂 <code class="docutils literal notranslate"><span class="pre">StageResult</span></code> / <code class="docutils literal notranslate"><span class="pre">RunRecord</span></code></p></li>
+<li><p>制造 blocked，观察不可交付</p></li>
+<li><p>打开报告与交付索引</p></li>
+<li><p>练习脱敏字段</p></li>
+</ol>
+<p>可离线运行，无需竞赛数据。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi</span><span class="w"> </span><span class="kn">import</span> <span class="n">BusinessPipeline</span><span class="p">,</span> <span class="n">StageResult</span><span class="p">,</span> <span class="n">intake_file</span>
+
+<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'outputs/business_course'</span><span class="p">)</span>
+<span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">SRC</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s1">'orders.csv'</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">'order_id'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span>
+    <span class="s1">'order_date'</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">'2024-01-01'</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">'D'</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s1">'amount'</span><span class="p">:</span> <span class="p">[</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">7.2</span><span class="p">,</span> <span class="mf">80.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">],</span>
+    <span class="s1">'channel'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'web'</span><span class="p">,</span> <span class="s1">'app'</span><span class="p">,</span> <span class="s1">'web'</span><span class="p">,</span> <span class="s1">'app'</span><span class="p">,</span> <span class="s1">'web'</span><span class="p">,</span> <span class="s1">'app'</span><span class="p">,</span> <span class="s1">'web'</span><span class="p">,</span> <span class="s1">'offline'</span><span class="p">],</span>
+    <span class="s1">'user_tier'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'A'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">,</span> <span class="s1">'A'</span><span class="p">,</span> <span class="s1">'A'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">,</span> <span class="s1">'A'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">],</span>
+    <span class="s1">'phone'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'13800000001'</span><span class="p">,</span> <span class="s1">'13800000002'</span><span class="p">,</span> <span class="s1">'13800000003'</span><span class="p">,</span> <span class="s1">'13800000004'</span><span class="p">,</span>
+              <span class="s1">'13800000005'</span><span class="p">,</span> <span class="s1">'13800000006'</span><span class="p">,</span> <span class="s1">'13800000007'</span><span class="p">,</span> <span class="s1">'13800000008'</span><span class="p">],</span>
+<span class="p">})</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">SRC</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'wrote'</span><span class="p">,</span> <span class="n">SRC</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="d01">
+<h2>1. 只跑接收（D01）<a class="headerlink" href="#d01" title="Link to this heading">#</a></h2>
+<p>看 sha256、台账与 <code class="docutils literal notranslate"><span class="pre">period</span></code>。缺列会 <code class="docutils literal notranslate"><span class="pre">warning</span></code>，缺文件会 <code class="docutils literal notranslate"><span class="pre">blocked</span></code>。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intake</span> <span class="o">=</span> <span class="n">intake_file</span><span class="p">(</span>
+    <span class="n">SRC</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="o">/</span> <span class="s1">'archive_intake'</span><span class="p">,</span>
+    <span class="n">required_columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'order_id'</span><span class="p">,</span> <span class="s1">'amount'</span><span class="p">,</span> <span class="s1">'channel'</span><span class="p">],</span>
+    <span class="n">period</span><span class="o">=</span><span class="s1">'2024-Q1'</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'status ='</span><span class="p">,</span> <span class="n">intake</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'sha256 ='</span><span class="p">,</span> <span class="n">intake</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'sha256'</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'period ='</span><span class="p">,</span> <span class="n">intake</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'period'</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'warnings ='</span><span class="p">,</span> <span class="n">intake</span><span class="o">.</span><span class="n">warnings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h2>2. 完整主链<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>显式传入字段角色，避免自动猜列。关注最后一阶段是否 <code class="docutils literal notranslate"><span class="pre">deliverable=True</span></code>。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">BusinessPipeline</span><span class="p">(</span>
+    <span class="n">OUT</span> <span class="o">/</span> <span class="s1">'archive_run'</span><span class="p">,</span>
+    <span class="n">required_columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'order_id'</span><span class="p">,</span> <span class="s1">'amount'</span><span class="p">],</span>
+    <span class="n">date_col</span><span class="o">=</span><span class="s1">'order_date'</span><span class="p">,</span>
+    <span class="n">value_col</span><span class="o">=</span><span class="s1">'amount'</span><span class="p">,</span>
+    <span class="n">dim_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">'channel'</span><span class="p">],</span>
+    <span class="n">segment_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">'user_tier'</span><span class="p">],</span>
+    <span class="n">redact_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">'phone'</span><span class="p">],</span>
+    <span class="n">period</span><span class="o">=</span><span class="s1">'2024-Q1'</span><span class="p">,</span>
+    <span class="n">chart_unit</span><span class="o">=</span><span class="s1">'CNY'</span><span class="p">,</span>
+    <span class="n">random_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">record</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">SRC</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="s1">'course01'</span><span class="p">)</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'blocked ='</span><span class="p">,</span> <span class="n">summary</span><span class="p">[</span><span class="s1">'blocked'</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">[</span><span class="s1">'stages'</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="p">[</span><span class="s1">'stage_id'</span><span class="p">]</span><span class="si">:</span><span class="s2">22s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">s</span><span class="p">[</span><span class="s1">'status'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h2>3. 打开交付物<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>阅读 <code class="docutils literal notranslate"><span class="pre">report.md</span></code> 与 <code class="docutils literal notranslate"><span class="pre">delivery_index.json</span></code>。结论应能指回 evidence。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="n">delivery</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s1">'archive_run'</span> <span class="o">/</span> <span class="s1">'course01__delivery'</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">delivery</span> <span class="o">/</span> <span class="s1">'report.md'</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">delivery</span> <span class="o">/</span> <span class="s1">'delivery_index.json'</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="n">index</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'--- report head ---'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)[:</span><span class="mi">900</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'--- delivery_index ---'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)),</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)[:</span><span class="mi">800</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>4. 阻断实验<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>对不存在的文件跑流水线：应出现 <code class="docutils literal notranslate"><span class="pre">blocked</span></code>，且不能当作正式交付。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bad</span> <span class="o">=</span> <span class="n">BusinessPipeline</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s1">'archive_blocked'</span><span class="p">,</span> <span class="n">stop_on_block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">OUT</span> <span class="o">/</span> <span class="s1">'missing.csv'</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="s1">'blocked01'</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'blocked ='</span><span class="p">,</span> <span class="n">bad</span><span class="o">.</span><span class="n">blocked</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">([</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">stage_id</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">status</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">bad</span><span class="o">.</span><span class="n">stages</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="p">])</span>
+<span class="n">d10</span> <span class="o">=</span> <span class="n">bad</span><span class="o">.</span><span class="n">stages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">bad</span><span class="o">.</span><span class="n">stages</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="k">if</span> <span class="n">d10</span> <span class="ow">and</span> <span class="n">d10</span><span class="o">.</span><span class="n">stage_id</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'archive'</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'deliverable ='</span><span class="p">,</span> <span class="n">d10</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'delivery_index'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'deliverable'</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># stop_on_block 可能在 D01 后直接返回，尚未到 D10</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'stages ended at'</span><span class="p">,</span> <span class="n">bad</span><span class="o">.</span><span class="n">stages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">stage_id</span> <span class="k">if</span> <span class="n">bad</span><span class="o">.</span><span class="n">stages</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2>5. 检查清单（课后）<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>[ ] 能口述四种 status 的含义</p></li>
+<li><p>[ ] 知道缺文件与缺列的差异</p></li>
+<li><p>[ ] 打开过 report 与 delivery_index</p></li>
+<li><p>[ ] 完成练习页：<code class="docutils literal notranslate"><span class="pre">book/practice/business_pipeline.md</span></code></p></li>
+</ul>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./cases"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../practice/22_movielens_ndcg.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">练习：E22 MovieLens NDCG</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../practice/business_pipeline.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">练习：业务流水线</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目录
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#d01">1. 只跑接收（D01）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">2. 完整主链</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3. 打开交付物</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">4. 阻断实验</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">5. 检查清单（课后）</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+作者： WangLaoShi
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

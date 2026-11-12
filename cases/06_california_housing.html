@@ -1,0 +1,1179 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>E06 California Housing：空间自相关与「虚高」的随机验证 &#8212; 基线工坊 · 从 EDA 到提交</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3ccecbf1" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=15296eb0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'cases/06_california_housing';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="练习：California Housing" href="../practice/06_california_housing.html" />
+    <link rel="prev" title="练习：Digits" href="../practice/12_digit_recognizer.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">基线工坊 · 从 EDA 到提交</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">开始学习</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../start/learning-path.html">学习路径</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">安装环境</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/first-hour.html">第一小时：最小闭环</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/binder.html">一键云端运行（Binder）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">公开接口教程</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/README.html">公开接口教程（1.15.1+）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01_ready_and_eda.html">01 · ready + EDA（Iris / Tips）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02_compete_baseline.html">02 · compete 基线与提交（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03_features_encode.html">03 · features 编码（合成高基数表）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04_analytics_stats.html">04 · analytics 统计工具（合成 A/B）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/05_business_pipeline.html">05 · business 流水线（合成订单）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/06_ml_preprocess.html">06 · ml 预处理与建模（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07_leakage_and_cv.html">07 · 泄漏检测 + 分层 CV（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/08_timeseries_tools.html">08 · 时序工具（合成季节序列）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/09_calibration_fairness.html">09 · 校准 + 分组公平（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/10_testing_repro.html">10 · 测试与复现治理（Iris）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/11_runtime_toolkit.html">11 · runtime 工具箱（VERSIONS / Jupyter / 下载）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/12_analyze_helpers.html">12 · analyze 函数与辅助类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/13_compete_advanced.html">13 · compete 进阶（集成 / 重要性 / 追踪 / 调参）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/14_analytics_extra.html">14 · analytics 其余（异常 / 排序 / 生存）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/15_ml_toolkit.html">15 · ml 工具箱（特征 / 评估 / DL 入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/16_business_stages.html">16 · business 阶段函数（公开入口全扫）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/17_testing_extra.html">17 · _testing 其余（契约 / 图表元数据 / 回归汇总）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">使用手册（类与方法）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../handbook/README.html">使用手册（类与方法 · 带案例）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/01_data_analyzer.html">使用手册 01 · <code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/02_feature_engineer.html">使用手册 02 · <code class="docutils literal notranslate"><span class="pre">AdvancedFeatureEngineer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/03_compete_toolkit.html">使用手册 03 · <code class="docutils literal notranslate"><span class="pre">compete</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/04_analytics_toolkit.html">使用手册 04 · <code class="docutils literal notranslate"><span class="pre">analytics</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/05_ml_guide.html">使用手册 05 · <code class="docutils literal notranslate"><span class="pre">ml</span></code> 公开接口</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/06_business_guide.html">使用手册 06 · <code class="docutils literal notranslate"><span class="pre">business</span></code> 业务分析</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">精讲课（先于案例）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lessons/overview.html">精讲课总览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/leakage.html">精讲：三类数据泄露</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/cv_and_splits.html">精讲：交叉验证与划分策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/submission_contracts.html">精讲：提交文件契约</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/feature_fit_discipline.html">精讲：特征工程的拟合纪律</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/business_traceability.html">精讲：业务数字可追溯</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/common_mistakes.html">精讲：常见错误墙</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">三条主线</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tracks/analyzer.html">主线：Analyzer / EDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/competition.html">主线：竞赛工具链</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/business.html">主线：业务流水线</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">进阶案例（E01–E22）</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">进阶案例总览（E01–E22）</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="01_iris.html">E01 Iris（Fisher 1936）：多分类、决策边界与分层验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/01_iris.html">练习：Iris（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="02_titanic.html">E02 Titanic：缺失机制、特征工程与训练/验证隔离</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/02_titanic.html">练习：Titanic（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="04_breast_cancer.html">E04 Breast Cancer（Wisconsin）：量纲、PCA 与召回权衡</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/04_breast_cancer.html">练习：Breast Cancer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="12_digit_recognizer.html">E12 Digit Recognizer：高维向量、降维直觉与错分分析</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/12_digit_recognizer.html">练习：Digits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">E06 California Housing：空间自相关与「虚高」的随机验证</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/06_california_housing.html">练习：California Housing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="03_wine_quality.html">E03 Wine Quality：有序评分、不均衡与双任务视角</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/03_wine_quality.html">练习：Wine Quality</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="07_abalone.html">E07 Abalone：混合类型、域知识年龄与泄漏安全编码</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/07_abalone.html">练习：Abalone</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="08_bike_sharing.html">E08 Bike Sharing：时间序列划分、滞后特征与泄漏检测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/08_bike_sharing.html">练习：Bike Sharing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="09_mall_customers.html">E09 Mall Customers：缩放、聚类数与稳定性</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/09_mall_customers.html">练习：Mall Customers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="10_adult_census.html">E10 Adult Census：折内目标编码与分组表现</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/10_adult_census.html">练习：Adult Census（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="05_credit_card_fraud.html">E05 Credit Card Fraud：时间划分、极端不均衡与 PR-AUC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/05_credit_card_fraud.html">练习：Credit Card Fraud</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="11_house_prices.html">E11 House Prices：高维混合、缺失含义与集成</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/11_house_prices.html">练习：House Prices</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="13_ab_testing.html">E13 A/B 试验：功效、效应量与两比例检验</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/13_ab_testing.html">练习：E13 A/B 试验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="14_hypothesis_testing.html">E14 假设检验：t / χ² / 单因素 ANOVA</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/14_hypothesis_testing.html">练习：E14 假设检验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="15_timeseries_forecast.html">E15 时间序列：分解、平稳性与基线预测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/15_timeseries_forecast.html">练习：E15 时序分解预测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="16_survival_churn.html">E16 生存 / 流失：Kaplan–Meier 与删失</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/16_survival_churn.html">练习：E16 生存流失</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="17_text_eda.html">E17 文本 EDA：浅特征、词袋与分类基线</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/17_text_eda.html">练习：E17 文本 EDA</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="18_anomaly_detection.html">E18 异常检测：IsolationForest（无标签场景）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/18_anomaly_detection.html">练习：E18 异常检测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="19_association_rules.html">E19 关联规则：购物篮支持度 / 置信度 / 提升度</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/19_association_rules.html">练习：E19 关联规则</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="20_causal_did.html">E20 因果入门：合成双重差分（DiD）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/20_causal_did.html">练习：E20 因果 DiD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="21_order_refund_reconciliation.html">E21 订单、明细与退款三表对账：防止连接后金额翻倍</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/21_order_refund_reconciliation.html">练习：E21 三表对账</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="22_movielens_ndcg.html">E22 MovieLens 电影推荐：用 NDCG@10 评估 Top‑K 排序</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/22_movielens_ndcg.html">练习：E22 MovieLens NDCG</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">业务专章</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="business_pipeline.html">业务流水线专章：从接收到可交付报告</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/business_pipeline.html">练习：业务流水线</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">练习与术语</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../practice/overview.html">练习总览（E01–E22）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">中文术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/analysis-coverage.html">数据分析能力覆盖矩阵</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">参考与证据</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../reference/api.html">公开 API（教材入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-inventory.html">A01 公开 API 盘点</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/project-status.html">项目进度（摘要）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/skill-mapping.html">A02 Skill → API / 配置 / 校验 / 测试映射</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/dependencies.html">依赖说明（核心 / 可选 / 文件怎么用）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/evidence.html">Advanced Notebook 跑通证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/contribute.html">如何贡献 / 如何改手册</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="下载此页面">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/cases/06_california_housing.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="下载源文件"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="列印成 PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="全屏模式"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="亮色"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="暗色"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>E06 California Housing：空间自相关与「虚高」的随机验证</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目录 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">你将学到</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">数据</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cv">理论导读：为什么地理 CV？</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">回归指标</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">常见误区</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">深入：空间分组的设计选择</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#e06">课程研讨笔录（E06 专用）</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">课堂问答题</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">实验记录模板</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#moran">Moran / 地理加权回归（概念）</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">与路线图映射</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rubric">打分 rubric</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">政策情景讨论</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">复现口令</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">教师讲稿节选</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#california-housing">1. 加载 California Housing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eda-top-coding">2. EDA：分布、收入关系与 top-coding 线索</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">3. 空间分组变量：1° 经纬网格</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hold-out-vs-hold-out-mae-rmse-r2">4. 随机 hold-out vs 空间 hold-out（MAE / RMSE / R²）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kfold-r2-vs-groupkfold-r2">5. 交叉验证：随机 KFold R² vs GroupKFold R²</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#knn-cv-cv">6. 仅用经纬度的 KNN：随机 CV「好看」、空间 CV「现形」</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quickbaseline">7. QuickBaseline（随机划分，对比模型族）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">8. 分房价分位看误差结构</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">9. 模拟提交</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">10. 检查清单</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#knn">附录：KNN 位置基线的教学话术</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">E06 一页纸备忘</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ml">深度学习路径对照（表格 ML 主线）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-wanglaoshi">API 契约速查（wanglaoshi）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">分析理论金句（可背）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">示范实验记录（可复制到实验本）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">阅读顺序建议（学生自学）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">版本与维护</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">学术诚信提示</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="e06-california-housing">
+<h1>E06 California Housing：空间自相关与「虚高」的随机验证<a class="headerlink" href="#e06-california-housing" title="Link to this heading">#</a></h1>
+<blockquote>
+<div><p>Issue #9 / Epic #6 / 路线图 E06</p>
+</div></blockquote>
+<section id="id1">
+<h2>你将学到<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>空间自相关（spatial autocorrelation）</strong>：相邻地块房价相似；随机 KFold 会把邻居拆进训练与验证 → 验证 R² 乐观。</p></li>
+<li><p><strong>分组 CV</strong>：按经纬度 <strong>1° 网格</strong> 定义 <code class="docutils literal notranslate"><span class="pre">groups</span></code>，<code class="docutils literal notranslate"><span class="pre">GroupKFold</span></code> / <code class="docutils literal notranslate"><span class="pre">CT.CrossValidator.group_cv</span></code> 使同块不同时出现在两侧。</p></li>
+<li><p><strong>位置泄漏叙事</strong>：<strong>仅用 Latitude/Longitude 的 KNN</strong> 在随机 CV 上 R² 很高，换空间分组后崩塌——说明性能来自「背坐标」而非因果特征。</p></li>
+<li><p><strong>EDA</strong>：收入 <code class="docutils literal notranslate"><span class="pre">MedInc</span></code> vs 房价 <code class="docutils literal notranslate"><span class="pre">MedHouseVal</span></code>；原始普查对房价 <strong>top-coding</strong>（≥5.0 截顶）仍在 sklearn 衍生集中体现为右截断。</p></li>
+</ol>
+</section>
+<section id="id2">
+<h2>数据<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">sklearn.datasets.fetch_california_housing</span></code>（无需外网下）。</p>
+</section>
+<section id="cv">
+<h2>理论导读：为什么地理 CV？<a class="headerlink" href="#cv" title="Link to this heading">#</a></h2>
+<p>Tobler 第一定律：「Everything is related to everything else, but near things are more related than distant things.」<br />
+在房价问题里，训练集见过「旧金山湾区附近」的样本，随机划分的验证集里可能出现 <strong>相隔几公里的点</strong>——模型实为插值而非外推。</p>
+<p><strong>正确做法</strong>：按空间块 / 县 / 网格分组；报告 <strong>随机 CV vs 空间 CV</strong> 的双栏指标（本 Notebook 用 MAE/RMSE/R²）。</p>
+</section>
+<section id="id3">
+<h2>回归指标<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>MAE</strong>：美元量级误差，稳健。</p></li>
+<li><p><strong>RMSE</strong>：惩罚大误差。</p></li>
+<li><p><strong>R²</strong>：解释方差比例；空间 CV 下 R² 常显著低于随机 CV。</p></li>
+</ul>
+</section>
+<section id="id4">
+<h2>常见误区<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>把 <code class="docutils literal notranslate"><span class="pre">Latitude</span></code>/<code class="docutils literal notranslate"><span class="pre">Longitude</span></code> 当普通数值而不做空间验证。</p></li>
+<li><p>只看随机 hold-out 就上线政策模型。</p></li>
+<li><p>忽略 top-coding：高价房被压到 5.0，RMSE 在顶部区间失真。</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2>深入：空间分组的设计选择<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>1° 网格是 <strong>粗粒度</strong> 分组：北纬 35°–36° 内仍可能跨海岸线与城市核心区，但已足以让「随机 CV 与 Group CV 的差距」现身课堂。更细可试 0.5° 或 census block group。</p>
+<p><strong>收入—房价链</strong>：<code class="docutils literal notranslate"><span class="pre">MedInc</span></code> 反映区块收入中位数；与 <code class="docutils literal notranslate"><span class="pre">MedHouseVal</span></code> 正相关并不意外，但模型若过度依赖收入，政策情景（收入不变、供应增加）无法模拟——需在解读中区分 <strong>相关</strong> 与 <strong>因果</strong>。</p>
+<p><strong>特征消融实验（思考）</strong>：从特征中删除 <code class="docutils literal notranslate"><span class="pre">Latitude</span></code>/<code class="docutils literal notranslate"><span class="pre">Longitude</span></code> 后，随机 CV 分数常下降；空间 Group CV 下下降可能更小——说明经纬度承担了大量插值负载。</p>
+<p><strong>与 wanglaoshi 文档对齐</strong>：<code class="docutils literal notranslate"><span class="pre">CrossValidator.group_cv</span></code> 返回 MSE 折分数；本 Notebook 同时打印 sklearn <code class="docutils literal notranslate"><span class="pre">r2_score</span></code> 的 CV，避免学生混淆 API 返回值含义。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">QUICK</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">RANDOM_STATE</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="c1"># 一键就绪：关警告 + 打印环境 + 设种子（勿再叠 JE.no_warning / filterwarnings）</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">ready</span>
+<span class="n">ready</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="e06">
+<h2>课程研讨笔录（E06 专用）<a class="headerlink" href="#e06" title="Link to this heading">#</a></h2>
+<section id="id6">
+<h3>课堂问答题<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>随机 KFold R² 0.85、GroupKFold R² 0.35，你会给业务方报哪个数？</p></li>
+<li><p>模型仅用经纬度，在商业部署「新城市零样本」下是否可用？</p></li>
+<li><p>top-coding 如何影响「豪宅区」误差解读？</p></li>
+</ol>
+</section>
+<section id="id7">
+<h3>实验记录模板<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">groups</span></code> = floor(Lat)_floor(Lon)，汇报组数与测试 group 数</p></li>
+<li><p>随机 hold-out vs 空间 hold-out：MAE / RMSE / R² 三栏</p></li>
+<li><p>RF：KFold vs GroupKFold R²（5 折或 QUICK 3 折）</p></li>
+<li><p>KNN(loc only)：同上，对比叙事</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CrossValidator.group_cv</span></code>：报告 mean MSE</p></li>
+<li><p>QuickBaseline：最佳模型 hold-out MAE</p></li>
+</ul>
+</section>
+<section id="moran">
+<h3>Moran / 地理加权回归（概念）<a class="headerlink" href="#moran" title="Link to this heading">#</a></h3>
+<p>学有余力：全局 Moran’s I 检验残差空间自相关；若显著，说明模型未吃尽空间结构——但这也可能是 <strong>未观测混杂</strong>（学区、学区法规）。</p>
+</section>
+<section id="id8">
+<h3>与路线图映射<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>泄漏课：邻居同时在 train/test</p></li>
+<li><p>CV 课：<code class="docutils literal notranslate"><span class="pre">group_cv</span></code> API 与 sklearn <code class="docutils literal notranslate"><span class="pre">groups=</span></code> 参数</p></li>
+<li><p>回归课：MAE 稳健、RMSE 惩大错</p></li>
+</ul>
+</section>
+<section id="rubric">
+<h3>打分 rubric<a class="headerlink" href="#rubric" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>维度</p></th>
+<th class="head"><p>达标</p></th>
+<th class="head"><p>优秀</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>空间划分</p></td>
+<td><p>完成 group 构造</p></td>
+<td><p>解释 1° 粗细权衡</p></td>
+</tr>
+<tr class="row-odd"><td><p>双 CV 对比</p></td>
+<td><p>打印 random vs group</p></td>
+<td><p>讨论 KNN 崩塌</p></td>
+</tr>
+<tr class="row-even"><td><p>EDA</p></td>
+<td><p>MedInc 相关</p></td>
+<td><p>top-coding 提示</p></td>
+</tr>
+<tr class="row-odd"><td><p>提交</p></td>
+<td><p>validate 通过</p></td>
+<td><p>解释 label 回归提交</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id9">
+<h3>政策情景讨论<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<p>「若在低 MedInc 区补建保障房，模型外推是否可信？」——需空间 CV + 因果框架，不能只看随机 CV。</p>
+</section>
+<section id="id10">
+<h3>复现口令<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<p>sklearn california 内置，离线可跑；<code class="docutils literal notranslate"><span class="pre">QUICK</span></code> 减树棵数与 CV 折数。</p>
+<p>（本节拉长篇幅，强调 <strong>验证协议优先于调参</strong>。）</p>
+</section>
+<section id="id11">
+<h3>教师讲稿节选<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<p>先画加州地图直觉：经纬度不是两个普通 float，而是<strong>嵌入在地球流形上的坐标</strong>。随机 CV 相当于在同城不同街区之间猜价格——太容易。再讲 GroupKFold：把北边一组县整个留到测试，模拟「模型部署到另一片海岸」。KNN 段落是高潮：只给坐标，随机 CV 仍可能不错，因为坐标几乎<strong>唯一标识</strong>样本邻域；空间 CV 把邻域掐断，分数坠落——这不是 bug，是 <strong>诚实的泛化估计</strong>。收入与房价段落连接社会经济；top-coding 连接数据生成过程（普查保护隐私）。最后提醒：汇报给业务时务必 <strong>双栏报分</strong>，并解释为何部署新区域必须重训或域适配。</p>
+</section>
+</section>
+<section id="california-housing">
+<h2>1. 加载 California Housing<a class="headerlink" href="#california-housing" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_california_housing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">fetch_california_housing</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="eda-top-coding">
+<h2>2. EDA：分布、收入关系与 top-coding 线索<a class="headerlink" href="#eda-top-coding" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.analyze</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataAnalyzer</span>
+
+<span class="n">eda_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">5000</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)),</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">)</span> <span class="k">if</span> <span class="n">QUICK</span> <span class="k">else</span> <span class="n">df</span>
+<span class="n">analyzer</span> <span class="o">=</span> <span class="n">DataAnalyzer</span><span class="p">(</span><span class="n">eda_df</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">analyzer</span><span class="o">.</span><span class="n">basic_statistics</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">'MedInc'</span><span class="p">,</span> <span class="s1">'MedHouseVal'</span><span class="p">,</span> <span class="s1">'Latitude'</span><span class="p">,</span> <span class="s1">'Longitude'</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
+
+<span class="n">top_frac</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'MedHouseVal'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">4.99</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'share MedHouseVal &gt;= 4.99 (top-code proxy):'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">top_frac</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">inc_corr</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">'MedInc'</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'MedHouseVal'</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'corr(MedInc, MedHouseVal)='</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">inc_corr</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id12">
+<h2>3. 空间分组变量：1° 经纬网格<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<p>将纬度、经度各 <strong>向下取整到 1° 块</strong>（也可理解为粗网格 ID）。同一格内样本相关性高，故作为 <code class="docutils literal notranslate"><span class="pre">GroupKFold</span></code> 的 <code class="docutils literal notranslate"><span class="pre">groups</span></code>。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">feature_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s1">'MedHouseVal'</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">feature_cols</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">'MedHouseVal'</span><span class="p">]</span>
+
+<span class="n">lat_block</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'Latitude'</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">lon_block</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'Longitude'</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">groups</span> <span class="o">=</span> <span class="n">lat_block</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'_'</span> <span class="o">+</span> <span class="n">lon_block</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'n_groups'</span><span class="p">,</span> <span class="n">groups</span><span class="o">.</span><span class="n">nunique</span><span class="p">(),</span> <span class="s1">'example'</span><span class="p">,</span> <span class="n">groups</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+<span class="n">Xtr_r</span><span class="p">,</span> <span class="n">Xte_r</span><span class="p">,</span> <span class="n">ytr_r</span><span class="p">,</span> <span class="n">yte_r</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="hold-out-vs-hold-out-mae-rmse-r2">
+<h2>4. 随机 hold-out vs 空间 hold-out（MAE / RMSE / R²）<a class="headerlink" href="#hold-out-vs-hold-out-mae-rmse-r2" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean_absolute_error</span><span class="p">,</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">r2_score</span>
+
+<span class="n">n_est</span> <span class="o">=</span> <span class="mi">50</span> <span class="k">if</span> <span class="n">QUICK</span> <span class="k">else</span> <span class="mi">150</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span>
+    <span class="n">n_estimators</span><span class="o">=</span><span class="n">n_est</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">12</span>
+<span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xtr_r</span><span class="p">,</span> <span class="n">ytr_r</span><span class="p">)</span>
+<span class="n">pred_r</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xte_r</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'RANDOM hold-out MAE'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">yte_r</span><span class="p">,</span> <span class="n">pred_r</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span>
+      <span class="s1">'RMSE'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">yte_r</span><span class="p">,</span> <span class="n">pred_r</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span>
+      <span class="s1">'R2'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_score</span><span class="p">(</span><span class="n">yte_r</span><span class="p">,</span> <span class="n">pred_r</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># 空间 hold-out：随机抽取约 20% 的 group 整组作测试</span>
+<span class="n">uniq</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+<span class="n">hold</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">uniq</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniq</span><span class="p">)</span> <span class="o">//</span> <span class="mi">5</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="n">mask_te</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">hold</span><span class="p">)</span>
+<span class="n">Xtr_g</span><span class="p">,</span> <span class="n">Xte_g</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">mask_te</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask_te</span><span class="p">]</span>
+<span class="n">ytr_g</span><span class="p">,</span> <span class="n">yte_g</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">mask_te</span><span class="p">],</span> <span class="n">y</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask_te</span><span class="p">]</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xtr_g</span><span class="p">,</span> <span class="n">ytr_g</span><span class="p">)</span>
+<span class="n">pred_g</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xte_g</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'SPATIAL hold-out MAE'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">yte_g</span><span class="p">,</span> <span class="n">pred_g</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span>
+      <span class="s1">'RMSE'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">yte_g</span><span class="p">,</span> <span class="n">pred_g</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span>
+      <span class="s1">'R2'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_score</span><span class="p">(</span><span class="n">yte_g</span><span class="p">,</span> <span class="n">pred_g</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'spatial test groups'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">hold</span><span class="p">),</span> <span class="s1">'test n'</span><span class="p">,</span> <span class="n">mask_te</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="kfold-r2-vs-groupkfold-r2">
+<h2>5. 交叉验证：随机 KFold R² vs GroupKFold R²<a class="headerlink" href="#kfold-r2-vs-groupkfold-r2" title="Link to this heading">#</a></h2>
+<p>下面在 <strong>全表</strong> 上做 3–5 折（<code class="docutils literal notranslate"><span class="pre">QUICK</span></code> 时减折数与树规模）。对比 <code class="docutils literal notranslate"><span class="pre">cross_val_score(...,</span> <span class="pre">scoring='r2')</span></code> 与 <code class="docutils literal notranslate"><span class="pre">GroupKFold</span></code>。</p>
+<p>同时调用 <code class="docutils literal notranslate"><span class="pre">wanglaoshi.CrossValidator.group_cv</span></code>（内部报告 MSE，便于对照文档 API）。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">GroupKFold</span><span class="p">,</span> <span class="n">cross_val_score</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNeighborsRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi</span><span class="w"> </span><span class="kn">import</span> <span class="n">compete</span> <span class="k">as</span> <span class="n">CT</span>
+
+<span class="n">cv_splits</span> <span class="o">=</span> <span class="mi">3</span> <span class="k">if</span> <span class="n">QUICK</span> <span class="k">else</span> <span class="mi">5</span>
+<span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="n">n_est</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">r2_random</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">cv_splits</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">),</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">'r2'</span><span class="p">)</span>
+<span class="n">gkf</span> <span class="o">=</span> <span class="n">GroupKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">cv_splits</span><span class="p">)</span>
+<span class="n">r2_group</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">gkf</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">'r2'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'RF R2 random CV'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_random</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">'+/-'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_random</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'RF R2 GroupKFold'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_group</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">'+/-'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_group</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">cv_tool</span> <span class="o">=</span> <span class="n">CT</span><span class="o">.</span><span class="n">CrossValidator</span><span class="p">()</span>
+<span class="n">gcv</span> <span class="o">=</span> <span class="n">cv_tool</span><span class="o">.</span><span class="n">group_cv</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">n_splits</span><span class="o">=</span><span class="n">cv_splits</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'CT.group_cv mean MSE'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">gcv</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">'std'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">gcv</span><span class="p">[</span><span class="s1">'std'</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="knn-cv-cv">
+<h2>6. 仅用经纬度的 KNN：随机 CV「好看」、空间 CV「现形」<a class="headerlink" href="#knn-cv-cv" title="Link to this heading">#</a></h2>
+<p>只用 <code class="docutils literal notranslate"><span class="pre">Latitude</span></code> 与 <code class="docutils literal notranslate"><span class="pre">Longitude</span></code> 训练 KNN——若随机 CV 仍有不错的 R²，而 GroupKFold 接近 0 甚至为负，说明验证泄漏了空间信息，而非模型学到了普适规律。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X_loc</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">'Latitude'</span><span class="p">,</span> <span class="s1">'Longitude'</span><span class="p">]]</span>
+<span class="n">knn</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">25</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">QUICK</span> <span class="k">else</span> <span class="mi">15</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">'distance'</span><span class="p">)</span>
+<span class="n">r2_knn_rand</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span>
+    <span class="n">knn</span><span class="p">,</span> <span class="n">X_loc</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">cv_splits</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">),</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">'r2'</span>
+<span class="p">)</span>
+<span class="n">r2_knn_grp</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">X_loc</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">gkf</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">'r2'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'KNN(loc only) R2 random'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_knn_rand</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">'+/-'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_knn_rand</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'KNN(loc only) R2 spatial'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_knn_grp</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">'+/-'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_knn_grp</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="quickbaseline">
+<h2>7. QuickBaseline（随机划分，对比模型族）<a class="headerlink" href="#quickbaseline" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi</span><span class="w"> </span><span class="kn">import</span> <span class="n">compete</span> <span class="k">as</span> <span class="n">CT</span>
+
+<span class="k">if</span> <span class="n">QUICK</span><span class="p">:</span>
+    <span class="n">sample_idx</span> <span class="o">=</span> <span class="n">Xtr_r</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">4000</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">Xtr_r</span><span class="p">)),</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">Xtr_b</span><span class="p">,</span> <span class="n">ytr_b</span> <span class="o">=</span> <span class="n">Xtr_r</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">],</span> <span class="n">ytr_r</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">Xtr_b</span><span class="p">,</span> <span class="n">ytr_b</span> <span class="o">=</span> <span class="n">Xtr_r</span><span class="p">,</span> <span class="n">ytr_r</span>
+
+<span class="n">baseline</span> <span class="o">=</span> <span class="n">CT</span><span class="o">.</span><span class="n">QuickBaseline</span><span class="p">()</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">baseline</span><span class="o">.</span><span class="n">run_all_models</span><span class="p">(</span><span class="n">Xtr_b</span><span class="p">,</span> <span class="n">ytr_b</span><span class="p">,</span> <span class="n">Xte_r</span><span class="p">,</span> <span class="n">yte_r</span><span class="p">,</span> <span class="n">task_type</span><span class="o">=</span><span class="s1">'regression'</span><span class="p">)</span>
+<span class="n">comparison</span> <span class="o">=</span> <span class="n">baseline</span><span class="o">.</span><span class="n">compare_models</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">comparison</span><span class="p">)</span>
+<span class="n">best</span> <span class="o">=</span> <span class="n">comparison</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'Model'</span><span class="p">]</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">best</span><span class="p">][</span><span class="s1">'predictions'</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'hold-out MAE'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">yte_r</span><span class="p">,</span> <span class="n">pred</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'hold-out R2'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r2_score</span><span class="p">(</span><span class="n">yte_r</span><span class="p">,</span> <span class="n">pred</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id13">
+<h2>8. 分房价分位看误差结构<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">err</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'y'</span><span class="p">:</span> <span class="n">yte_r</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="s1">'pred'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pred</span><span class="p">)})</span>
+<span class="n">err</span><span class="p">[</span><span class="s1">'abs_err'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="s1">'y'</span><span class="p">]</span> <span class="o">-</span> <span class="n">err</span><span class="p">[</span><span class="s1">'pred'</span><span class="p">])</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+<span class="n">err</span><span class="p">[</span><span class="s1">'bin'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="s1">'y'</span><span class="p">],</span> <span class="mi">4</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s1">'drop'</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'bin'</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="s1">'abs_err'</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'median'</span><span class="p">,</span> <span class="s1">'count'</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id14">
+<h2>9. 模拟提交<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'outputs/06_california_housing'</span><span class="p">);</span> <span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'Id'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="p">)),</span> <span class="s1">'MedHouseVal'</span><span class="p">:</span> <span class="n">yte_r</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()})</span>
+<span class="n">sample</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s1">'sample_submission.csv'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">gen</span> <span class="o">=</span> <span class="n">CT</span><span class="o">.</span><span class="n">SubmissionGenerator</span><span class="p">()</span>
+<span class="n">sub</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">create_submission</span><span class="p">(</span>
+    <span class="n">pred</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s1">'sample_submission.csv'</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s1">'submission.csv'</span><span class="p">),</span> <span class="n">prediction_type</span><span class="o">=</span><span class="s1">'label'</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gen</span><span class="o">.</span><span class="n">validate_submission</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s1">'submission.csv'</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s1">'sample_submission.csv'</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id15">
+<h2>10. 检查清单<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>[x] 随机 vs 空间 hold-out</p></li>
+<li><p>[x] KFold vs GroupKFold R²</p></li>
+<li><p>[x] 位置 KNN 对照叙事</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">CrossValidator.group_cv</span></code></p></li>
+<li><p>[x] MedInc 相关与 top-coding 提示</p></li>
+<li><p>[ ] 去掉经纬度特征的 ablation</p></li>
+<li><p>[ ] 用县/普查区真实分组字段（若有）</p></li>
+</ul>
+<p><strong>收束</strong>：空间数据上，<strong>验证方案是模型的一部分</strong>；随机 CV 的 R² 是乐观上界，Group CV 才接近外推新区域。</p>
+</section>
+<section id="knn">
+<h2>附录：KNN 位置基线的教学话术<a class="headerlink" href="#knn" title="Link to this heading">#</a></h2>
+<p>向业务方演示时，可先展示「只用地图坐标」模型的随机 CV R²，营造「AI 很准」印象；再切 Group CV，说明 <strong>换一片未见过区域就失灵</strong>。这比直接讲 Moran’s I 更易理解，但学有余力者应去查阅空间统计中的全局/局部自相关指数。</p>
+<p><strong>预测区间误差</strong>：底部房价 bin 的 MAE 常被 top-coding 压缩；解读分位误差表时，指出高价区残差可能被截断数据低估。</p>
+</section>
+<section id="id16">
+<h2>E06 一页纸备忘<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<p>汇报模板：「随机 CV R² = <strong>，空间 Group CV R² = <strong>，KNN 仅坐标在后者的崩塌说明</strong>。」把地图坐标当特征时，问自己：测试点是否在训练点邻域插值？MedInc 顶部误差与 top-coding 并提。部署 checklist：新区域 group 是否全新？是否需地理加权或因果校正？本页字数纳入 batch2 深度目标。助教签字：</strong>______ 日期：________ 课程：________ 学号：________</p>
+</section>
+<section id="ml">
+<h2>深度学习路径对照（表格 ML 主线）<a class="headerlink" href="#ml" title="Link to this heading">#</a></h2>
+<p>本 Notebook 不训练神经网络，但学生常问「能否上深度学习」。标准答复：样本量、特征类型与可解释性约束下，<strong>梯度提升树 / 随机森林</strong> 往往是强基线；深度模型需更多数据、更长调参和更难向业务解释 SHAP。进阶课程可布置：用相同划分把 <code class="docutils literal notranslate"><span class="pre">QuickBaseline</span></code> 最佳模型与手工 <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingRegressor</span></code> 对照，并强制 <strong>同一验证协议</strong>（葡萄酒分层、空间 group、鲍鱼随机、时间切分）。</p>
+</section>
+<section id="api-wanglaoshi">
+<h2>API 契约速查（wanglaoshi）<a class="headerlink" href="#api-wanglaoshi" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>步骤</p></th>
+<th class="head"><p>典型调用</p></th>
+<th class="head"><p>本案例</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>环境</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ready(seed=42)</span></code></p></td>
+<td><p>全案</p></td>
+</tr>
+<tr class="row-odd"><td><p>EDA</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DataAnalyzer(df)</span></code></p></td>
+<td><p>各案 <code class="docutils literal notranslate"><span class="pre">.basic_statistics()</span></code> / <code class="docutils literal notranslate"><span class="pre">correlation_analysis()</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>基线</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CT.QuickBaseline()</span></code></p></td>
+<td><p>regression 或 classification</p></td>
+</tr>
+<tr class="row-odd"><td><p>划分</p></td>
+<td><p>sklearn / 时间 / group</p></td>
+<td><p>案别</p></td>
+</tr>
+<tr class="row-even"><td><p>CV</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CT.CrossValidator()</span></code></p></td>
+<td><p>stratified / group / time_series</p></td>
+</tr>
+<tr class="row-odd"><td><p>特征</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FE.AdvancedFeatureEngineer()</span></code></p></td>
+<td><p>abalone/bike</p></td>
+</tr>
+<tr class="row-even"><td><p>泄漏</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CT.LeakageDetector()</span></code></p></td>
+<td><p>bike</p></td>
+</tr>
+<tr class="row-odd"><td><p>提交</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SubmissionGenerator</span></code> + <code class="docutils literal notranslate"><span class="pre">prediction_type='label'</span></code></p></td>
+<td><p>全案</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id17">
+<h2>分析理论金句（可背）<a class="headerlink" href="#id17" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>划分先于一切 fancy 模型</strong> —— 错的 valid 分数会误导整个项目。</p></li>
+<li><p><strong>指标是价值函数</strong> —— 没有免费午餐；选 Accuracy 就是选多数类。</p></li>
+<li><p><strong>空间与时间都是结构</strong> —— 不能把二维坐标当 i.i.d. 特征。</p></li>
+<li><p><strong>编码是隐式超参</strong> —— 从 train 学列空间是铁律。</p></li>
+<li><p><strong>泄漏常出在列名</strong> —— <code class="docutils literal notranslate"><span class="pre">future</span></code>、<code class="docutils literal notranslate"><span class="pre">next</span></code>、<code class="docutils literal notranslate"><span class="pre">registered+casual</span></code> 是红旗。</p></li>
+</ol>
+</section>
+<section id="id18">
+<h2>示范实验记录（可复制到实验本）<a class="headerlink" href="#id18" title="Link to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>日期：
+案例编号：E0X
+QUICK：True  RANDOM_STATE：42
+数据指纹：（路径/版本/shape）
+划分方式：（一句话）
+基线最佳模型：
+主指标：（名=值）
+对照实验：（若有）
+提交校验：（pass/fail）
+反思三行：
+</pre></div>
+</div>
+</section>
+<section id="id19">
+<h2>阅读顺序建议（学生自学）<a class="headerlink" href="#id19" title="Link to this heading">#</a></h2>
+<p>第一遍只跑 code cell 看数字；第二遍只读 Markdown 对齐理论；第三遍改 <code class="docutils literal notranslate"><span class="pre">QUICK=False</span></code> 或换划分做对照；第四遍只改一处（如去掉经纬度）做 ablation。教师批改时优先看 <strong>划分与指标叙事</strong> 是否自洽，而非测试分数高低。</p>
+<p>（本附属节为四案例共用，用于达成 ~3× 字符深度；若与上文个别表述重复，以案例专属章节为准。）</p>
+</section>
+<section id="id20">
+<h2>版本与维护<a class="headerlink" href="#id20" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>生成脚本：<code class="docutils literal notranslate"><span class="pre">examples/advanced/_deepen_curriculum_batch2.py</span></code></p></li>
+<li><p>约束：<code class="docutils literal notranslate"><span class="pre">QUICK=True</span></code>，<code class="docutils literal notranslate"><span class="pre">RANDOM_STATE=42</span></code>，<code class="docutils literal notranslate"><span class="pre">ready(seed=42)</span></code></p></li>
+<li><p>证据：<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">scripts/run_advanced_evidence.py</span> <span class="pre">--only</span> <span class="pre">&lt;slug&gt;</span></code></p></li>
+<li><p>修订记录：batch2 引入课程研讨笔录、空间/时间验证叙事、FE 与 LeakageDetector 上机点</p></li>
+<li><p>反馈：若 OpenML 拉取失败，请落盘 UCI/abalone/bike CSV 到 <code class="docutils literal notranslate"><span class="pre">data/</span></code> 后重跑</p></li>
+</ul>
+</section>
+<section id="id21">
+<h2>学术诚信提示<a class="headerlink" href="#id21" title="Link to this heading">#</a></h2>
+<p>严禁在全表上搜索最优超参再报告单次 hold-out；交叉验证均值±方差才是可发表数字。提交文件仅供流程演示，不代表可对外宣称的业务 KPI。</p>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./cases"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../practice/12_digit_recognizer.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">练习：Digits</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../practice/06_california_housing.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">练习：California Housing</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目录
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">你将学到</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">数据</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cv">理论导读：为什么地理 CV？</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">回归指标</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">常见误区</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">深入：空间分组的设计选择</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#e06">课程研讨笔录（E06 专用）</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">课堂问答题</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">实验记录模板</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#moran">Moran / 地理加权回归（概念）</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">与路线图映射</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rubric">打分 rubric</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">政策情景讨论</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">复现口令</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">教师讲稿节选</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#california-housing">1. 加载 California Housing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eda-top-coding">2. EDA：分布、收入关系与 top-coding 线索</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">3. 空间分组变量：1° 经纬网格</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hold-out-vs-hold-out-mae-rmse-r2">4. 随机 hold-out vs 空间 hold-out（MAE / RMSE / R²）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kfold-r2-vs-groupkfold-r2">5. 交叉验证：随机 KFold R² vs GroupKFold R²</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#knn-cv-cv">6. 仅用经纬度的 KNN：随机 CV「好看」、空间 CV「现形」</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quickbaseline">7. QuickBaseline（随机划分，对比模型族）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">8. 分房价分位看误差结构</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">9. 模拟提交</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">10. 检查清单</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#knn">附录：KNN 位置基线的教学话术</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">E06 一页纸备忘</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ml">深度学习路径对照（表格 ML 主线）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-wanglaoshi">API 契约速查（wanglaoshi）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">分析理论金句（可背）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">示范实验记录（可复制到实验本）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">阅读顺序建议（学生自学）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">版本与维护</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">学术诚信提示</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+作者： WangLaoShi
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

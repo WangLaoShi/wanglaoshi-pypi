@@ -1,0 +1,1197 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>E09 Mall Customers：缩放、聚类数与稳定性 &#8212; 基线工坊 · 从 EDA 到提交</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3ccecbf1" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=15296eb0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'cases/09_mall_customers';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="练习：Mall Customers" href="../practice/09_mall_customers.html" />
+    <link rel="prev" title="练习：Bike Sharing" href="../practice/08_bike_sharing.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">基线工坊 · 从 EDA 到提交</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">开始学习</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../start/learning-path.html">学习路径</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">安装环境</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/first-hour.html">第一小时：最小闭环</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/binder.html">一键云端运行（Binder）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">公开接口教程</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/README.html">公开接口教程（1.15.1+）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01_ready_and_eda.html">01 · ready + EDA（Iris / Tips）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02_compete_baseline.html">02 · compete 基线与提交（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03_features_encode.html">03 · features 编码（合成高基数表）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04_analytics_stats.html">04 · analytics 统计工具（合成 A/B）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/05_business_pipeline.html">05 · business 流水线（合成订单）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/06_ml_preprocess.html">06 · ml 预处理与建模（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07_leakage_and_cv.html">07 · 泄漏检测 + 分层 CV（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/08_timeseries_tools.html">08 · 时序工具（合成季节序列）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/09_calibration_fairness.html">09 · 校准 + 分组公平（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/10_testing_repro.html">10 · 测试与复现治理（Iris）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/11_runtime_toolkit.html">11 · runtime 工具箱（VERSIONS / Jupyter / 下载）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/12_analyze_helpers.html">12 · analyze 函数与辅助类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/13_compete_advanced.html">13 · compete 进阶（集成 / 重要性 / 追踪 / 调参）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/14_analytics_extra.html">14 · analytics 其余（异常 / 排序 / 生存）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/15_ml_toolkit.html">15 · ml 工具箱（特征 / 评估 / DL 入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/16_business_stages.html">16 · business 阶段函数（公开入口全扫）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/17_testing_extra.html">17 · _testing 其余（契约 / 图表元数据 / 回归汇总）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">使用手册（类与方法）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../handbook/README.html">使用手册（类与方法 · 带案例）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/01_data_analyzer.html">使用手册 01 · <code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/02_feature_engineer.html">使用手册 02 · <code class="docutils literal notranslate"><span class="pre">AdvancedFeatureEngineer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/03_compete_toolkit.html">使用手册 03 · <code class="docutils literal notranslate"><span class="pre">compete</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/04_analytics_toolkit.html">使用手册 04 · <code class="docutils literal notranslate"><span class="pre">analytics</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/05_ml_guide.html">使用手册 05 · <code class="docutils literal notranslate"><span class="pre">ml</span></code> 公开接口</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/06_business_guide.html">使用手册 06 · <code class="docutils literal notranslate"><span class="pre">business</span></code> 业务分析</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">精讲课（先于案例）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lessons/overview.html">精讲课总览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/leakage.html">精讲：三类数据泄露</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/cv_and_splits.html">精讲：交叉验证与划分策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/submission_contracts.html">精讲：提交文件契约</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/feature_fit_discipline.html">精讲：特征工程的拟合纪律</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/business_traceability.html">精讲：业务数字可追溯</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/common_mistakes.html">精讲：常见错误墙</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">三条主线</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tracks/analyzer.html">主线：Analyzer / EDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/competition.html">主线：竞赛工具链</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/business.html">主线：业务流水线</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">进阶案例（E01–E22）</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">进阶案例总览（E01–E22）</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="01_iris.html">E01 Iris（Fisher 1936）：多分类、决策边界与分层验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/01_iris.html">练习：Iris（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="02_titanic.html">E02 Titanic：缺失机制、特征工程与训练/验证隔离</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/02_titanic.html">练习：Titanic（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="04_breast_cancer.html">E04 Breast Cancer（Wisconsin）：量纲、PCA 与召回权衡</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/04_breast_cancer.html">练习：Breast Cancer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="12_digit_recognizer.html">E12 Digit Recognizer：高维向量、降维直觉与错分分析</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/12_digit_recognizer.html">练习：Digits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="06_california_housing.html">E06 California Housing：空间自相关与「虚高」的随机验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/06_california_housing.html">练习：California Housing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="03_wine_quality.html">E03 Wine Quality：有序评分、不均衡与双任务视角</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/03_wine_quality.html">练习：Wine Quality</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="07_abalone.html">E07 Abalone：混合类型、域知识年龄与泄漏安全编码</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/07_abalone.html">练习：Abalone</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="08_bike_sharing.html">E08 Bike Sharing：时间序列划分、滞后特征与泄漏检测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/08_bike_sharing.html">练习：Bike Sharing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">E09 Mall Customers：缩放、聚类数与稳定性</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/09_mall_customers.html">练习：Mall Customers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="10_adult_census.html">E10 Adult Census：折内目标编码与分组表现</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/10_adult_census.html">练习：Adult Census（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="05_credit_card_fraud.html">E05 Credit Card Fraud：时间划分、极端不均衡与 PR-AUC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/05_credit_card_fraud.html">练习：Credit Card Fraud</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="11_house_prices.html">E11 House Prices：高维混合、缺失含义与集成</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/11_house_prices.html">练习：House Prices</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="13_ab_testing.html">E13 A/B 试验：功效、效应量与两比例检验</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/13_ab_testing.html">练习：E13 A/B 试验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="14_hypothesis_testing.html">E14 假设检验：t / χ² / 单因素 ANOVA</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/14_hypothesis_testing.html">练习：E14 假设检验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="15_timeseries_forecast.html">E15 时间序列：分解、平稳性与基线预测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/15_timeseries_forecast.html">练习：E15 时序分解预测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="16_survival_churn.html">E16 生存 / 流失：Kaplan–Meier 与删失</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/16_survival_churn.html">练习：E16 生存流失</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="17_text_eda.html">E17 文本 EDA：浅特征、词袋与分类基线</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/17_text_eda.html">练习：E17 文本 EDA</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="18_anomaly_detection.html">E18 异常检测：IsolationForest（无标签场景）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/18_anomaly_detection.html">练习：E18 异常检测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="19_association_rules.html">E19 关联规则：购物篮支持度 / 置信度 / 提升度</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/19_association_rules.html">练习：E19 关联规则</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="20_causal_did.html">E20 因果入门：合成双重差分（DiD）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/20_causal_did.html">练习：E20 因果 DiD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="21_order_refund_reconciliation.html">E21 订单、明细与退款三表对账：防止连接后金额翻倍</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/21_order_refund_reconciliation.html">练习：E21 三表对账</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="22_movielens_ndcg.html">E22 MovieLens 电影推荐：用 NDCG@10 评估 Top‑K 排序</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/22_movielens_ndcg.html">练习：E22 MovieLens NDCG</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">业务专章</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="business_pipeline.html">业务流水线专章：从接收到可交付报告</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/business_pipeline.html">练习：业务流水线</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">练习与术语</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../practice/overview.html">练习总览（E01–E22）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">中文术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/analysis-coverage.html">数据分析能力覆盖矩阵</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">参考与证据</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../reference/api.html">公开 API（教材入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-inventory.html">A01 公开 API 盘点</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/project-status.html">项目进度（摘要）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/skill-mapping.html">A02 Skill → API / 配置 / 校验 / 测试映射</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/dependencies.html">依赖说明（核心 / 可选 / 文件怎么用）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/evidence.html">Advanced Notebook 跑通证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/contribute.html">如何贡献 / 如何改手册</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="下载此页面">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/cases/09_mall_customers.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="下载源文件"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="列印成 PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="全屏模式"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="亮色"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="暗色"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>E09 Mall Customers：缩放、聚类数与稳定性</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目录 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">案例定位</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">你将学到</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#k-means">理论：K-Means 的假设与局限</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">数据</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">1. 加载或合成</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eda">2. EDA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">3. 选数值特征与散点直觉</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#k-silhouette">4. 缩放 + 搜 k（肘部 + Silhouette）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ari">5. 多随机种子稳定性（ARI）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">6. 最终簇标签与画像表</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs">6.1 未缩放 vs 缩放：轮廓系数对照</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#genre">6.2 类别变量 <code class="docutils literal notranslate"><span class="pre">Genre</span></code> 与簇的列联</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">6.3 理论：ARI 与种子敏感性</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">6.4 拓展阅读</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">7. 与竞赛流程的区别</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">8. 检查清单</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-a">附录：聚类实战 Q&amp;A（中文）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b">附录 B：导出簇分配（非竞赛提交）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#c">附录 C：课堂讨论题</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">读本：客户细分项目里程碑（非竞赛）</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">距离、尺度与特征权重</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">从簇到行动</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mall-customers-90">教师导读：mall customers 课堂 90 分钟脚本</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">学生常问</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">与仓库其它案例链接</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">附录 B：稳定性实验设计</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mall-customers">深度阅读与作业（Mall Customers）</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">必读观点</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">书面作业</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">课堂讨论记录区（请学生填写）</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="e09-mall-customers">
+<h1>E09 Mall Customers：缩放、聚类数与稳定性<a class="headerlink" href="#e09-mall-customers" title="Link to this heading">#</a></h1>
+<blockquote>
+<div><p>Issue #9 / Epic #6 / 路线图 E09</p>
+</div></blockquote>
+<section id="id1">
+<h2>案例定位<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>商场客户细分是<strong>无监督聚类</strong>经典题：没有「标准答案标签」，也没有 Kaggle 式提交排名。<br />
+目标是：<strong>用可重复的簇结构支撑运营动作</strong>（高净值低消费 vs 低净值高消费等），而不是 chasing leaderboard。</p>
+</section>
+<section id="id2">
+<h2>你将学到<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>聚类前必须做<strong>特征缩放</strong>（Income / Score 量纲不同）</p></li>
+<li><p><strong>选 k</strong>：肘部法（inertia）+ 轮廓系数（silhouette）互相印证</p></li>
+<li><p><strong>稳定性</strong>：换 <code class="docutils literal notranslate"><span class="pre">random_state</span></code> 时，标签置换不应剧烈变化（用 ARI 量化）</p></li>
+<li><p><strong>wanglaoshi</strong>：<code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code> 做分布摸底；本案例<strong>不做</strong> <code class="docutils literal notranslate"><span class="pre">SubmissionGenerator</span></code>（非竞赛提交场景）</p></li>
+</ol>
+</section>
+<section id="k-means">
+<h2>理论：K-Means 的假设与局限<a class="headerlink" href="#k-means" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>假设：球形簇、近似等方差；对 Income-Score 散点通常尚可</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_init</span></code>：多次初始化取最优 inertia，减轻局部最优</p></li>
+<li><p>稳定性：客户细分要可解释 → 若换种子簇大幅重排，业务难以落地</p></li>
+</ul>
+</section>
+<section id="id3">
+<h2>数据<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>本地：<code class="docutils literal notranslate"><span class="pre">data/Mall_Customers.csv</span></code></p></li>
+<li><p>缺失：合成客户画像 DEMO</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">QUICK</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">RANDOM_STATE</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="c1"># 一键就绪：关警告 + 打印环境 + 设种子（勿再叠 JE.no_warning / filterwarnings）</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">ready</span>
+<span class="n">ready</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>1. 加载或合成<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'../../data/Mall_Customers.csv'</span><span class="p">)</span>
+<span class="n">DEMO</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'local'</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">DEMO</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">400</span> <span class="k">if</span> <span class="n">QUICK</span> <span class="k">else</span> <span class="mi">800</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">'CustomerID'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="s1">'Genre'</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">'Male'</span><span class="p">,</span> <span class="s1">'Female'</span><span class="p">],</span> <span class="n">n</span><span class="p">),</span>
+        <span class="s1">'Age'</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+        <span class="s1">'Annual Income (k$)'</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">140</span><span class="p">),</span>
+        <span class="s1">'Spending Score (1-100)'</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+    <span class="p">})</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'DEMO customers'</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="n">data_mode</span> <span class="o">=</span> <span class="s1">'demo'</span> <span class="k">if</span> <span class="n">DEMO</span> <span class="k">else</span> <span class="s1">'real'</span>
+<span class="n">n_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">DEMO</span><span class="p">:</span>
+    <span class="n">data_source</span> <span class="o">=</span> <span class="s1">'synthetic_demo'</span>
+    <span class="n">data_sha256</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">data_source</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="p">(</span><span class="s1">'openml:'</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">data_sha256</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_sha256</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'utf-8'</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_source</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'openml'</span><span class="p">):</span>
+                <span class="n">data_source</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'inmemory:</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">data_sha256</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="nb">print</span><span class="p">({</span><span class="s1">'data_mode'</span><span class="p">:</span> <span class="n">data_mode</span><span class="p">,</span> <span class="s1">'n_rows'</span><span class="p">:</span> <span class="n">n_rows</span><span class="p">,</span> <span class="s1">'data_source'</span><span class="p">:</span> <span class="n">data_source</span><span class="p">,</span> <span class="s1">'data_sha256'</span><span class="p">:</span> <span class="n">data_sha256</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="eda">
+<h2>2. EDA<a class="headerlink" href="#eda" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.analyze</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataAnalyzer</span>
+
+<span class="n">analyzer</span> <span class="o">=</span> <span class="n">DataAnalyzer</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">analyzer</span><span class="o">.</span><span class="n">get_basic_info</span><span class="p">())</span>
+<span class="n">display</span><span class="p">(</span><span class="n">analyzer</span><span class="o">.</span><span class="n">basic_statistics</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2>3. 选数值特征与散点直觉<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'Annual Income (k$)'</span><span class="p">,</span> <span class="s1">'Spending Score (1-100)'</span><span class="p">,</span> <span class="s1">'Age'</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="s1">'id'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()][:</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'cluster features:'</span><span class="p">,</span> <span class="n">cols</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">X</span><span class="p">[</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Income vs Spending（未缩放）'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="k-silhouette">
+<h2>4. 缩放 + 搜 k（肘部 + Silhouette）<a class="headerlink" href="#k-silhouette" title="Link to this heading">#</a></h2>
+<p>轮廓系数 (s \in [-1,1])：越接近 1 表示点与同簇更紧、与他簇更疏。<br />
+肘部法看 inertia 下降放缓的 k；两者不一致时，优先结合<strong>业务可解释性</strong>定 k。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">silhouette_score</span>
+
+<span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">Xs</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">ks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">QUICK</span> <span class="k">else</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">inertias</span><span class="p">,</span> <span class="n">sils</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ks</span><span class="p">:</span>
+    <span class="n">km</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">lab</span> <span class="o">=</span> <span class="n">km</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+    <span class="n">inertias</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">km</span><span class="o">.</span><span class="n">inertia_</span><span class="p">)</span>
+    <span class="n">sils</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">silhouette_score</span><span class="p">(</span><span class="n">Xs</span><span class="p">,</span> <span class="n">lab</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ks</span><span class="p">),</span> <span class="n">inertias</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Elbow (inertia)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'k'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ks</span><span class="p">),</span> <span class="n">sils</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Silhouette'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'k'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">best_k</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ks</span><span class="p">)[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sils</span><span class="p">))]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'best_k by silhouette'</span><span class="p">,</span> <span class="n">best_k</span><span class="p">,</span> <span class="s1">'score'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">sils</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="ari">
+<h2>5. 多随机种子稳定性（ARI）<a class="headerlink" href="#ari" title="Link to this heading">#</a></h2>
+<p><strong>Adjusted Rand Index (ARI)</strong> 衡量两套标签在忽略置换意义下的一致性，1 为完全一致。<br />
+对固定 <code class="docutils literal notranslate"><span class="pre">best_k</span></code>，扫描多个 <code class="docutils literal notranslate"><span class="pre">random_state</span></code>；若 ARI 均值过低，说明解不稳定，不宜直接用于运营命名。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">adjusted_rand_score</span>
+
+<span class="n">base</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">best_k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+<span class="n">seeds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">12</span> <span class="k">if</span> <span class="n">QUICK</span> <span class="k">else</span> <span class="mi">30</span><span class="p">))</span>
+<span class="n">aris</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="n">seeds</span><span class="p">:</span>
+    <span class="n">lab</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">best_k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+    <span class="n">aris</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adjusted_rand_score</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">lab</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'ARI vs base seed: mean'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">aris</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">'min'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">aris</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'sample ARI'</span><span class="p">,</span> <span class="n">aris</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h2>6. 最终簇标签与画像表<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">best_k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+<span class="n">profile</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">profile</span><span class="p">[</span><span class="s1">'cluster'</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
+<span class="n">centers</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'cluster'</span><span class="p">)[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">display</span><span class="p">(</span><span class="n">centers</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">best_k</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">labels</span> <span class="o">==</span> <span class="n">c</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Xs</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Xs</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.55</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'cluster </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">' (scaled)'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">' (scaled)'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'KMeans k=</span><span class="si">{</span><span class="n">best_k</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vs">
+<h2>6.1 未缩放 vs 缩放：轮廓系数对照<a class="headerlink" href="#vs" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">km_raw</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">best_k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">km_scl</span> <span class="o">=</span> <span class="n">labels</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'silhouette raw'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">silhouette_score</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">km_raw</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'silhouette scaled'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">silhouette_score</span><span class="p">(</span><span class="n">Xs</span><span class="p">,</span> <span class="n">km_scl</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="genre">
+<h2>6.2 类别变量 <code class="docutils literal notranslate"><span class="pre">Genre</span></code> 与簇的列联<a class="headerlink" href="#genre" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="s1">'Genre'</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">profile</span><span class="p">[</span><span class="s1">'cluster'</span><span class="p">],</span> <span class="n">profile</span><span class="p">[</span><span class="s1">'Genre'</span><span class="p">],</span> <span class="n">normalize</span><span class="o">=</span><span class="s1">'index'</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'无 Genre 列'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id7">
+<h2>6.3 理论：ARI 与种子敏感性<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>ARI 接近 1 说明簇划分在标签置换意义下稳定。<br />
+若 <code class="docutils literal notranslate"><span class="pre">min(ARI)</span> <span class="pre">&lt;</span> <span class="pre">0.7</span></code>，建议增大 <code class="docutils literal notranslate"><span class="pre">n_init</span></code>、尝试 GMM（软分配）或与业务专家共创 k。<br />
+<strong>本案例不是提交竞赛</strong>：无需 <code class="docutils literal notranslate"><span class="pre">SubmissionGenerator</span></code>；交付物是「可解释的 <code class="docutils literal notranslate"><span class="pre">CustomerID</span> <span class="pre">→</span> <span class="pre">cluster</span></code> 映射表」。</p>
+</section>
+<section id="id8">
+<h2>6.4 拓展阅读<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Davies–Bouldin</strong>：簇内散 / 簇间距，越小越好（与 silhouette 互补）</p></li>
+<li><p><strong>层次聚类</strong>：小 n 时可画树状图辅助选 k</p></li>
+<li><p><strong>SCatter 经典四象限</strong>：Income × Spending 平面上的「土豪 / 潜力 / 谨慎 / 普通」叙事</p></li>
+</ul>
+</section>
+<section id="id9">
+<h2>7. 与竞赛流程的区别<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>维度</p></th>
+<th class="head"><p>本案例</p></th>
+<th class="head"><p>典型 Kaggle 分类</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>标签</p></td>
+<td><p>无真值簇标签</p></td>
+<td><p>有监督 y</p></td>
+</tr>
+<tr class="row-odd"><td><p>指标</p></td>
+<td><p>轮廓/ARI/业务解读</p></td>
+<td><p>AUC/LogLoss</p></td>
+</tr>
+<tr class="row-even"><td><p>提交</p></td>
+<td><p><strong>不需要</strong></p></td>
+<td><p>SubmissionGenerator</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>若要将簇用于_campaign_，导出 <code class="docutils literal notranslate"><span class="pre">CustomerID,</span> <span class="pre">cluster</span></code> 即可，无需概率型预测文件。</p>
+</section>
+<section id="id10">
+<h2>8. 检查清单<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>[x] 缩放后聚类</p></li>
+<li><p>[x] elbow + silhouette 选 k</p></li>
+<li><p>[x] 多 seed ARI 稳定性</p></li>
+<li><p>[x] 簇均值画像</p></li>
+<li><p>[ ] 业务命名（如「理性消费者」「冲动型」）</p></li>
+<li><p>[ ] 与 A/B 活动对照验证</p></li>
+</ul>
+</section>
+<section id="q-a">
+<h2>附录：聚类实战 Q&amp;A（中文）<a class="headerlink" href="#q-a" title="Link to this heading">#</a></h2>
+<p><strong>Q：k 越大越好吗？</strong><br />
+A：否。k 增大 inertia 单调降，但 silhouette 常先升后降。要在可解释性与拟合间折中。</p>
+<p><strong>Q：为何不用 Accuracy？</strong><br />
+A：无标签场景根本没有 Accuracy。若用外部分群标签评估，那是另一套监督指标，不是本节重点。</p>
+<p><strong>Q：K-Means 对离群点？</strong><br />
+A：敏感。营销金额尖峰客户可单独做 anomaly 层，再对其子集聚类。</p>
+<p><strong>Q：稳定性多重要？</strong><br />
+A：运营要固定话术与 coupon 策略，ARI&lt;0.8 的解难以年度复用。可多 seed 投票或选 medoid 代表点。</p>
+<p><strong>Q：与 wanglaoshi 的关系？</strong><br />
+A：<code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code> 做分布与缺失；聚类本身用 sklearn。本案例 deliberately 不用 <code class="docutils literal notranslate"><span class="pre">SubmissionGenerator</span></code>，强调「洞察交付」而非排名。</p>
+<p><strong>Q：Gender/年龄要进模型吗？</strong><br />
+A：伦理与法规允许时可用于画像；若仅作切片报告，可不加入距离计算，避免敏感属性驱动分群。</p>
+</section>
+<section id="b">
+<h2>附录 B：导出簇分配（非竞赛提交）<a class="headerlink" href="#b" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="n">export</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[[</span><span class="s1">'CustomerID'</span><span class="p">,</span> <span class="s1">'cluster'</span><span class="p">]</span> <span class="o">+</span> <span class="n">cols</span><span class="p">]</span> <span class="k">if</span> <span class="s1">'CustomerID'</span> <span class="ow">in</span> <span class="n">profile</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="n">profile</span><span class="p">[[</span><span class="s1">'cluster'</span><span class="p">]</span> <span class="o">+</span> <span class="n">cols</span><span class="p">]</span>
+<span class="n">out_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'outputs/09_mall_customers'</span><span class="p">)</span>
+<span class="n">out_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">export</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span> <span class="o">/</span> <span class="s1">'cluster_assignments_preview.csv'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'wrote'</span><span class="p">,</span> <span class="n">out_path</span> <span class="o">/</span> <span class="s1">'cluster_assignments_preview.csv'</span><span class="p">,</span> <span class="s1">'rows preview'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">export</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="c">
+<h2>附录 C：课堂讨论题<a class="headerlink" href="#c" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>若 Marketing 坚持 k=6 但 silhouette 峰值在 k=4，你如何沟通？</p></li>
+<li><p>ARI 很高但簇中心业务难命名，是否仍上线？</p></li>
+<li><p>新增线上特征（会员等级）后，旧簇映射如何迁移？</p></li>
+<li><p>对比 K-Means 与 Gaussian Mixture 的软分配优劣。</p></li>
+</ol>
+</section>
+<section id="id11">
+<h2>读本：客户细分项目里程碑（非竞赛）<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>阶段</p></th>
+<th class="head"><p>产出</p></th>
+<th class="head"><p>成功标准</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>W1</p></td>
+<td><p>清洗 + EDA</p></td>
+<td><p>无重复 CustomerID，缺失率表</p></td>
+</tr>
+<tr class="row-odd"><td><p>W2</p></td>
+<td><p>缩放 + 选 k</p></td>
+<td><p>silhouette≥0.25 且业务认可 k</p></td>
+</tr>
+<tr class="row-even"><td><p>W3</p></td>
+<td><p>稳定性</p></td>
+<td><p>ARI mean≥0.85</p></td>
+</tr>
+<tr class="row-odd"><td><p>W4</p></td>
+<td><p>画像 + 命名</p></td>
+<td><p>每簇一句话价值主张</p></td>
+</tr>
+<tr class="row-even"><td><p>W5</p></td>
+<td><p>试点</p></td>
+<td><p>小规模 campaign 对照组 uplift</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>聚类 ≠ 分类：没有唯一真值标签，因此<strong>不要为了虚构 leaderboard 造 submission 文件</strong>。wanglaoshi 的价值在 <code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code> 帮你在 W1 快速发现量纲与缺失；后续距离与聚类仍用 sklearn 标准栈。</p>
+<section id="id12">
+<h3>距离、尺度与特征权重<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<p>欧氏距离对量纲敏感：Income 以千美元计、Score 0–100，若不 <code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code>，Income 将主导距离。<br />
+若业务认为 Spending 更重要，可在缩放后对列乘权重（例如 <code class="docutils literal notranslate"><span class="pre">Xs[:,1]</span> <span class="pre">*=</span> <span class="pre">1.5</span></code>），但须在文档写明，否则年度复现困难。</p>
+</section>
+<section id="id13">
+<h3>从簇到行动<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
+<p>常见四象限叙事（Income × Spending）：高收高花「喜爱型」、高收低花「谨慎型」、低收高花「冲动型」、低收低花「普通型」。数字标签需经 centroid 验证，不可生搬硬套。</p>
+</section>
+</section>
+<section id="mall-customers-90">
+<h2>教师导读：mall customers 课堂 90 分钟脚本<a class="headerlink" href="#mall-customers-90" title="Link to this heading">#</a></h2>
+<p><strong>0–10 min</strong>：展示未缩放散点，问「哪个轴主导距离？」引导学生说 Income。<br />
+<strong>10–25 min</strong>：<code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code> + 重新散点；强调聚类是几何问题。<br />
+<strong>25–40 min</strong>：肘部 + silhouette 双图；出现分歧时投票，不要求唯一 k。<br />
+<strong>40–55 min</strong>：多 seed ARI；若 min ARI 低，现场调高 n_init 示范。<br />
+<strong>55–70 min</strong>：簇画像 + 四象限叙事；讨论「簇不等于人格标签」的伦理。<br />
+<strong>70–85 min</strong>：对比 Kaggle 分类赛：无 submission、无 PR-AUC。<br />
+<strong>85–90 min</strong>：收口 wanglaoshi：<code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code> 在 W1，聚类在 sklearn。</p>
+<section id="id14">
+<h3>学生常问<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>「silhouette 为负是否不能用？」部分点本就处于簇边界，可接受。</p></li>
+<li><p>「能否用 DBSCAN？」可以，但要讲密度参数 ε；本案例用 KMeans 因可重复。</p></li>
+<li><p>「Genre 要 one-hot 吗？」可选侧车分析，不必进距离，除非业务明确要按性别分群。</p></li>
+</ul>
+</section>
+<section id="id15">
+<h3>与仓库其它案例链接<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>E05：监督 + 极端不均衡 + PR-AUC + 提交</p></li>
+<li><p>E10：监督 + 高基数 TE 泄漏</p></li>
+<li><p>E11：回归 + log 目标 + ModelEnsemble</p></li>
+</ul>
+<p>本案例刻意<strong>不</strong>走提交流程，避免学生误认为所有数据集都要 <code class="docutils literal notranslate"><span class="pre">SubmissionGenerator</span></code>。</p>
+</section>
+</section>
+<section id="id16">
+<h2>附录 B：稳定性实验设计<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<p>固定 k，改 <code class="docutils literal notranslate"><span class="pre">random_state</span></code> 多次，计算标签与参考运行的 ARI。不稳定 → 特征不足或 k 不合理。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">adjusted_rand_score</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">Xn</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="s1">'number'</span><span class="p">)</span>
+    <span class="n">Xs</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Xn</span><span class="p">)</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+    <span class="n">aris</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span> <span class="k">if</span> <span class="n">QUICK</span> <span class="k">else</span> <span class="mi">15</span><span class="p">):</span>
+        <span class="n">lab</span><span class="o">=</span><span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+        <span class="n">aris</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adjusted_rand_score</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">lab</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'ARI mean±std vs seed0:'</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">aris</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">aris</span><span class="p">)))</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="mall-customers">
+<h2>深度阅读与作业（Mall Customers）<a class="headerlink" href="#mall-customers" title="Link to this heading">#</a></h2>
+<section id="id17">
+<h3>必读观点<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>无监督任务用轮廓系数与 <strong>多种子稳定性</strong>，不是 Accuracy。</p></li>
+<li><p>k 的选择要能讲出业务分层（高消费/价格敏感等）。</p></li>
+<li><p>标准化影响距离型聚类结果。</p></li>
+</ol>
+</section>
+<section id="id18">
+<h3>书面作业<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>报告 k=3..8 的轮廓系数曲线。</p></li>
+<li><p>计算多种子 ARI 稳定性。</p></li>
+<li><p>为最终簇写 3 句运营话术（禁止虚构因果）。</p></li>
+</ol>
+</section>
+</section>
+<section id="id19">
+<h2>课堂讨论记录区（请学生填写）<a class="headerlink" href="#id19" title="Link to this heading">#</a></h2>
+<p>主题：09_mall_customers</p>
+<ol class="arabic simple">
+<li><p>本日最重要的一个概念：________________</p></li>
+<li><p>我曾犯过的一个泄露/划分错误：________________</p></li>
+<li><p>对应的 wanglaoshi API：________________</p></li>
+<li><p>若重做实验，我将固定的种子与协议：________________</p></li>
+</ol>
+<p>（以下为延长阅读摘要，帮助达到课程阅读量）</p>
+<p>数据分析正统流程始终是：<strong>问题定义 → 数据质量 → 协议（划分/指标）→ 基线 → 诊断 → 交付</strong>。任何跳过协议直接调参的行为，都会在换数据时暴露。本课数据集的经典地位，来自它能把上述某几环的错误放大到「肉眼可见」。请把本笔记与仓库 <code class="docutils literal notranslate"><span class="pre">docs/API_REFERENCE.md</span></code>、<code class="docutils literal notranslate"><span class="pre">book/lessons/</span></code> 精讲对照阅读。</p>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./cases"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../practice/08_bike_sharing.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">练习：Bike Sharing</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../practice/09_mall_customers.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">练习：Mall Customers</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目录
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">案例定位</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">你将学到</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#k-means">理论：K-Means 的假设与局限</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">数据</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">1. 加载或合成</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eda">2. EDA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">3. 选数值特征与散点直觉</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#k-silhouette">4. 缩放 + 搜 k（肘部 + Silhouette）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ari">5. 多随机种子稳定性（ARI）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">6. 最终簇标签与画像表</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs">6.1 未缩放 vs 缩放：轮廓系数对照</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#genre">6.2 类别变量 <code class="docutils literal notranslate"><span class="pre">Genre</span></code> 与簇的列联</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">6.3 理论：ARI 与种子敏感性</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">6.4 拓展阅读</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">7. 与竞赛流程的区别</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">8. 检查清单</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-a">附录：聚类实战 Q&amp;A（中文）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b">附录 B：导出簇分配（非竞赛提交）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#c">附录 C：课堂讨论题</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">读本：客户细分项目里程碑（非竞赛）</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">距离、尺度与特征权重</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">从簇到行动</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mall-customers-90">教师导读：mall customers 课堂 90 分钟脚本</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">学生常问</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">与仓库其它案例链接</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">附录 B：稳定性实验设计</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mall-customers">深度阅读与作业（Mall Customers）</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">必读观点</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">书面作业</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">课堂讨论记录区（请学生填写）</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+作者： WangLaoShi
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+/* 基线工坊：真正加宽正文 + 自适应
+ *
+ * pydata-sphinx-theme 默认：
+ *   .bd-page-width { max-width: 88rem }
+ *   .bd-article-container { max-width: 60em }  ← 正文偏窄的主因
+ * 还必须放宽 .bd-container / .bd-container__inner，否则外侧仍留白。
+ * 官方说明：两条规则必须分开写，合并选择器会输给主题默认 specificity。
+ * https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/layout.html
+ */
+
+/* ---------- 1) 外层：吃满视口 ---------- */
+.bd-container {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.bd-container .bd-container__inner {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.bd-page-width {
+  max-width: 100% !important;
+}
+
+/* 顶栏同样吃满（顶栏也套了 bd-page-width） */
+.bd-header .bd-header__inner.bd-page-width,
+header.bd-header .bd-page-width {
+  max-width: 100% !important;
+}
+
+/* ---------- 2) 中间正文：从 60em 放宽 ---------- */
+/* 与主题默认选择器同级，并加 !important，避免被 sphinx-book 覆盖 */
+.bd-main .bd-content .bd-article-container {
+  max-width: 100% !important; /* default 60em */
+  width: 100% !important;
+}
+
+.bd-main .bd-content {
+  max-width: 100% !important;
+  width: 100% !important;
+  justify-content: flex-start !important; /* 默认 center 会让窄栏居中显得更「空」 */
+  flex-grow: 1;
+}
+
+.bd-main {
+  flex-grow: 1;
+  max-width: 100% !important;
+}
+
+/* 可读性：超宽屏正文不必贴死边缘；限制行长但仍远宽于 60em */
+.bd-article {
+  max-width: min(96rem, 100%) !important;
+  width: 100%;
+  margin-inline: 0; /* 左对齐主栏，不再居中成细条 */
+  padding-inline: clamp(0.75rem, 2vw, 2rem);
+  box-sizing: border-box;
+}
+
+/* ---------- 3) Notebook / 表格 / 图：小屏可横滑 ---------- */
+div.cell_output,
+div.highlight,
+div.cell div.highlight,
+pre,
+.bd-article table,
+.bd-article .table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.bd-article table {
+  display: block;
+  width: 100%;
+}
+
+.bd-article img,
+.bd-article .no-scaled-link img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------- 4) 断点：平板 / 手机 ---------- */
+@media (max-width: 1200px) {
+  .bd-main .bd-content .bd-article-container {
+    max-width: 100% !important;
+  }
+
+  .bd-article {
+    max-width: 100% !important;
+    padding-inline: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .bd-page-width,
+  .bd-container,
+  .bd-container .bd-container__inner {
+    max-width: 100% !important;
+  }
+
+  .bd-article h1 {
+    font-size: 1.55rem;
+  }
+
+  .bd-article h2 {
+    font-size: 1.25rem;
+  }
+
+  .bd-article pre,
+  .bd-article code {
+    font-size: 0.85em;
+  }
+
+  /* 侧栏打开时正文仍可滚动，避免整页锁死 */
+  .bd-main {
+    min-width: 0;
+  }
+}
+
+/* 顶栏公告：允许换行，避免小屏被裁切 */
+.bd-header-announcement,
+#bd-header-announcement {
+  white-space: normal !important;
+  line-height: 1.45;
+  text-align: left;
+  padding: 0.4rem 0.75rem;
+}

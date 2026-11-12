@@ -1,0 +1,1469 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>中文术语表 &#8212; 基线工坊 · 从 EDA 到提交</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3ccecbf1" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=15296eb0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/glossary';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="数据分析能力覆盖矩阵" href="analysis-coverage.html" />
+    <link rel="prev" title="练习总览（E01–E22）" href="../practice/overview.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">基线工坊 · 从 EDA 到提交</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">搜索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">开始学习</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../start/learning-path.html">学习路径</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">安装环境</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/first-hour.html">第一小时：最小闭环</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/binder.html">一键云端运行（Binder）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">公开接口教程</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/README.html">公开接口教程（1.15.1+）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01_ready_and_eda.html">01 · ready + EDA（Iris / Tips）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02_compete_baseline.html">02 · compete 基线与提交（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03_features_encode.html">03 · features 编码（合成高基数表）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04_analytics_stats.html">04 · analytics 统计工具（合成 A/B）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/05_business_pipeline.html">05 · business 流水线（合成订单）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/06_ml_preprocess.html">06 · ml 预处理与建模（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07_leakage_and_cv.html">07 · 泄漏检测 + 分层 CV（Titanic）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/08_timeseries_tools.html">08 · 时序工具（合成季节序列）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/09_calibration_fairness.html">09 · 校准 + 分组公平（Breast cancer）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/10_testing_repro.html">10 · 测试与复现治理（Iris）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/11_runtime_toolkit.html">11 · runtime 工具箱（VERSIONS / Jupyter / 下载）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/12_analyze_helpers.html">12 · analyze 函数与辅助类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/13_compete_advanced.html">13 · compete 进阶（集成 / 重要性 / 追踪 / 调参）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/14_analytics_extra.html">14 · analytics 其余（异常 / 排序 / 生存）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/15_ml_toolkit.html">15 · ml 工具箱（特征 / 评估 / DL 入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/16_business_stages.html">16 · business 阶段函数（公开入口全扫）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/17_testing_extra.html">17 · _testing 其余（契约 / 图表元数据 / 回归汇总）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">使用手册（类与方法）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../handbook/README.html">使用手册（类与方法 · 带案例）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/01_data_analyzer.html">使用手册 01 · <code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/02_feature_engineer.html">使用手册 02 · <code class="docutils literal notranslate"><span class="pre">AdvancedFeatureEngineer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/03_compete_toolkit.html">使用手册 03 · <code class="docutils literal notranslate"><span class="pre">compete</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/04_analytics_toolkit.html">使用手册 04 · <code class="docutils literal notranslate"><span class="pre">analytics</span></code> 工具箱</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/05_ml_guide.html">使用手册 05 · <code class="docutils literal notranslate"><span class="pre">ml</span></code> 公开接口</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbook/06_business_guide.html">使用手册 06 · <code class="docutils literal notranslate"><span class="pre">business</span></code> 业务分析</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">精讲课（先于案例）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lessons/overview.html">精讲课总览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/leakage.html">精讲：三类数据泄露</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/cv_and_splits.html">精讲：交叉验证与划分策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/submission_contracts.html">精讲：提交文件契约</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/feature_fit_discipline.html">精讲：特征工程的拟合纪律</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/business_traceability.html">精讲：业务数字可追溯</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lessons/common_mistakes.html">精讲：常见错误墙</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">三条主线</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tracks/analyzer.html">主线：Analyzer / EDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/competition.html">主线：竞赛工具链</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracks/business.html">主线：业务流水线</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">进阶案例（E01–E22）</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../cases/overview.html">进阶案例总览（E01–E22）</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/01_iris.html">E01 Iris（Fisher 1936）：多分类、决策边界与分层验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/01_iris.html">练习：Iris（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/02_titanic.html">E02 Titanic：缺失机制、特征工程与训练/验证隔离</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/02_titanic.html">练习：Titanic（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/04_breast_cancer.html">E04 Breast Cancer（Wisconsin）：量纲、PCA 与召回权衡</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/04_breast_cancer.html">练习：Breast Cancer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/12_digit_recognizer.html">E12 Digit Recognizer：高维向量、降维直觉与错分分析</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/12_digit_recognizer.html">练习：Digits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/06_california_housing.html">E06 California Housing：空间自相关与「虚高」的随机验证</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/06_california_housing.html">练习：California Housing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/03_wine_quality.html">E03 Wine Quality：有序评分、不均衡与双任务视角</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/03_wine_quality.html">练习：Wine Quality</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/07_abalone.html">E07 Abalone：混合类型、域知识年龄与泄漏安全编码</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/07_abalone.html">练习：Abalone</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/08_bike_sharing.html">E08 Bike Sharing：时间序列划分、滞后特征与泄漏检测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/08_bike_sharing.html">练习：Bike Sharing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/09_mall_customers.html">E09 Mall Customers：缩放、聚类数与稳定性</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/09_mall_customers.html">练习：Mall Customers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/10_adult_census.html">E10 Adult Census：折内目标编码与分组表现</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/10_adult_census.html">练习：Adult Census（绑定 wanglaoshi API）</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/05_credit_card_fraud.html">E05 Credit Card Fraud：时间划分、极端不均衡与 PR-AUC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/05_credit_card_fraud.html">练习：Credit Card Fraud</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/11_house_prices.html">E11 House Prices：高维混合、缺失含义与集成</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/11_house_prices.html">练习：House Prices</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/13_ab_testing.html">E13 A/B 试验：功效、效应量与两比例检验</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/13_ab_testing.html">练习：E13 A/B 试验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/14_hypothesis_testing.html">E14 假设检验：t / χ² / 单因素 ANOVA</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/14_hypothesis_testing.html">练习：E14 假设检验</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/15_timeseries_forecast.html">E15 时间序列：分解、平稳性与基线预测</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/15_timeseries_forecast.html">练习：E15 时序分解预测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/16_survival_churn.html">E16 生存 / 流失：Kaplan–Meier 与删失</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/16_survival_churn.html">练习：E16 生存流失</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/17_text_eda.html">E17 文本 EDA：浅特征、词袋与分类基线</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/17_text_eda.html">练习：E17 文本 EDA</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/18_anomaly_detection.html">E18 异常检测：IsolationForest（无标签场景）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/18_anomaly_detection.html">练习：E18 异常检测</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/19_association_rules.html">E19 关联规则：购物篮支持度 / 置信度 / 提升度</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/19_association_rules.html">练习：E19 关联规则</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/20_causal_did.html">E20 因果入门：合成双重差分（DiD）</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/20_causal_did.html">练习：E20 因果 DiD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/21_order_refund_reconciliation.html">E21 订单、明细与退款三表对账：防止连接后金额翻倍</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/21_order_refund_reconciliation.html">练习：E21 三表对账</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/22_movielens_ndcg.html">E22 MovieLens 电影推荐：用 NDCG@10 评估 Top‑K 排序</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/22_movielens_ndcg.html">练习：E22 MovieLens NDCG</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">业务专章</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cases/business_pipeline.html">业务流水线专章：从接收到可交付报告</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../practice/business_pipeline.html">练习：业务流水线</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">练习与术语</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../practice/overview.html">练习总览（E01–E22）</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">中文术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis-coverage.html">数据分析能力覆盖矩阵</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">参考与证据</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="api.html">公开 API（教材入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-inventory.html">A01 公开 API 盘点</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project-status.html">项目进度（摘要）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="skill-mapping.html">A02 Skill → API / 配置 / 校验 / 测试映射</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependencies.html">依赖说明（核心 / 可选 / 文件怎么用）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="evidence.html">Advanced Notebook 跑通证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">如何贡献 / 如何改手册</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="下载此页面">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/reference/glossary.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="下载源文件"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="列印成 PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="全屏模式"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="亮色"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="暗色"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>中文术语表</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目录 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">包架构与稳定公开接口（1.15.1+）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">工作流与交付</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">探索与质量</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">特征与泄漏</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">验证与模型</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">分类与不均衡</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">回归与变换</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">降维与相关</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">聚类</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">假设检验与试验</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">时间序列</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">生存、排序、公平与校准</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">文本与异常</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">因果与进阶</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">竞赛与业务常用缩写</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1>中文术语表<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>进阶课号一律 <strong>E01–E22</strong>（勿与配套勾选 EM01–EM05 混淆）。<br />
+包版本以 <strong>1.15.1+</strong> 为准：公开写法走<strong>稳定公开接口</strong>，根上旧模块名为过渡 shim。</p>
+<p>按主题分组；与 <a class="reference internal" href="api.html"><span class="std std-doc">API 参考</span></a>、<a class="reference internal" href="analysis-coverage.html"><span class="std std-doc">分析覆盖矩阵</span></a>、仓库 <a class="reference external" href="https://github.com/WangLaoShi/wanglaoshi-pypi/blob/main/docs/ARCHITECTURE.md"><code class="docutils literal notranslate"><span class="pre">docs/ARCHITECTURE.md</span></code></a> 对照。包内符号用反引号标出。</p>
+<section id="id2">
+<h2>包架构与稳定公开接口（1.15.1+）<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>稳定公开接口</p></td>
+<td><p>Facade / public API surface</p></td>
+<td><p>对外稳定入口子包（设计模式 Facade）；实现细节藏在子模块里</p></td>
+</tr>
+<tr class="row-odd"><td><p>接口模块</p></td>
+<td><p>facade module</p></td>
+<td><p>某一稳定公开接口对应的子包，如 <code class="docutils literal notranslate"><span class="pre">compete</span></code>、<code class="docutils literal notranslate"><span class="pre">analyze</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>竞赛公开接口</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wanglaoshi.compete</span></code></p></td>
+<td><p>提交、基线、泄漏、集成、CV、调参、实验追踪</p></td>
+</tr>
+<tr class="row-odd"><td><p>分析公开接口</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wanglaoshi.analyze</span></code></p></td>
+<td><p>EDA / 报告（<code class="docutils literal notranslate"><span class="pre">DataAnalyzer</span></code>、<code class="docutils literal notranslate"><span class="pre">analyze_data</span></code> 等）</p></td>
+</tr>
+<tr class="row-even"><td><p>特征公开接口</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wanglaoshi.features</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AdvancedFeatureEngineer</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>分析学公开接口</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wanglaoshi.analytics</span></code></p></td>
+<td><p>时序 / 统计 / 校准 / 公平 / 异常 / 排序 / 生存</p></td>
+</tr>
+<tr class="row-even"><td><p>ML 公开接口</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wanglaoshi.ml</span></code></p></td>
+<td><p>预处理与建模；<code class="docutils literal notranslate"><span class="pre">TORCH_AVAILABLE</span></code> 标识是否装了 torch</p></td>
+</tr>
+<tr class="row-odd"><td><p>运行时公开接口</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wanglaoshi.runtime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ready</span></code> / <code class="docutils literal notranslate"><span class="pre">VERSIONS</span></code> / <code class="docutils literal notranslate"><span class="pre">JupyterEnv</span></code> / 字体 / 下载</p></td>
+</tr>
+<tr class="row-even"><td><p>测试公开接口</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wanglaoshi._testing</span></code></p></td>
+<td><p>断言、分数下限、数据台账、实验上下文、回归摘要</p></td>
+</tr>
+<tr class="row-odd"><td><p>业务包</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wanglaoshi.business</span></code></p></td>
+<td><p>Skill 固化流水线（接收→清洗→指标→结论→归档）</p></td>
+</tr>
+<tr class="row-even"><td><p>shim</p></td>
+<td><p>compatibility shim</p></td>
+<td><p>根上旧路径转发到公开接口；<strong>新代码勿依赖</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>legacy</p></td>
+<td><p>soft-deprecated</p></td>
+<td><p>如 <code class="docutils literal notranslate"><span class="pre">Analyzer_Plain</span></code> / <code class="docutils literal notranslate"><span class="pre">wqe</span></code>；导入有警告</p></td>
+</tr>
+<tr class="row-even"><td><p>静默 legacy</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">WANGLAOSHI_SILENCE_LEGACY=1</span></code></p></td>
+<td><p>关闭 Plain/wqe 的 DeprecationWarning</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>推荐导入示例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">ready</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.analyze</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataAnalyzer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.compete</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuickBaseline</span><span class="p">,</span> <span class="n">SubmissionGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.features</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdvancedFeatureEngineer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.analytics</span><span class="w"> </span><span class="kn">import</span> <span class="n">StatsToolkit</span><span class="p">,</span> <span class="n">TimeSeriesTools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.ml</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataPreprocessor</span><span class="p">,</span> <span class="n">MLModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi.business</span><span class="w"> </span><span class="kn">import</span> <span class="n">BusinessPipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wanglaoshi._testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">assert_close</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>工作流与交付<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>基线</p></td>
+<td><p>baseline</p></td>
+<td><p>可复现、可提交的第一版预测流水线</p></td>
+</tr>
+<tr class="row-odd"><td><p>快速基线</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compete.QuickBaseline</span></code></p></td>
+<td><p>一键切分、训练、评估、可选提交文件</p></td>
+</tr>
+<tr class="row-even"><td><p>就绪</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">runtime.ready</span></code></p></td>
+<td><p>Notebook 一键关警告、打环境信息、设随机种子</p></td>
+</tr>
+<tr class="row-odd"><td><p>环境信息</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">runtime.VERSIONS</span></code></p></td>
+<td><p>检查 / 展示已装库版本</p></td>
+</tr>
+<tr class="row-even"><td><p>阶段结果</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">StageResult</span></code></p></td>
+<td><p>流水线每步状态：<code class="docutils literal notranslate"><span class="pre">passed</span></code> / <code class="docutils literal notranslate"><span class="pre">warning</span></code> / <code class="docutils literal notranslate"><span class="pre">blocked</span></code> / <code class="docutils literal notranslate"><span class="pre">skipped</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>提交契约</p></td>
+<td><p>submission contract</p></td>
+<td><p>行序/ID/列名与评测机约定一致</p></td>
+</tr>
+<tr class="row-even"><td><p>提交生成器</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compete.SubmissionGenerator</span></code></p></td>
+<td><p>按模板写出提交 CSV；需明确 <code class="docutils literal notranslate"><span class="pre">prediction_type</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>泄漏检测</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compete.LeakageDetector</span></code></p></td>
+<td><p>查目标泄漏、时间泄漏等常见坑</p></td>
+</tr>
+<tr class="row-even"><td><p>实验追踪</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compete.ExperimentTracker</span></code></p></td>
+<td><p>记录参数、指标与产物路径</p></td>
+</tr>
+<tr class="row-odd"><td><p>业务流水线</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BusinessPipeline</span></code></p></td>
+<td><p>可追溯多阶段业务分析管线（D01–D12）</p></td>
+</tr>
+<tr class="row-even"><td><p>指标登记</p></td>
+<td><p>metric registry</p></td>
+<td><p>指标口径版本化（<code class="docutils literal notranslate"><span class="pre">validate_metric_dict</span></code>）</p></td>
+</tr>
+<tr class="row-odd"><td><p>证据回放</p></td>
+<td><p>evidence replay</p></td>
+<td><p>CI/脚本重跑 notebook 并落盘摘要</p></td>
+</tr>
+<tr class="row-even"><td><p>分数下限</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SCORE_FLOORS</span></code> / <code class="docutils literal notranslate"><span class="pre">assert_above_floor</span></code></p></td>
+<td><p>回归门槛：分数不得低于约定地板</p></td>
+</tr>
+<tr class="row-odd"><td><p>数据台账</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DataRegistry</span></code></p></td>
+<td><p>登记数据集来源、协议、版本与校验</p></td>
+</tr>
+<tr class="row-even"><td><p>实验上下文</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ExperimentContext</span></code></p></td>
+<td><p>固定种子与依赖版本快照，便于复现</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id4">
+<h2>探索与质量<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>探索性分析</p></td>
+<td><p>EDA</p></td>
+<td><p>描述、缺失、分布、相关、可视化</p></td>
+</tr>
+<tr class="row-odd"><td><p>数据剖析器</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">analyze.DataAnalyzer</span></code></p></td>
+<td><p>一站式 EDA / 报告辅助</p></td>
+</tr>
+<tr class="row-even"><td><p>便捷分析</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">analyze_data</span></code> / <code class="docutils literal notranslate"><span class="pre">analyze_notebook</span></code></p></td>
+<td><p>函数式入口；Notebook 优先模块函数</p></td>
+</tr>
+<tr class="row-odd"><td><p>缺失机制</p></td>
+<td><p>MCAR/MAR/MNAR</p></td>
+<td><p>完全随机 / 依赖观测 / 依赖未观测</p></td>
+</tr>
+<tr class="row-even"><td><p>异常值</p></td>
+<td><p>outlier</p></td>
+<td><p>偏离主体分布的点；未必是错误</p></td>
+</tr>
+<tr class="row-odd"><td><p>重复行</p></td>
+<td><p>duplicate</p></td>
+<td><p>完全或键重复；需业务判定去留</p></td>
+</tr>
+<tr class="row-even"><td><p>口径</p></td>
+<td><p>definition</p></td>
+<td><p>指标分子分母、时间窗、归属规则</p></td>
+</tr>
+<tr class="row-odd"><td><p>一致性校验</p></td>
+<td><p>consistency check</p></td>
+<td><p>主键、外键、汇总勾稽</p></td>
+</tr>
+<tr class="row-even"><td><p>对账</p></td>
+<td><p>reconciliation</p></td>
+<td><p>汇总结果与源表勾稽一致</p></td>
+</tr>
+<tr class="row-odd"><td><p>连接膨胀</p></td>
+<td><p>join inflation</p></td>
+<td><p>一对多 join 导致行数/金额被放大</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id5">
+<h2>特征与泄漏<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>特征工程</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">features.AdvancedFeatureEngineer</span></code></p></td>
+<td><p>衍生、编码、缩放、文本/时间特征</p></td>
+</tr>
+<tr class="row-odd"><td><p>目标编码</p></td>
+<td><p>target encoding / <code class="docutils literal notranslate"><span class="pre">target_encode</span></code></p></td>
+<td><p>用目标统计编码类别；<strong>必须折内</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>频率编码</p></td>
+<td><p>frequency encoding / <code class="docutils literal notranslate"><span class="pre">frequency_encode</span></code></p></td>
+<td><p>用出现频次压缩类别；无监督</p></td>
+</tr>
+<tr class="row-odd"><td><p>时间特征</p></td>
+<td><p>datetime features</p></td>
+<td><p>从时间戳拆出的周期与滞后候选</p></td>
+</tr>
+<tr class="row-even"><td><p>滞后特征</p></td>
+<td><p>lag</p></td>
+<td><p>用历史值预测未来；禁止用「未来」</p></td>
+</tr>
+<tr class="row-odd"><td><p>数据泄漏</p></td>
+<td><p>leakage</p></td>
+<td><p>训练时用不该在预测时可得的信息</p></td>
+</tr>
+<tr class="row-even"><td><p>时间泄漏</p></td>
+<td><p>time leakage</p></td>
+<td><p>用了预测时刻之后的信息</p></td>
+</tr>
+<tr class="row-odd"><td><p>目标泄漏</p></td>
+<td><p>target leakage</p></td>
+<td><p>特征直接或间接含目标</p></td>
+</tr>
+<tr class="row-even"><td><p>折内安全</p></td>
+<td><p>fold-safe</p></td>
+<td><p>编码/统计只在当前训练折拟合，再映射到验证折</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id6">
+<h2>验证与模型<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>交叉验证</p></td>
+<td><p>CV / <code class="docutils literal notranslate"><span class="pre">compete.CrossValidator</span></code></p></td>
+<td><p>K 折等；估计泛化</p></td>
+</tr>
+<tr class="row-odd"><td><p>分组交叉验证</p></td>
+<td><p>GroupKFold / <code class="docutils literal notranslate"><span class="pre">group_cv</span></code></p></td>
+<td><p>同组样本同进同出，防泄漏</p></td>
+</tr>
+<tr class="row-even"><td><p>时间序列切分</p></td>
+<td><p>TimeSeriesSplit</p></td>
+<td><p>训练窗严格早于验证窗</p></td>
+</tr>
+<tr class="row-odd"><td><p>分层抽样</p></td>
+<td><p>stratified</p></td>
+<td><p>保持类别比例</p></td>
+</tr>
+<tr class="row-even"><td><p>过拟合</p></td>
+<td><p>overfitting</p></td>
+<td><p>训练集好、泛化差</p></td>
+</tr>
+<tr class="row-odd"><td><p>欠拟合</p></td>
+<td><p>underfitting</p></td>
+<td><p>模型容量不足或特征不足</p></td>
+</tr>
+<tr class="row-even"><td><p>集成</p></td>
+<td><p>ensemble / <code class="docutils literal notranslate"><span class="pre">compete.ModelEnsemble</span></code></p></td>
+<td><p>多模型融合（平均、加权、堆叠）</p></td>
+</tr>
+<tr class="row-odd"><td><p>调参</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compete.HyperparameterOptimizer</span></code></p></td>
+<td><p>网格 / 随机 / Optuna（需 extras）</p></td>
+</tr>
+<tr class="row-even"><td><p>特征重要性</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compete.FeatureImportanceAnalyzer</span></code></p></td>
+<td><p>排列/模型内置重要性等</p></td>
+</tr>
+<tr class="row-odd"><td><p>校准</p></td>
+<td><p>calibration / <code class="docutils literal notranslate"><span class="pre">analytics</span></code></p></td>
+<td><p>预测概率与真实频率对齐</p></td>
+</tr>
+<tr class="row-even"><td><p>预处理</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ml.DataPreprocessor</span></code></p></td>
+<td><p>缺失、编码等表数据预处理</p></td>
+</tr>
+<tr class="row-odd"><td><p>ML 模型封装</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ml.MLModel</span></code></p></td>
+<td><p>统一接口的经典机器学习模型</p></td>
+</tr>
+<tr class="row-even"><td><p>torch 可用</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TORCH_AVAILABLE</span></code></p></td>
+<td><p>是否已安装 PyTorch；不影响 sklearn 部分</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id7">
+<h2>分类与不均衡<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>准确率</p></td>
+<td><p>accuracy</p></td>
+<td><p>正确数 / 总数；类别不平衡时易误导</p></td>
+</tr>
+<tr class="row-odd"><td><p>精确率</p></td>
+<td><p>precision</p></td>
+<td><p>预测为正中真正为正的比例</p></td>
+</tr>
+<tr class="row-even"><td><p>召回率</p></td>
+<td><p>recall / TPR</p></td>
+<td><p>真实为正中被找出的比例</p></td>
+</tr>
+<tr class="row-odd"><td><p>F1</p></td>
+<td><p>F1-score</p></td>
+<td><p>精确率与召回的调和平均</p></td>
+</tr>
+<tr class="row-even"><td><p>ROC-AUC</p></td>
+<td><p>ROC AUC</p></td>
+<td><p>排序能力；不关心阈值</p></td>
+</tr>
+<tr class="row-odd"><td><p>PR-AUC</p></td>
+<td><p>average precision</p></td>
+<td><p>不均衡下更敏感的排序/检出指标</p></td>
+</tr>
+<tr class="row-even"><td><p>混淆矩阵</p></td>
+<td><p>confusion matrix</p></td>
+<td><p>TP/FP/FN/TN</p></td>
+</tr>
+<tr class="row-odd"><td><p>类别不平衡</p></td>
+<td><p>class imbalance</p></td>
+<td><p>正负样本比例悬殊</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">class_weight</span></code></p></td>
+<td><p>class_weight</p></td>
+<td><p>提高少数类误分代价</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id8">
+<h2>回归与变换<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MAE</p></td>
+<td><p>mean absolute error</p></td>
+<td><p>绝对误差均值；稳健、可解释</p></td>
+</tr>
+<tr class="row-odd"><td><p>RMSE</p></td>
+<td><p>root mean squared error</p></td>
+<td><p>对大误差更敏感</p></td>
+</tr>
+<tr class="row-even"><td><p>R²</p></td>
+<td><p>coefficient of determination</p></td>
+<td><p>相对基线方差的解释比例</p></td>
+</tr>
+<tr class="row-odd"><td><p>目标变换</p></td>
+<td><p>target transform</p></td>
+<td><p>如 log1p；逆变换后才可比业务单位</p></td>
+</tr>
+<tr class="row-even"><td><p>残差</p></td>
+<td><p>residual</p></td>
+<td><p>真实 − 预测；用于诊断异方差/结构</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id9">
+<h2>降维与相关<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>相关矩阵</p></td>
+<td><p>correlation</p></td>
+<td><p>线性相关强度；非因果</p></td>
+</tr>
+<tr class="row-odd"><td><p>共线性</p></td>
+<td><p>multicollinearity</p></td>
+<td><p>特征高度相关，系数不稳</p></td>
+</tr>
+<tr class="row-even"><td><p>PCA</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pca_analysis</span></code></p></td>
+<td><p>主成分；方差方向，非监督</p></td>
+</tr>
+<tr class="row-odd"><td><p>方差解释比</p></td>
+<td><p>explained variance ratio</p></td>
+<td><p>各主成分解释的方差比例</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id10">
+<h2>聚类<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>K-Means</p></td>
+<td><p>k-means</p></td>
+<td><p>距离型划分聚类</p></td>
+</tr>
+<tr class="row-odd"><td><p>轮廓系数</p></td>
+<td><p>silhouette</p></td>
+<td><p>簇内紧、簇间离的综合分</p></td>
+</tr>
+<tr class="row-even"><td><p>稳定性</p></td>
+<td><p>stability</p></td>
+<td><p>种子/子样扰动下簇是否可复现</p></td>
+</tr>
+<tr class="row-odd"><td><p>业务可读标签</p></td>
+<td><p>persona</p></td>
+<td><p>用统计画像给簇命名，避免只报簇号</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id11">
+<h2>假设检验与试验<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>统计工具箱</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">analytics.StatsToolkit</span></code></p></td>
+<td><p>常见检验与试验辅助入口</p></td>
+</tr>
+<tr class="row-odd"><td><p>试验设计</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ExperimentDesign</span></code></p></td>
+<td><p>样本量 / 功效等试验设计辅助</p></td>
+</tr>
+<tr class="row-even"><td><p>零假设</p></td>
+<td><p>H₀</p></td>
+<td><p>默认「无效应 / 无差异」</p></td>
+</tr>
+<tr class="row-odd"><td><p>备择假设</p></td>
+<td><p>H₁</p></td>
+<td><p>研究者关心的差异或效应</p></td>
+</tr>
+<tr class="row-even"><td><p>p 值</p></td>
+<td><p>p-value</p></td>
+<td><p>在 H₀ 下看到当前或更极端结果的概率</p></td>
+</tr>
+<tr class="row-odd"><td><p>效应量</p></td>
+<td><p>effect size</p></td>
+<td><p>差异「有多大」（如 Cohen’s d、提升百分点）</p></td>
+</tr>
+<tr class="row-even"><td><p>功效</p></td>
+<td><p>power</p></td>
+<td><p>真实有效应时能检出的概率</p></td>
+</tr>
+<tr class="row-odd"><td><p>一类错误</p></td>
+<td><p>Type I / α</p></td>
+<td><p>误拒真 H₀（假阳性）</p></td>
+</tr>
+<tr class="row-even"><td><p>二类错误</p></td>
+<td><p>Type II / β</p></td>
+<td><p>未拒假 H₀（假阴性）</p></td>
+</tr>
+<tr class="row-odd"><td><p>t 检验</p></td>
+<td><p>t-test</p></td>
+<td><p>均值差（正态/大样本近似）</p></td>
+</tr>
+<tr class="row-even"><td><p>卡方检验</p></td>
+<td><p>χ²</p></td>
+<td><p>分类表独立性 / 拟合优度</p></td>
+</tr>
+<tr class="row-odd"><td><p>方差分析</p></td>
+<td><p>ANOVA</p></td>
+<td><p>多组均值是否有差异</p></td>
+</tr>
+<tr class="row-even"><td><p>A/B 试验</p></td>
+<td><p>A/B test</p></td>
+<td><p>随机分流比较两（多）版本</p></td>
+</tr>
+<tr class="row-odd"><td><p>样本量</p></td>
+<td><p>sample size</p></td>
+<td><p>达目标功效所需观测数</p></td>
+</tr>
+<tr class="row-even"><td><p>多重比较</p></td>
+<td><p>multiple testing</p></td>
+<td><p>多次检验抬高假阳性；需校正</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id12">
+<h2>时间序列<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>时序工具</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">analytics.TimeSeriesTools</span></code></p></td>
+<td><p>分解、检验、切分等辅助</p></td>
+</tr>
+<tr class="row-odd"><td><p>趋势</p></td>
+<td><p>trend</p></td>
+<td><p>长期方向性变化</p></td>
+</tr>
+<tr class="row-even"><td><p>季节性</p></td>
+<td><p>seasonality</p></td>
+<td><p>固定周期波动</p></td>
+</tr>
+<tr class="row-odd"><td><p>残差分量</p></td>
+<td><p>remainder</p></td>
+<td><p>分解后剩余项</p></td>
+</tr>
+<tr class="row-even"><td><p>平稳性</p></td>
+<td><p>stationarity</p></td>
+<td><p>均值/方差不随时间系统性漂移</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADF</p></td>
+<td><p>Augmented Dickey–Fuller</p></td>
+<td><p>单位根/平稳性检验之一</p></td>
+</tr>
+<tr class="row-even"><td><p>季节分解</p></td>
+<td><p>STL / classical decomp</p></td>
+<td><p>拆成趋势+季节+残差</p></td>
+</tr>
+<tr class="row-odd"><td><p>前瞻偏差</p></td>
+<td><p>look-ahead bias</p></td>
+<td><p>用未来信息训练/评估</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id13">
+<h2>生存、排序、公平与校准<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>删失</p></td>
+<td><p>censoring</p></td>
+<td><p>观测结束时事件未发生</p></td>
+</tr>
+<tr class="row-odd"><td><p>生存函数</p></td>
+<td><p>S(t)</p></td>
+<td><p>t 时刻仍未事件的概率</p></td>
+</tr>
+<tr class="row-even"><td><p>Kaplan–Meier</p></td>
+<td><p>KM</p></td>
+<td><p>非参数生存曲线估计</p></td>
+</tr>
+<tr class="row-odd"><td><p>风险比</p></td>
+<td><p>hazard ratio</p></td>
+<td><p>相对风险（模型语境）</p></td>
+</tr>
+<tr class="row-even"><td><p>流失</p></td>
+<td><p>churn</p></td>
+<td><p>客户停止使用等事件</p></td>
+</tr>
+<tr class="row-odd"><td><p>生存分析器</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">analytics.SurvivalAnalyzer</span></code></p></td>
+<td><p>生存/流失相关辅助</p></td>
+</tr>
+<tr class="row-even"><td><p>NDCG</p></td>
+<td><p>NDCG</p></td>
+<td><p>排序质量指标（归一化折损累计增益）</p></td>
+</tr>
+<tr class="row-odd"><td><p>排序指标</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">analytics.RankingMetrics</span></code></p></td>
+<td><p>排序任务评估入口</p></td>
+</tr>
+<tr class="row-even"><td><p>分组指标</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GroupMetricsReport</span></code></p></td>
+<td><p>按敏感属性切片的表现</p></td>
+</tr>
+<tr class="row-odd"><td><p>公平性</p></td>
+<td><p>fairness</p></td>
+<td><p>组间 TPR/FPR 等差异是否可接受</p></td>
+</tr>
+<tr class="row-even"><td><p>可靠性图</p></td>
+<td><p>reliability diagram</p></td>
+<td><p>预测概率分箱 vs 真实频率</p></td>
+</tr>
+<tr class="row-odd"><td><p>ECE</p></td>
+<td><p>expected calibration error</p></td>
+<td><p>分箱加权的校准误差</p></td>
+</tr>
+<tr class="row-even"><td><p>Brier 分数</p></td>
+<td><p>Brier score</p></td>
+<td><p>概率预测均方误差</p></td>
+</tr>
+<tr class="row-odd"><td><p>校准报告</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CalibrationReport</span></code></p></td>
+<td><p>校准诊断结构化结果</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id14">
+<h2>文本与异常<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>词袋</p></td>
+<td><p>bag-of-words</p></td>
+<td><p>词频向量，忽略语序</p></td>
+</tr>
+<tr class="row-odd"><td><p>TF-IDF</p></td>
+<td><p>tf-idf</p></td>
+<td><p>词频 × 逆文档频率</p></td>
+</tr>
+<tr class="row-even"><td><p>文本特征</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">extract_text_features</span></code></p></td>
+<td><p>长度、标点、简单统计等浅特征</p></td>
+</tr>
+<tr class="row-odd"><td><p>异常检测</p></td>
+<td><p>anomaly detection / <code class="docutils literal notranslate"><span class="pre">AnomalyDetector</span></code></p></td>
+<td><p>无标签或弱标签下找离群模式</p></td>
+</tr>
+<tr class="row-even"><td><p>Isolation Forest</p></td>
+<td><p>iForest</p></td>
+<td><p>随机划分隔离异常点</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id15">
+<h2>因果与进阶<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>术语</p></th>
+<th class="head"><p>英文 / 符号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>相关 ≠ 因果</p></td>
+<td><p>association ≠ causation</p></td>
+<td><p>观测相关不能直接当干预效应</p></td>
+</tr>
+<tr class="row-odd"><td><p>混杂</p></td>
+<td><p>confounding</p></td>
+<td><p>同时影响处理与结果的变量</p></td>
+</tr>
+<tr class="row-even"><td><p>双重差分</p></td>
+<td><p>DiD</p></td>
+<td><p>处理组与对照组的趋势差之差</p></td>
+</tr>
+<tr class="row-odd"><td><p>工具变量</p></td>
+<td><p>IV</p></td>
+<td><p>外生变异识别因果</p></td>
+</tr>
+<tr class="row-even"><td><p>关联规则</p></td>
+<td><p>association rules</p></td>
+<td><p>购物篮「若买 A 则买 B」</p></td>
+</tr>
+<tr class="row-odd"><td><p>对称聚合</p></td>
+<td><p>symmetric aggregate</p></td>
+<td><p>一对多连接后防重复计数的度量语义</p></td>
+</tr>
+<tr class="row-even"><td><p>同比</p></td>
+<td><p>YoY</p></td>
+<td><p>与去年同期对比；需处理缺期/零基数/未完月</p></td>
+</tr>
+<tr class="row-odd"><td><p>头腰尾</p></td>
+<td><p>value tiers</p></td>
+<td><p>按贡献分层（如收入头部客户）</p></td>
+</tr>
+<tr class="row-even"><td><p>先验敏感性</p></td>
+<td><p>prior sensitivity</p></td>
+<td><p>贝叶斯结论随先验变化的程度</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id16">
+<h2>竞赛与业务常用缩写<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>缩写</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>OOF</p></td>
+<td><p>Out-of-fold，折外预测</p></td>
+</tr>
+<tr class="row-odd"><td><p>LB</p></td>
+<td><p>Leaderboard，排行榜分</p></td>
+</tr>
+<tr class="row-even"><td><p>CV</p></td>
+<td><p>Cross-validation</p></td>
+</tr>
+<tr class="row-odd"><td><p>SMOTE 等</p></td>
+<td><p>过采样；竞赛慎用，优先 <code class="docutils literal notranslate"><span class="pre">class_weight</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>KPI</p></td>
+<td><p>关键业务指标</p></td>
+</tr>
+<tr class="row-odd"><td><p>ETL</p></td>
+<td><p>抽取-转换-加载</p></td>
+</tr>
+<tr class="row-even"><td><p>D01–D12</p></td>
+<td><p>业务流水线阶段编号（intake→归档等）</p></td>
+</tr>
+<tr class="row-odd"><td><p>E01–E22</p></td>
+<td><p>进阶 Notebook 课号</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<p><strong>维护：</strong> 新增进阶课或公开接口变更时同步补词；签名与可运行示例以仓库 <code class="docutils literal notranslate"><span class="pre">docs/API_REFERENCE.md</span></code> 为准，架构以 <code class="docutils literal notranslate"><span class="pre">docs/ARCHITECTURE.md</span></code> 为准。</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./reference"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../practice/overview.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">练习总览（E01–E22）</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="analysis-coverage.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">数据分析能力覆盖矩阵</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目录
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">包架构与稳定公开接口（1.15.1+）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">工作流与交付</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">探索与质量</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">特征与泄漏</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">验证与模型</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">分类与不均衡</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">回归与变换</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">降维与相关</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">聚类</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">假设检验与试验</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">时间序列</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">生存、排序、公平与校准</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">文本与异常</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">因果与进阶</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">竞赛与业务常用缩写</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+作者： WangLaoShi
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
